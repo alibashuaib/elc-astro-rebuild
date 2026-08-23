@@ -1,0 +1,81 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbSchema } from '../../lib/schema';
+// NOTE: localBusinessSchema() is intentionally NOT emitted here yet — its NAP/geo
+// fields are still placeholders (see lib/schema.ts TODOs). Emitting fake address/
+// coordinates would actively hurt local SEO. Wire it in once the GBP NAP mismatch
+// (plan §8) is resolved with real data.
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', url: 'https://elc.com.sa/en/' },
+  { name: 'Contact', url: 'https://elc.com.sa/en/contact' },
+]);
+---
+
+<Layout
+  locale="en"
+  path="/contact"
+  title="Contact ELC"
+  description="Get in touch with ELC — location, hours, and contact form."
+  jsonLd={breadcrumbs}
+>
+  <section class="container prose-page">
+    <h1>Contact</h1>
+
+    <div class="contact-grid">
+      <div>
+        <h2>Location & hours</h2>
+        <p>Placeholder — real address must match the Google Business Profile listing exactly (plan §8).</p>
+        <p>Placeholder — opening hours.</p>
+
+        <h2>WhatsApp</h2>
+        <p>Use the floating WhatsApp button on any page for the fastest response.</p>
+      </div>
+
+      <form class="contact-form" method="POST" action="/api/contact">
+        <!--
+          Static form, works with JS fully disabled (plain POST). Action target is a
+          placeholder — plan calls for "lightweight serverless form handling, no full
+          backend" (e.g. a small Cloudflare/Netlify function or a service like Formspree).
+          Not wired to a real endpoint yet — see project TODOs.
+        -->
+        <label>
+          Name
+          <input type="text" name="name" required />
+        </label>
+        <label>
+          Email
+          <input type="email" name="email" required />
+        </label>
+        <label>
+          Message
+          <textarea name="message" rows="5" required></textarea>
+        </label>
+        <button type="submit" class="btn btn-primary">Send message</button>
+      </form>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .prose-page { padding-block: var(--space-6); }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    max-width: 60rem;
+  }
+  .contact-form { display: flex; flex-direction: column; gap: var(--space-3); }
+  .contact-form label { display: flex; flex-direction: column; gap: var(--space-1); font-weight: 600; }
+  .contact-form input, .contact-form textarea {
+    font: inherit;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg-raised);
+    color: var(--color-ink);
+  }
+  @media (max-width: 720px) {
+    .contact-grid { grid-template-columns: 1fr; }
+  }
+</style>

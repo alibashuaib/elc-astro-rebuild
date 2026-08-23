@@ -1,0 +1,34 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
+  { name: 'من نحن', url: 'https://elc.com.sa/ar/about' },
+]);
+---
+
+<Layout
+  locale="ar"
+  path="/about"
+  title="من نحن — ELC"
+  description="ELC مركز لغة إنجليزية معتمد من TVTC. تعرّف على اعتمادنا ومرافقنا ومدرّبينا."
+  jsonLd={[organizationSchema(), breadcrumbs]}
+>
+  <section class="container prose-page">
+    <h1>من نحن</h1>
+
+    <h2>الاعتماد</h2>
+    <p>محتوى مؤقت — سيتم إضافة رابط سجل اعتماد TVTC القابل للتحقق هنا (البند المفتوح رقم 8 في الخطة).</p>
+
+    <h2>المرافق</h2>
+    <p>محتوى مؤقت — وصف وصور المرافق.</p>
+
+    <h2>المدرّبون</h2>
+    <p>محتوى مؤقت — ملفات تعريف المدرّبين بأسمائهم ومؤهلاتهم.</p>
+  </section>
+</Layout>
+
+<style>
+  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+</style>

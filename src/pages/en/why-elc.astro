@@ -1,0 +1,40 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbSchema } from '../../lib/schema';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', url: 'https://elc.com.sa/en/' },
+  { name: 'Why ELC', url: 'https://elc.com.sa/en/why-elc' },
+]);
+---
+
+<Layout
+  locale="en"
+  path="/why-elc"
+  title="Why ELC — What Makes Us Different"
+  description="How ELC compares on accreditation, class structure, and outcomes — for learners weighing their options."
+  jsonLd={breadcrumbs}
+>
+  <section class="container prose-page">
+    <h1>Why ELC</h1>
+    <p>
+      Written for the "Comparison Shopper" — someone weighing a few language centers
+      before enrolling. Compare on facts, not by disparaging alternatives.
+    </p>
+
+    <h2>What to look for in a language center</h2>
+    <ul>
+      <li>Verifiable accreditation (TVTC)</li>
+      <li>Named, credentialed instructors — not anonymous "expert teachers"</li>
+      <li>Structured curriculum with a visible CEFR level path (A1→C2)</li>
+      <li>Transparent pricing and duration, published up front</li>
+    </ul>
+
+    <h2>Where ELC stands on each</h2>
+    <p>Placeholder — fill in with real, specific comparisons once available.</p>
+  </section>
+</Layout>
+
+<style>
+  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+</style>

@@ -1,0 +1,46 @@
+---
+// Kept from the current site — a working conversion channel today (plan §4).
+// Plain <a>, no JS: works identically with scripting disabled.
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+// TODO: replace with the real business WhatsApp number.
+const phone = '966500000000';
+---
+
+<a
+  class="whatsapp-fab"
+  href={`https://wa.me/${phone}`}
+  target="_blank"
+  rel="noopener"
+  aria-label={label}
+>
+  <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" aria-hidden="true">
+    <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.06c-.24.68-1.4 1.31-1.93 1.35-.5.05-1.02.24-3.4-.71-2.87-1.14-4.71-4.06-4.85-4.25-.14-.19-1.16-1.54-1.16-2.94s.73-2.09.99-2.38c.26-.28.57-.35.76-.35h.55c.18 0 .42-.03.65.5.24.55.81 1.9.88 2.04.07.14.12.3.02.49-.1.19-.15.3-.3.46-.14.16-.3.36-.43.48-.14.14-.29.29-.13.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.61-.07.16-.19.7-.81.88-1.09.19-.28.37-.23.62-.14.26.09 1.62.76 1.9.9.28.14.47.21.53.33.07.12.07.68-.17 1.36z" />
+  </svg>
+</a>
+
+<style>
+  .whatsapp-fab {
+    position: fixed;
+    inset-inline-end: var(--space-4);
+    bottom: var(--space-4);
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: #25d366;
+    color: #fff;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.2);
+  }
+  .whatsapp-fab:hover { background: #1ebc59; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .whatsapp-fab { transition: transform var(--motion-fast) var(--ease); }
+    .whatsapp-fab:hover { transform: scale(1.06); }
+  }
+</style>

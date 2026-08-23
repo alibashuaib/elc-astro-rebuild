@@ -1,0 +1,41 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', url: 'https://elc.com.sa/en/' },
+  { name: 'About', url: 'https://elc.com.sa/en/about' },
+]);
+---
+
+<Layout
+  locale="en"
+  path="/about"
+  title="About ELC"
+  description="ELC is a TVTC-accredited English language center. Learn about our accreditation, facilities, and instructors."
+  jsonLd={[organizationSchema(), breadcrumbs]}
+>
+  <section class="container prose-page">
+    <h1>About ELC</h1>
+
+    <h2>Accreditation</h2>
+    <p>
+      Placeholder — link to the verifiable TVTC accreditation record here once available
+      (plan §8: real photography and credentials still to be collected).
+    </p>
+
+    <h2>Facilities</h2>
+    <p>Placeholder — facilities description and photos.</p>
+
+    <h2>Instructors</h2>
+    <p>
+      Placeholder — named, credentialed instructor profiles go here. This directly fixes
+      the audit's "no named instructors" E-E-A-T gap; each instructor should get a name,
+      photo, and credentials, not an anonymous "our team."
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+</style>

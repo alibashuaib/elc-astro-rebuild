@@ -14,8 +14,8 @@ const year = new Date().getFullYear();
       <p>© {year} ELC. All rights reserved.</p>
     </div>
     <nav aria-label="Legal">
-      <a href={localizePath(locale, '/legal/terms')}>Terms</a>
-      <a href={localizePath(locale, '/legal/privacy')}>Privacy</a>
+      <a href={localizePath(locale, '/legal/terms')}>{t('footer.terms')}</a>
+      <a href={localizePath(locale, '/legal/privacy')}>{t('footer.privacy')}</a>
     </nav>
   </div>
 </footer>

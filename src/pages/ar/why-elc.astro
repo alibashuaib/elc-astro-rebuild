@@ -1,0 +1,37 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { breadcrumbSchema } from '../../lib/schema';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
+  { name: 'لماذا ELC', url: 'https://elc.com.sa/ar/why-elc' },
+]);
+---
+
+<Layout
+  locale="ar"
+  path="/why-elc"
+  title="لماذا ELC — ما الذي يميّزنا"
+  description="كيف تقارن ELC من حيث الاعتماد وهيكل الدورات والنتائج — لمن يقارن بين الخيارات."
+  jsonLd={breadcrumbs}
+>
+  <section class="container prose-page">
+    <h1>لماذا ELC</h1>
+    <p>موجّه لمن يقارن بين مراكز اللغة قبل التسجيل — مقارنة بالحقائق، دون الإساءة للبدائل.</p>
+
+    <h2>ما الذي يجب البحث عنه في مركز لغة</h2>
+    <ul>
+      <li>اعتماد قابل للتحقق (TVTC)</li>
+      <li>مدرّبون بأسماء ومؤهلات واضحة</li>
+      <li>منهج منظم بمسار مستويات CEFR واضح (A1 إلى C2)</li>
+      <li>أسعار ومدد شفافة ومعلنة مسبقًا</li>
+    </ul>
+
+    <h2>موقف ELC في كل نقطة</h2>
+    <p>محتوى مؤقت — سيتم إضافة مقارنات حقيقية ومحددة لاحقًا.</p>
+  </section>
+</Layout>
+
+<style>
+  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+</style>

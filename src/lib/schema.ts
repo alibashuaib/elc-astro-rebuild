@@ -23,6 +23,37 @@ export function organizationSchema() {
   };
 }
 
+export function localBusinessSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    '@id': `${SITE_URL}/#organization`,
+    name: 'ELC',
+    url: SITE_URL,
+    // NAP must exactly match the corrected Google Business Profile listing —
+    // do not fill this in until the "Knowledge Edifice Institute" vs "ELC" mismatch
+    // (plan §8) is resolved with the client, or the mismatch gets baked back in.
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '', // TODO
+      addressLocality: '', // TODO
+      addressRegion: '', // TODO
+      postalCode: '', // TODO
+      addressCountry: 'SA',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 0, // TODO — must match GBP exactly
+      longitude: 0, // TODO
+    },
+    telephone: '', // TODO
+    priceRange: '$$', // TODO — confirm band once pricing is finalized
+    openingHoursSpecification: [
+      // TODO — real hours, per corrected GBP listing
+    ],
+  };
+}
+
 export function breadcrumbSchema(items: { name: string; url: string }[]) {
   return {
     '@context': 'https://schema.org',
