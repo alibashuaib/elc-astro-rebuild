@@ -20,12 +20,26 @@ const breadcrumbs = breadcrumbSchema([
 
     <div class="contact-grid">
       <div>
-        <h2>الموقع وساعات العمل</h2>
-        <p>محتوى مؤقت — يجب أن يطابق العنوان الفعلي سجل Google Business Profile تمامًا (البند 8 في الخطة).</p>
-        <p>محتوى مؤقت — ساعات العمل.</p>
+        <h2>الموقع</h2>
+        <p>
+          جدة، حي الفيحاء، خلف البنك الأهلي.
+          <br />
+          <em>هذا وصف تقريبي من الموقع الحالي — يجب استبداله بعنوان رسمي بعد حل مشكلة تطابق NAP/GBP (البند 8 في الخطة)، وإضافة خريطة حقيقية هنا.</em>
+        </p>
+
+        <h2>الهاتف والبريد الإلكتروني</h2>
+        <ul class="contact-list">
+          <li><a class="numeric" href="tel:+966126305553">012 630 5553</a></li>
+          <li><a class="numeric" href="tel:+966126306030">012 630 6030</a></li>
+          <li><a class="numeric" href="tel:+966591799917">059 179 9917</a></li>
+          <li><a href="mailto:info@elc.com.sa">info@elc.com.sa</a></li>
+        </ul>
 
         <h2>واتساب</h2>
         <p>استخدم زر واتساب العائم في أي صفحة للحصول على أسرع رد.</p>
+
+        <h2>ساعات العمل</h2>
+        <p><em>غير معلنة على الموقع الحالي — تحتاج إلى الجدول الفعلي.</em></p>
       </div>
 
       <form class="contact-form" method="POST" action="/api/contact">
@@ -49,6 +63,8 @@ const breadcrumbs = breadcrumbSchema([
 
 <style>
   .prose-page { padding-block: var(--space-6); }
+  .contact-list { list-style: none; padding: 0; margin: 0 0 var(--space-4); }
+  .contact-list li { margin-bottom: var(--space-1); }
   .contact-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;

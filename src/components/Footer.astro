@@ -5,6 +5,14 @@ interface Props { locale: Locale }
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 const year = new Date().getFullYear();
+
+// Real contact/social details, pulled from the live elc.com.sa.
+const socialLinks = [
+  { label: 'Facebook', href: 'https://www.facebook.com/ELCJeddah' },
+  { label: 'Twitter', href: 'https://twitter.com/elcjeddah' },
+  { label: 'Instagram', href: 'https://www.instagram.com/elcjeddah' },
+  { label: 'Snapchat', href: 'https://www.snapchat.com/add/elcjeddah' },
+];
 ---
 
 <footer class="site-footer">
@@ -12,7 +20,17 @@ const year = new Date().getFullYear();
     <div>
       <strong>ELC</strong>
       <p>© {year} ELC. All rights reserved.</p>
+      <p>
+        <a class="numeric" href="tel:+966546656000">+966 54 665 6000</a>
+        &nbsp;·&nbsp;
+        <a href="mailto:info@elc.com.sa">info@elc.com.sa</a>
+      </p>
     </div>
+    <nav aria-label="Social">
+      {socialLinks.map((s) => (
+        <a href={s.href} target="_blank" rel="noopener">{s.label}</a>
+      ))}
+    </nav>
     <nav aria-label="Legal">
       <a href={localizePath(locale, '/legal/terms')}>{t('footer.terms')}</a>
       <a href={localizePath(locale, '/legal/privacy')}>{t('footer.privacy')}</a>
@@ -32,10 +50,11 @@ const year = new Date().getFullYear();
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-4);
   }
+  .footer-inner p { margin: var(--space-1) 0 0; }
   .footer-inner nav a {
     color: var(--color-ink-muted);
-    margin-inline-start: var(--space-3);
+    margin-inline-end: var(--space-3);
   }
 </style>

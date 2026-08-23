@@ -1,6 +1,6 @@
 ---
 title: Kids General English
-summary: Age-appropriate English learning for kids, building confidence through play and structure.
+summary: Age-appropriate English learning for kids aged 6-14, across 6 structured levels.
 category: kids
 level: A1
 price: 900
@@ -16,5 +16,9 @@ faqs:
 draft: false
 ---
 
-Full curriculum breakdown, schedule, and enrollment details go here — placeholder
-content until real copy is written (plan doc §8, open item).
+Helps kids aged 6-14 learn English across 6 structured levels, taught by
+certified instructors (CELTA/TESOL/DELTA or equivalent) in a dedicated
+children's section of the center.
+
+Full curriculum breakdown, schedule, and pricing still need real copy (plan
+doc §8, open item) — the current live site doesn't publish these either.

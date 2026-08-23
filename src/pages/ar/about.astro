@@ -8,22 +8,30 @@ const breadcrumbs = breadcrumbSchema([
   { name: 'من نحن', url: 'https://elc.com.sa/ar/about' },
 ]);
 
+// محتوى حقيقي مأخوذ من صفحة "من نحن" في الموقع الحالي elc.com.sa.
 const blocks = [
   {
     icon: 'certificate' as const,
     title: 'الاعتماد',
-    text: 'محتوى مؤقت — سيتم إضافة رابط سجل اعتماد TVTC القابل للتحقق هنا.',
+    text: 'معتمدون من TVTC منذ التأسيس عام 2010. الشهادات معترف بها داخل السعودية ومقبولة لدى المؤسسات التعليمية وأصحاب العمل. TODO: إضافة رابط سجل TVTC القابل للتحقق.',
   },
   {
     icon: 'building' as const,
     title: 'المرافق',
-    text: 'محتوى مؤقت — وصف وصور حقيقية للمرافق، بعد جمعها.',
+    text: 'أقسام مخصصة للأطفال وللطالبات، فصول مجهزة بتقنيات حديثة وأجهزة عرض، مكتبة للقراءة، كافيتيريا داخلية، ساعات دعم إضافية، وخدمات نقل. ما زالت هناك حاجة لصور حقيقية (البند 8).',
   },
   {
     icon: 'instructor' as const,
     title: 'المدرّبون',
-    text: 'محتوى مؤقت — ملفات تعريف المدرّبين بأسمائهم وصورهم ومؤهلاتهم، بدلًا من "فريقنا" المجهول.',
+    text: 'يحمل المدرّبون شهادات معتمدة دوليًا — CELTA أو TESOL أو DELTA أو ما يعادلها — ويشاركون في تدريب مستمر. TODO: هذا لا يحل فجوة "عدم وجود مدرّبين بأسمائهم" — الأسماء والصور والمؤهلات الفردية غير منشورة على الموقع الحالي أيضًا، وتحتاج إلى جمعها.',
   },
+];
+
+const mission = 'تقديم تعليم عالي الجودة للغة الإنجليزية يمكّن المتعلمين من تحقيق طموحاتهم الأكاديمية والمهنية.';
+const stats = [
+  { value: '+15,000', label: 'طالب تم تدريبهم' },
+  { value: '+9', label: 'برامج دراسية' },
+  { value: '2010', label: 'التأسيس' },
 ];
 ---
 
@@ -36,6 +44,16 @@ const blocks = [
 >
   <section class="container prose-page">
     <h1>من نحن</h1>
+    <p class="mission">{mission}</p>
+
+    <div class="stats-row">
+      {stats.map((s) => (
+        <div class="stat">
+          <span class="stat-value numeric">{s.value}</span>
+          <span class="stat-label">{s.label}</span>
+        </div>
+      ))}
+    </div>
 
     <div class="about-grid">
       {blocks.map((b) => (
@@ -51,6 +69,18 @@ const blocks = [
 
 <style>
   .prose-page { padding-block: var(--space-6); }
+  .mission { font-size: var(--fs-lg); color: var(--color-ink-muted); max-width: 55ch; }
+  .stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    margin: var(--space-5) 0;
+    padding: var(--space-4) 0;
+    border-block: 1px solid var(--color-border);
+  }
+  .stat { display: flex; flex-direction: column; }
+  .stat-value { font-size: var(--fs-xl); font-weight: 700; color: var(--color-crimson-text); }
+  .stat-label { color: var(--color-ink-muted); font-size: var(--fs-sm); }
   .about-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));

@@ -1,6 +1,6 @@
 ---
 title: Adults General English
-summary: A structured path from beginner to fluent, for adult learners with real-world speaking goals.
+summary: A structured path across 8 levels from beginner to fluent, for adult learners with real-world speaking goals.
 category: adults
 level: B1
 price: 1200
@@ -16,8 +16,10 @@ faqs:
 draft: false
 ---
 
-Full curriculum breakdown, schedule, and enrollment details go here — placeholder
-content until real copy is written (plan doc §8, open item).
+Organized into 8 well-structured levels, so each trainee starts at the level
+that actually matches where they are. Full curriculum breakdown, schedule, and
+pricing still need real copy (plan doc §8, open item) — the current live site
+doesn't publish these either.
 
 ## Curriculum
 

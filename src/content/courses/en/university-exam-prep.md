@@ -1,6 +1,6 @@
 ---
-title: University & Exam Prep
-summary: Focused preparation for IELTS/TOEFL and university-readiness English.
+title: University & Exam Prep (PUP)
+summary: An intensive program for high school graduates — IELTS/TOEFL and university-readiness English.
 category: exam-prep
 level: C1
 price: 2200
@@ -16,8 +16,12 @@ faqs:
 draft: false
 ---
 
-Full curriculum breakdown, schedule, and enrollment details go here — placeholder
-content until real copy is written (plan doc §8, open item).
+Known on the current site as the PUP (Preparation for University Program) —
+an intensive program that establishes and qualifies high school graduates
+for English, including IELTS and TOEFL preparation.
+
+Full curriculum breakdown, schedule, and pricing still need real copy (plan
+doc §8, open item) — the current live site doesn't publish these either.
 
 ## What's covered
 

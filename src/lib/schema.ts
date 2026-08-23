@@ -14,15 +14,27 @@ export function organizationSchema(aggregateRating?: { rating: number; reviewCou
     '@type': 'EducationalOrganization',
     name: 'ELC',
     url: SITE_URL,
+    foundingDate: '2010', // real, from the live site's About page
+    email: 'info@elc.com.sa', // real
+    telephone: '+966546656000', // real (primary/WhatsApp number)
     // TODO: replace with the corrected legal/GBP name once the NAP mismatch is resolved
     // ("Knowledge Edifice Institute" vs "ELC" — see plan doc section 8).
+    // Locality is real (from the live site); street/region/postal/geo need the
+    // corrected GBP listing — a landmark description ("behind Al Ahli Bank") isn't
+    // a valid structured streetAddress, so it stays as visible page copy instead
+    // (see src/pages/{en,ar}/contact.astro), not schema.
     address: {
       '@type': 'PostalAddress',
       streetAddress: '', // TODO: fill from corrected GBP listing
-      addressLocality: '',
+      addressLocality: 'Jeddah',
       addressCountry: 'SA',
     },
+    // Real, from the live site's footer/social links.
     sameAs: [
+      'https://www.facebook.com/ELCJeddah',
+      'https://twitter.com/elcjeddah',
+      'https://www.instagram.com/elcjeddah',
+      'https://www.snapchat.com/add/elcjeddah',
       // TODO: add YouTube, LinkedIn — currently missing per audit
     ],
     ...(aggregateRating && {
@@ -47,8 +59,8 @@ export function localBusinessSchema() {
     // (plan §8) is resolved with the client, or the mismatch gets baked back in.
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '', // TODO
-      addressLocality: '', // TODO
+      streetAddress: '', // TODO — "Al Fayahaa district, behind Al Ahli Bank" isn't a valid streetAddress
+      addressLocality: 'Jeddah', // real
       addressRegion: '', // TODO
       postalCode: '', // TODO
       addressCountry: 'SA',
@@ -58,7 +70,7 @@ export function localBusinessSchema() {
       latitude: 0, // TODO — must match GBP exactly
       longitude: 0, // TODO
     },
-    telephone: '', // TODO
+    telephone: '+966546656000', // real
     priceRange: '$$', // TODO — confirm band once pricing is finalized
     openingHoursSpecification: [
       // TODO — real hours, per corrected GBP listing

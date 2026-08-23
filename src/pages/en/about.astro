@@ -8,22 +8,32 @@ const breadcrumbs = breadcrumbSchema([
   { name: 'About', url: 'https://elc.com.sa/en/about' },
 ]);
 
+// Real content pulled from the live elc.com.sa "About Us" page — replaces the
+// old placeholder copy. Instructor block still can't be fully fixed (see below):
+// the live site names no individual instructors, only qualification types.
 const blocks = [
   {
     icon: 'certificate' as const,
     title: 'Accreditation',
-    text: 'Placeholder — link to the verifiable TVTC accreditation record here once available.',
+    text: 'TVTC-accredited since our founding in 2010. Certificates are recognized within Saudi Arabia and accepted by educational institutions and employers. TODO: link the verifiable TVTC record once available.',
   },
   {
     icon: 'building' as const,
     title: 'Facilities',
-    text: 'Placeholder — facilities description and real photography, once collected.',
+    text: 'Dedicated sections for children and for female students, classrooms equipped with modern technology and projectors, a reading library, an indoor cafeteria, supplementary support hours, and transportation services. Real photography still needed (plan §8).',
   },
   {
     icon: 'instructor' as const,
     title: 'Instructors',
-    text: 'Placeholder — named, credentialed instructor profiles. Fixes the audit\'s "no named instructors" E-E-A-T gap: each instructor gets a name, photo, and credentials, not an anonymous "our team."',
+    text: 'Teachers hold internationally recognized certifications — CELTA, TESOL, DELTA, or equivalent — and take part in ongoing training. TODO: this still doesn\'t fix the audit\'s "no named instructors" gap — individual names, photos, and credentials aren\'t published on the current site either, and need to be collected.',
   },
+];
+
+const mission = 'Provide high-quality English language education that empowers learners to achieve their academic and professional aspirations.';
+const stats = [
+  { value: '15,000+', label: 'students taught' },
+  { value: '9+', label: 'course programs' },
+  { value: '2010', label: 'founded' },
 ];
 ---
 
@@ -36,6 +46,16 @@ const blocks = [
 >
   <section class="container prose-page">
     <h1>About ELC</h1>
+    <p class="mission">{mission}</p>
+
+    <div class="stats-row">
+      {stats.map((s) => (
+        <div class="stat">
+          <span class="stat-value numeric">{s.value}</span>
+          <span class="stat-label">{s.label}</span>
+        </div>
+      ))}
+    </div>
 
     <div class="about-grid">
       {blocks.map((b) => (
@@ -51,6 +71,18 @@ const blocks = [
 
 <style>
   .prose-page { padding-block: var(--space-6); }
+  .mission { font-size: var(--fs-lg); color: var(--color-ink-muted); max-width: 55ch; }
+  .stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    margin: var(--space-5) 0;
+    padding: var(--space-4) 0;
+    border-block: 1px solid var(--color-border);
+  }
+  .stat { display: flex; flex-direction: column; }
+  .stat-value { font-size: var(--fs-xl); font-weight: 700; color: var(--color-crimson-text); }
+  .stat-label { color: var(--color-ink-muted); font-size: var(--fs-sm); }
   .about-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
