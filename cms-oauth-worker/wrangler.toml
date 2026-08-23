@@ -1,0 +1,7 @@
+name = "elc-cms-oauth"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Secrets (set via `wrangler secret put <NAME>`, never committed):
+#   GITHUB_OAUTH_CLIENT_ID
+#   GITHUB_OAUTH_CLIENT_SECRET

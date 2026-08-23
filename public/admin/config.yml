@@ -1,17 +1,14 @@
 # Decap CMS config — git-backed visual editor for non-technical staff.
 #
 # TODO before this works in production:
-#   1. Create the GitHub repo and push this project.
-#   2. Set up a Decap OAuth provider (either Netlify's free OAuth proxy, even
-#      without using Netlify for hosting, or a small self-hosted one) and
-#      replace `repo` below with the real "owner/repo".
-#   3. Point base_url at that OAuth provider.
+#   Deploy cms-oauth-worker/ (see its README) and replace `base_url` below with
+#   the deployed Worker's URL.
 
 backend:
   name: github
   repo: alibashuaib/elc-astro-rebuild
   branch: main
-  base_url: https://TODO-oauth-provider.example.com
+  base_url: https://TODO-deploy-cms-oauth-worker.workers.dev
   auth_endpoint: auth
 
 # Draft/staging preview before anything goes live — important for price/schedule changes.
