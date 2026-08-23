@@ -2,11 +2,13 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import CourseCard from '../../../components/CourseCard.astro';
+import CourseFilter from '../../../components/CourseFilter.astro';
 import { breadcrumbSchema } from '../../../lib/schema';
 
 const allCourses = await getCollection('courses', (entry) => {
   return entry.id.startsWith('en/') && !entry.data.draft;
 });
+const categories = [...new Set(allCourses.map((c) => c.data.category))];
 
 const collectionPageSchema = {
   '@context': 'https://schema.org',
@@ -39,6 +41,8 @@ const breadcrumbs = breadcrumbSchema([
   <section class="container">
     <h1>Courses</h1>
     <p>Find the right course by level, duration, and price.</p>
+
+    <CourseFilter locale="en" categories={categories} />
 
     <div class="course-grid">
       {allCourses.map((course) => (

@@ -18,6 +18,12 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+        env:
+          # Optional — build succeeds without them (fetchGoogleReviews returns null
+          # and the testimonials section just doesn't render). Add as repo secrets
+          # once the Google Business Profile + a Places API key exist.
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ secrets.GOOGLE_PLACE_ID }}
 
       # Gate every PR on the performance/a11y/SEO budgets from the rebuild plan —
       # fail the build if any page drops below the thresholds in lighthouserc.json.

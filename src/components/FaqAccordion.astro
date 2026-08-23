@@ -1,0 +1,49 @@
+---
+// Native <details>/<summary> — zero JS, works with scripting fully disabled,
+// keyboard-accessible and screen-reader-friendly for free.
+interface Props {
+  faqs: { question: string; answer: string }[];
+  title: string;
+}
+const { faqs, title } = Astro.props;
+---
+
+{faqs.length > 0 && (
+  <section class="faq">
+    <h2>{title}</h2>
+    {faqs.map((faq) => (
+      <details class="faq-item">
+        <summary>{faq.question}</summary>
+        <p>{faq.answer}</p>
+      </details>
+    ))}
+  </section>
+)}
+
+<style>
+  .faq { margin-top: var(--space-6); }
+  .faq-item {
+    border-bottom: 1px solid var(--color-border);
+    padding-block: var(--space-3);
+  }
+  .faq-item summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-family: var(--font-display);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-3);
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: '+';
+    font-size: var(--fs-lg);
+    color: var(--color-crimson-text);
+    flex-shrink: 0;
+    transition: transform var(--motion-fast) var(--ease);
+  }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item p { margin-top: var(--space-2); color: var(--color-ink-muted); }
+</style>

@@ -15,6 +15,11 @@ const courseSchema = z.object({
   hoursPerWeek: z.number(),
   image: z.string().optional(),
   imageAlt: z.string().optional(), // required in practice via CMS field config — see admin/config.yml
+  // Structured FAQs, not markdown headings — lets the page render a real accordion
+  // AND emit FAQPage schema from the same data, so they can never drift apart.
+  faqs: z
+    .array(z.object({ question: z.string(), answer: z.string() }))
+    .default([]),
   draft: z.boolean().default(false),
 });
 
@@ -37,16 +42,8 @@ const blog = defineCollection({
   schema: postSchema,
 });
 
-const testimonialSchema = z.object({
-  authorName: z.string(),
-  courseTaken: z.string().optional(),
-  rating: z.number().min(1).max(5),
-  quote: z.string(),
-});
+// No manual "testimonials" collection: reviews are pulled live from the Google
+// Business Profile at build time instead (see lib/googleReviews.ts), so there's
+// never a staff-editable path to a fabricated quote.
 
-const testimonials = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/testimonials' }),
-  schema: testimonialSchema,
-});
-
-export const collections = { courses, blog, testimonials };
+export const collections = { courses, blog };

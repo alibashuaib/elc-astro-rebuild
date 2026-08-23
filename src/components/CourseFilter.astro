@@ -1,0 +1,78 @@
+---
+// Client-side category filter for the courses hub. All cards render server-side
+// regardless of JS state (so content stays fully crawlable and works with JS off —
+// filtering is a progressive enhancement, not a requirement to see the catalog).
+import { categoryLabels, useTranslations, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  categories: string[]; // distinct categories actually present in this locale's courses
+}
+const { locale, categories } = Astro.props;
+const t = useTranslations(locale);
+const labels = categoryLabels[locale];
+---
+
+<div class="course-filter" role="group" aria-label={t('courses.filterAll')}>
+  <button type="button" class="filter-chip is-active" data-filter="all">{t('courses.filterAll')}</button>
+  {categories.map((cat) => (
+    <button type="button" class="filter-chip" data-filter={cat}>{labels[cat]}</button>
+  ))}
+</div>
+<p class="no-results" hidden>{t('courses.noResults')}</p>
+
+<style>
+  .course-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+  .filter-chip {
+    font: inherit;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-raised);
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+  .filter-chip:hover { border-color: var(--color-crimson-text); }
+  .filter-chip.is-active {
+    background: var(--color-crimson);
+    border-color: var(--color-crimson);
+    color: #fff;
+  }
+  .no-results { color: var(--color-ink-muted); margin-top: var(--space-4); }
+</style>
+
+<script>
+  // Progressive enhancement only: with JS disabled, every course card is already
+  // visible in the initial HTML (see .course-grid in the parent page).
+  const filterEl = document.querySelector<HTMLElement>('.course-filter');
+  const grid = document.querySelector<HTMLElement>('.course-grid');
+  const noResults = document.querySelector<HTMLElement>('.no-results');
+  if (!filterEl || !grid) {
+    // Nothing to enhance on this page.
+  } else {
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-category]'));
+    const chips = Array.from(filterEl.querySelectorAll<HTMLButtonElement>('.filter-chip'));
+
+    filterEl.addEventListener('click', (e) => {
+      const chip = (e.target as HTMLElement).closest<HTMLButtonElement>('.filter-chip');
+      if (!chip) return;
+
+      chips.forEach((c) => c.classList.toggle('is-active', c === chip));
+      const filter = chip.dataset.filter;
+
+      let visibleCount = 0;
+      cards.forEach((card) => {
+        const match = filter === 'all' || card.dataset.category === filter;
+        card.hidden = !match;
+        if (match) visibleCount++;
+      });
+      if (noResults) noResults.hidden = visibleCount > 0;
+    });
+  }
+</script>

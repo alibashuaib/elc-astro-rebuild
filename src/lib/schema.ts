@@ -3,7 +3,12 @@
 
 const SITE_URL = 'https://elc.com.sa';
 
-export function organizationSchema() {
+/**
+ * @param aggregateRating Only ever pass real numbers from lib/googleReviews.ts's
+ *   GoogleReviewsResult — never fabricated. Omit entirely if reviews aren't
+ *   configured yet (the build already does this — see src/pages/{en,ar}/index.astro).
+ */
+export function organizationSchema(aggregateRating?: { rating: number; reviewCount: number }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
@@ -20,6 +25,13 @@ export function organizationSchema() {
     sameAs: [
       // TODO: add YouTube, LinkedIn — currently missing per audit
     ],
+    ...(aggregateRating && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: aggregateRating.rating,
+        reviewCount: aggregateRating.reviewCount,
+      },
+    }),
   };
 }
 
@@ -51,6 +63,18 @@ export function localBusinessSchema() {
     openingHoursSpecification: [
       // TODO — real hours, per corrected GBP listing
     ],
+  };
+}
+
+export function faqPageSchema(faqs: { question: string; answer: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
   };
 }
 

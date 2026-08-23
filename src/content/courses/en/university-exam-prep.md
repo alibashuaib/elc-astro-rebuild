@@ -8,6 +8,11 @@ currency: SAR
 durationWeeks: 8
 hoursPerWeek: 6
 imageAlt: Students preparing for an English proficiency exam at ELC
+faqs:
+  - question: What happens if I miss a class?
+    answer: Placeholder answer — replace with the real make-up-class policy.
+  - question: Is there a certificate at the end?
+    answer: Placeholder answer — replace with the real certification details.
 draft: false
 ---
 

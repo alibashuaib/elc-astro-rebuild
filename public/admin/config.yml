@@ -51,6 +51,14 @@ collections:
       - { name: hoursPerWeek, label: Hours per week, widget: number, value_type: int }
       - { name: image, label: Image, widget: image, required: false }
       - { name: imageAlt, label: Image alt text, widget: string, required: true, i18n: true }
+      - name: faqs
+        label: FAQs
+        widget: list
+        i18n: true
+        required: false
+        fields:
+          - { name: question, label: Question, widget: string }
+          - { name: answer, label: Answer, widget: text }
       - { name: draft, label: Draft, widget: boolean, default: true }
       - { name: body, label: Body, widget: markdown, i18n: true }
 
@@ -71,16 +79,6 @@ collections:
       - { name: draft, label: Draft, widget: boolean, default: true }
       - { name: body, label: Body, widget: markdown, i18n: true }
 
-  - name: testimonials
-    label: Testimonials
-    folder: src/content/testimonials
-    i18n: true
-    create: true
-    slug: '{{slug}}'
-    extension: md
-    format: frontmatter
-    fields:
-      - { name: authorName, label: Author Name, widget: string, i18n: true }
-      - { name: courseTaken, label: Course Taken, widget: string, required: false }
-      - { name: rating, label: Rating (1-5), widget: number, min: 1, max: 5, value_type: int }
-      - { name: quote, label: Quote, widget: text, i18n: true }
+# No "testimonials" collection: reviews shown on the site are pulled live from the
+# Google Business Profile at build time (src/lib/googleReviews.ts) — staff manage
+# them by replying to/curating reviews on Google, not through this CMS.

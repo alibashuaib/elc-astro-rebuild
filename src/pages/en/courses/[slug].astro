@@ -1,7 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
-import { courseSchema, breadcrumbSchema } from '../../../lib/schema';
+import FaqAccordion from '../../../components/FaqAccordion.astro';
+import { courseSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
 import { categoryLabels, useTranslations } from '../../../i18n/ui';
 
 export async function getStaticPaths() {
@@ -16,7 +17,7 @@ const { course } = Astro.props;
 const { slug } = Astro.params;
 const { Content } = await render(course);
 const t = useTranslations('en');
-const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek } = course.data;
+const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek, faqs } = course.data;
 
 const url = `https://elc.com.sa/en/courses/${slug}`;
 
@@ -34,6 +35,8 @@ const breadcrumbs = breadcrumbSchema([
   { name: 'Courses', url: 'https://elc.com.sa/en/courses' },
   { name: title, url },
 ]);
+
+const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(faqs)] : [])];
 ---
 
 <Layout
@@ -41,7 +44,7 @@ const breadcrumbs = breadcrumbSchema([
   path={`/courses/${slug}`}
   title={`${title} — ELC`}
   description={summary}
-  jsonLd={[ldCourse, breadcrumbs]}
+  jsonLd={ldEntries}
 >
   <article class="container course-detail">
     <nav aria-label="Breadcrumb" class="breadcrumb">
@@ -67,6 +70,8 @@ const breadcrumbs = breadcrumbSchema([
     <div class="prose">
       <Content />
     </div>
+
+    <FaqAccordion faqs={faqs} title="FAQs" />
   </article>
 </Layout>
 

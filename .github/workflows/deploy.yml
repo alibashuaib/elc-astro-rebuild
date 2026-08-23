@@ -26,6 +26,9 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ secrets.GOOGLE_PLACE_ID }}
 
       # TODO before this runs for real: add FTP_SERVER / FTP_USERNAME / FTP_PASSWORD
       # as repo secrets (Settings → Secrets and variables → Actions), pointing at the

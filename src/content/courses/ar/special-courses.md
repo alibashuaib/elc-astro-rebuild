@@ -8,6 +8,11 @@ currency: SAR
 durationWeeks: 4
 hoursPerWeek: 3
 imageAlt: جلسة نادي محادثة لمجموعة صغيرة في ELC
+faqs:
+  - question: ماذا يحدث إذا فاتتني حصة؟
+    answer: إجابة مؤقتة — سيتم استبدالها بسياسة تعويض الحصص الفعلية.
+  - question: هل توجد شهادة في النهاية؟
+    answer: إجابة مؤقتة — سيتم استبدالها بتفاصيل الشهادة الفعلية.
 draft: false
 ---
 

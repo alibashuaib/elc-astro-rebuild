@@ -8,6 +8,11 @@ currency: SAR
 durationWeeks: 8
 hoursPerWeek: 6
 imageAlt: Adult students in an English conversation class at ELC
+faqs:
+  - question: How many students are in each class?
+    answer: Placeholder answer — replace with the real class-size figure.
+  - question: What happens if I miss a class?
+    answer: Placeholder answer — replace with the real make-up-class policy.
 draft: false
 ---
 
@@ -19,8 +24,3 @@ content until real copy is written (plan doc §8, open item).
 - Weeks 1–2: Foundations
 - Weeks 3–5: Communication skills
 - Weeks 6–8: Fluency practice
-
-## FAQs
-
-**How many students per class?**
-Placeholder answer.

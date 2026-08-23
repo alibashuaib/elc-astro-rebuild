@@ -8,6 +8,11 @@ currency: SAR
 durationWeeks: 10
 hoursPerWeek: 4
 imageAlt: Children in an English class at ELC
+faqs:
+  - question: What happens if I miss a class?
+    answer: Placeholder answer — replace with the real make-up-class policy.
+  - question: Is there a certificate at the end?
+    answer: Placeholder answer — replace with the real certification details.
 draft: false
 ---
 

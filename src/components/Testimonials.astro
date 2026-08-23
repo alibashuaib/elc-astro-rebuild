@@ -1,0 +1,86 @@
+---
+import type { GoogleReviewsResult } from '../lib/googleReviews';
+import { useTranslations, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  data: GoogleReviewsResult | null;
+}
+const { locale, data } = Astro.props;
+const t = useTranslations(locale);
+
+function stars(rating: number) {
+  return '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
+}
+---
+
+{data && data.reviews.length > 0 && (
+  <section class="testimonials">
+    <div class="testimonials-head">
+      <h2>{t('testimonials.title')}</h2>
+      <p class="overall">
+        <span class="stars" aria-hidden="true">{stars(data.overallRating)}</span>
+        <span class="numeric">{data.overallRating.toFixed(1)}</span>
+        <span class="count">({data.totalReviewCount} {t('testimonials.onGoogle')})</span>
+      </p>
+    </div>
+
+    <div class="testimonial-grid">
+      {data.reviews.slice(0, 6).map((review) => (
+        <blockquote class="testimonial-card">
+          <p class="stars" aria-label={`${review.rating} / 5`}>{stars(review.rating)}</p>
+          <p class="quote">{review.text}</p>
+          <footer>
+            <cite>{review.authorName}</cite>
+            <span class="time">{review.relativeTime}</span>
+          </footer>
+        </blockquote>
+      ))}
+    </div>
+
+    <a
+      href="https://www.google.com/maps/search/?api=1&query=ELC"
+      target="_blank"
+      rel="noopener"
+      class="btn btn-outline"
+    >
+      {t('testimonials.viewAll')}
+    </a>
+  </section>
+)}
+
+<style>
+  .testimonials { margin-top: var(--space-7); }
+  .testimonials-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .overall { display: flex; align-items: center; gap: var(--space-2); margin: 0; }
+  .stars { color: var(--color-amber-text); letter-spacing: 0.1em; margin: 0; }
+  .count { color: var(--color-ink-muted); font-size: var(--fs-sm); }
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+  .testimonial-card {
+    margin: 0;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg-raised);
+  }
+  .quote { color: var(--color-ink); margin: var(--space-2) 0; }
+  .testimonial-card footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--fs-sm);
+    color: var(--color-ink-muted);
+  }
+  cite { font-style: normal; font-weight: 600; color: var(--color-ink); }
+</style>

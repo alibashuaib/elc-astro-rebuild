@@ -14,7 +14,7 @@ const t = useTranslations(locale);
 const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek } = course.data;
 ---
 
-<article class="course-card">
+<article class="course-card" data-category={category}>
   <div class="card-top">
     <span class="badge">{categoryLabels[locale][category]}</span>
     <span class="badge badge-level numeric">{level}</span>

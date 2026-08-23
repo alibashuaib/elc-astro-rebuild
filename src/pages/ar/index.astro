@@ -1,6 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Testimonials from '../../components/Testimonials.astro';
 import { organizationSchema } from '../../lib/schema';
+import { fetchGoogleReviews } from '../../lib/googleReviews';
+
+const reviews = await fetchGoogleReviews('ar');
+const orgSchema = organizationSchema(
+  reviews ? { rating: reviews.overallRating, reviewCount: reviews.totalReviewCount } : undefined
+);
 ---
 
 <Layout
@@ -8,7 +15,7 @@ import { organizationSchema } from '../../lib/schema';
   path="/"
   title="ELC — دورات اللغة الإنجليزية في السعودية"
   description="دورات إنجليزية معتمدة للأطفال والكبار والشركات. احجز اختبار تحديد المستوى مجانًا."
-  jsonLd={organizationSchema()}
+  jsonLd={orgSchema}
 >
   <section class="hero container">
     <span class="eyebrow">معتمدة من TVTC · منذ [عام]</span>
@@ -28,6 +35,10 @@ import { organizationSchema } from '../../lib/schema';
     <p>أطفال · كبار · إنجليزي أعمال · تحضير امتحانات.</p>
     <a href="/ar/courses" class="btn btn-outline">تصفّح جميع الدورات</a>
   </section>
+
+  <div class="container">
+    <Testimonials locale="ar" data={reviews} />
+  </div>
 </Layout>
 
 <style>
