@@ -1,0 +1,59 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { organizationSchema } from '../../lib/schema';
+---
+
+<Layout
+  locale="ar"
+  path="/"
+  title="ELC — دورات اللغة الإنجليزية في السعودية"
+  description="دورات إنجليزية معتمدة للأطفال والكبار والشركات. احجز اختبار تحديد المستوى مجانًا."
+  jsonLd={organizationSchema()}
+>
+  <section class="hero container">
+    <span class="eyebrow">معتمدة من TVTC · منذ [عام]</span>
+    <h1>تعلّم الإنجليزية بثقة، في كل مستوى.</h1>
+    <p class="lead">
+      من المبتدئ إلى الطلاقة — دورات منظمة للأطفال والكبار والشركات، يقدّمها مدرّبون معتمدون بأسمائهم.
+    </p>
+    <a href="/ar/register" class="btn btn-primary">احجز اختبار تحديد المستوى</a>
+
+    <div class="level-meter" role="img" aria-label="مستويات الدورات من A1 للمبتدئ إلى C2 للمتقن">
+      <span class="numeric">A1</span><span class="numeric">A2</span><span class="numeric">B1</span><span class="numeric">B2</span><span class="numeric">C1</span><span class="numeric">C2</span>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2>الدورات</h2>
+    <p>أطفال · كبار · إنجليزي أعمال · تحضير امتحانات — بطاقات مؤقتة، سيتم ربط الكتالوج الفعلي بنظام إدارة المحتوى في المرحلة الثالثة.</p>
+  </section>
+</Layout>
+
+<style>
+  .hero { padding-block: var(--space-7); text-align: start; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-size: var(--fs-sm);
+    color: var(--color-amber-text);
+  }
+  .lead { font-size: var(--fs-lg); color: var(--color-ink-muted); max-width: 40ch; }
+  .level-meter {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    font-family: var(--font-mono);
+  }
+  .level-meter span {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-ink-muted);
+  }
+  .level-meter span:last-child {
+    background: var(--color-crimson);
+    color: #fff;
+    border-color: var(--color-crimson);
+  }
+</style>

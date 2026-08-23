@@ -1,0 +1,67 @@
+/*
+  Design tokens — ELC Astro Rebuild
+  Bold minimalism: crimson + amber on warm off-white, generous whitespace.
+  Kept in plain CSS custom properties — no framework, minimal bytes shipped.
+*/
+
+:root {
+  /* Brand colors, pulled from the existing logo */
+  --color-crimson: #a31e2e;       /* primary / CTA */
+  --color-crimson-ink: #7c1723;   /* hover/active state, darker for contrast */
+  --color-amber: #c97a1a;         /* sparing accent only — fails AA on white, never use for text on light bg */
+  --color-amber-text: #8f5610;    /* darkened amber, passes AA on --color-bg for small text if ever needed */
+
+  --color-bg: #fbf6ef;            /* warm off-white, not stark white */
+  --color-bg-raised: #ffffff;
+  --color-ink: #2b2420;           /* warm charcoal, not pure black */
+  --color-ink-muted: #6b6259;     /* warm slate gray, secondary text */
+  --color-border: #e7ddcf;
+
+  /* Type */
+  --font-display: 'Cairo', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace; /* prices/durations, forced LTR */
+
+  --fs-sm: clamp(0.875rem, 0.83rem + 0.2vw, 0.95rem);
+  --fs-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --fs-lg: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --fs-xl: clamp(1.75rem, 1.5rem + 1.2vw, 2.5rem);
+  --fs-2xl: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
+
+  /* Space scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+  --space-7: 6rem;
+
+  --radius: 0.5rem;
+  --max-width: 72rem;
+
+  --motion-fast: 150ms;
+  --motion-base: 250ms;
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dark mode variant */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #1c1815;
+    --color-bg-raised: #262019;
+    --color-ink: #f2ece2;
+    --color-ink-muted: #a89e91;
+    --color-border: #3a3229;
+    --color-crimson: #d64858;
+    --color-crimson-ink: #e8717e;
+    --color-amber-text: #e0a24a;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+  }
+}

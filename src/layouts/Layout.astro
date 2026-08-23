@@ -1,0 +1,71 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { useTranslations, localeDir, type Locale } from '../i18n/ui';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  /** path without locale prefix, e.g. "/courses" — used for canonical/hreflang/lang-switch */
+  path: string;
+  title: string;
+  description: string;
+  /** optional pre-serialized JSON-LD object(s) for this page */
+  jsonLd?: object | object[];
+  ogImage?: string;
+}
+
+const { locale, path, title, description, jsonLd, ogImage } = Astro.props;
+const t = useTranslations(locale);
+const dir = localeDir[locale];
+
+const site = Astro.site ?? new URL('https://elc.com.sa');
+const canonicalPath = `/${locale}${path === '/' ? '' : path}`;
+const canonicalUrl = new URL(canonicalPath, site).toString();
+const enUrl = new URL(`/en${path === '/' ? '' : path}`, site).toString();
+const arUrl = new URL(`/ar${path === '/' ? '' : path}`, site).toString();
+
+const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+
+<!doctype html>
+<html lang={locale} dir={dir}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <!-- Bidirectional hreflang, mapped to the equivalent page, not just the homepage -->
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="ar" href={arUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:locale" content={locale === 'ar' ? 'ar_SA' : 'en_US'} />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, site).toString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Preconnect only to origins actually used (fonts) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    {ldEntries.map((entry) => (
+      <script type="application/ld+json" set:html={JSON.stringify(entry)} />
+    ))}
+  </head>
+  <body>
+    <a href="#main" class="skip-link">{t('skip.content')}</a>
+    <Header locale={locale} currentPath={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

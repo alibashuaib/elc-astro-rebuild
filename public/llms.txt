@@ -1,0 +1,15 @@
+# ELC
+
+> Accredited English language courses in Saudi Arabia for kids, adults, and businesses.
+
+ELC (English Language Center) offers TVTC-accredited English courses across all
+CEFR levels (A1–C2), including Kids General English, Adults General English,
+Business English, University/Exam Prep, and Special Courses. Content on this
+site is written natively in both English and Arabic, not machine-translated.
+
+## Key pages
+
+- [Courses](https://elc.com.sa/en/courses): Full course catalog with pricing, duration, and level.
+- [About](https://elc.com.sa/en/about): Accreditation, facilities, and instructor credentials.
+- [Why ELC](https://elc.com.sa/en/why-elc): How ELC compares to alternatives.
+- [Register](https://elc.com.sa/en/register): Enrollment and placement testing.

@@ -1,0 +1,58 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { organizationSchema } from '../../lib/schema';
+---
+
+<Layout
+  locale="en"
+  path="/"
+  title="ELC — English Language Courses in Saudi Arabia"
+  description="Accredited English courses for kids, adults, and business. Book a free placement test."
+  jsonLd={organizationSchema()}
+>
+  <section class="hero container">
+    <span class="eyebrow">TVTC-Accredited · Since [year]</span>
+    <h1>Learn English with confidence, at every level.</h1>
+    <p class="lead">
+      From beginner to fluent — structured courses for kids, adults, and businesses,
+      taught by named, credentialed instructors.
+    </p>
+    <a href="/en/register" class="btn btn-primary">Book a Placement Test</a>
+
+    <div class="level-meter" role="img" aria-label="Course levels from A1 beginner to C2 proficient">
+      <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
+    </div>
+  </section>
+
+  <section class="container">
+    <h2>Courses</h2>
+    <p>Kids · Adults · Business English · Exam Prep — placeholder cards, real catalog wired to CMS in Phase 3.</p>
+  </section>
+</Layout>
+
+<style>
+  .hero { padding-block: var(--space-7); text-align: start; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
+    color: var(--color-amber-text);
+  }
+  .lead { font-size: var(--fs-lg); color: var(--color-ink-muted); max-width: 40ch; }
+  .level-meter {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    font-family: var(--font-mono);
+  }
+  .level-meter span {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-ink-muted);
+  }
+  .level-meter span:last-child {
+    background: var(--color-crimson);
+    color: #fff;
+    border-color: var(--color-crimson);
+  }
+</style>
