@@ -1,6 +1,8 @@
 /*
-  Design tokens — ELC Astro Rebuild
-  Bold minimalism: crimson + amber on warm off-white, generous whitespace.
+  Design tokens — ELC Astro Rebuild, 2026 pass.
+  Direction: "chalkboard & paper" — ink-toned zones alternating with crisp paper
+  zones, echoing the classroom itself, not a generic dark-mode-with-accent look.
+  Brand colors (crimson/gold) come from the existing logo — kept, but restaged.
   Kept in plain CSS custom properties — no framework, minimal bytes shipped.
 */
 
@@ -18,16 +20,31 @@
   --color-ink-muted: #6b6259;     /* warm slate gray, secondary text */
   --color-border: #e7ddcf;
 
+  /* Fixed "chalkboard" zone tokens — do NOT invert with prefers-color-scheme.
+     Used only for deliberately dark editorial bands (hero, stats strip), which
+     read the same whether the visitor's OS is in light or dark mode. */
+  --zone-ink-bg: #17120d;
+  --zone-ink-bg-raised: #221a13;
+  --zone-ink-text: #f7f2e9;
+  --zone-ink-muted: #b8ab98;
+  --zone-ink-border: #3a2f24;
+  --zone-ink-signal: #e35866;     /* crimson, lightened for AA text-on-ink (matches dark-mode logic below) */
+  --zone-ink-ember: #7c1723;
+
   /* Type */
   --font-display: 'Cairo', 'IBM Plex Sans Arabic', system-ui, sans-serif;
   --font-body: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace; /* prices/durations, forced LTR */
+  /* English-only editorial accent (eyebrows, pull-quotes) — no Arabic coverage,
+     so it never appears in the Arabic type system, only as a Latin flourish. */
+  --font-editorial: 'Newsreader', Georgia, serif;
 
   --fs-sm: clamp(0.875rem, 0.83rem + 0.2vw, 0.95rem);
   --fs-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   --fs-lg: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
   --fs-xl: clamp(1.75rem, 1.5rem + 1.2vw, 2.5rem);
-  --fs-2xl: clamp(2.25rem, 1.8rem + 2vw, 3.5rem);
+  --fs-2xl: clamp(2.5rem, 1.8rem + 3.5vw, 4.75rem);
+  --fs-3xl: clamp(3rem, 2rem + 5vw, 6.5rem);
 
   /* Space scale */
   --space-1: 0.25rem;
@@ -37,16 +54,19 @@
   --space-5: 2.5rem;
   --space-6: 4rem;
   --space-7: 6rem;
+  --space-8: 8.5rem;
 
   --radius: 0.5rem;
   --max-width: 72rem;
 
   --motion-fast: 150ms;
   --motion-base: 250ms;
+  --motion-slow: 600ms;
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark mode variant */
+/* Dark mode variant (the site-wide OS preference — distinct from the fixed
+   --zone-ink-* tokens above, which never change) */
 @media (prefers-color-scheme: dark) {
   :root {
     --color-bg: #1c1815;
@@ -69,5 +89,6 @@
   :root {
     --motion-fast: 0ms;
     --motion-base: 0ms;
+    --motion-slow: 0ms;
   }
 }

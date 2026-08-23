@@ -20,13 +20,57 @@ body {
 h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
   margin: 0 0 var(--space-3);
 }
 
-h1 { font-size: var(--fs-2xl); }
+h1 { font-size: var(--fs-3xl); letter-spacing: -0.02em; }
 h2 { font-size: var(--fs-xl); }
 h3 { font-size: var(--fs-lg); }
+
+/* Arabic script needs real headroom: diacritics (shadda, etc.) and tall
+   ascenders get visually clipped/orphaned at a tight Latin-style line-height.
+   1.05 reads fine for Latin display type, but collides with the line above
+   for Arabic — this is standard practice, not a one-off tweak. */
+:lang(ar) h1, :lang(ar) h2, :lang(ar) h3 {
+  line-height: 1.5;
+  letter-spacing: normal;
+}
+
+
+/* English-only editorial accent — small-caps-ish serif italic label, used for
+   eyebrows and pull-quotes. Never applied to Arabic text (Newsreader has no
+   Arabic glyphs); the Arabic system uses its own eyebrow treatment instead. */
+.editorial-mark {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* The "fluency line" — the site's signature motif (see HeroGraphic), reduced to
+   a plain gradient rule and reused as a section divider. One recurring idea,
+   not scattered decoration. */
+.fluency-rule {
+  height: 3px;
+  border: none;
+  margin: 0;
+  background: linear-gradient(90deg, var(--color-crimson-text), var(--color-amber-text));
+}
+
+/* Fixed-tone editorial band — chalkboard zone, independent of light/dark OS
+   preference (see tokens.css). Used sparingly: hero, one stats strip. */
+.zone-ink {
+  background: var(--zone-ink-bg);
+  color: var(--zone-ink-text);
+}
+.zone-ink h1, .zone-ink h2, .zone-ink h3 { color: var(--zone-ink-text); }
+.zone-ink p { color: var(--zone-ink-muted); }
+.zone-ink a:not(.btn) { color: var(--zone-ink-signal); }
+.zone-ink .btn-primary { background: var(--zone-ink-signal); color: var(--zone-ink-bg); }
+.zone-ink .btn-primary:hover { background: #fff; }
+.zone-ink .btn-outline { border-color: var(--zone-ink-border); color: var(--zone-ink-text); }
+.zone-ink .btn-outline:hover { border-color: var(--zone-ink-signal); }
 
 p { margin: 0 0 var(--space-3); color: var(--color-ink); }
 

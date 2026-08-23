@@ -17,6 +17,12 @@ const features = [
   { icon: 'calendar' as const, title: 'Structured levels', text: 'A clear A1→C2 path, so you always know where you stand.' },
   { icon: 'tag' as const, title: 'Transparent pricing', text: 'Price and duration published up front, on every course.' },
 ];
+
+const stats = [
+  { value: '15,000+', label: 'students taught' },
+  { value: '9+', label: 'course programs' },
+  { value: '2010', label: 'founded' },
+];
 ---
 
 <Layout
@@ -26,20 +32,35 @@ const features = [
   description="Accredited English courses for kids, adults, and business. Book a free placement test."
   jsonLd={orgSchema}
 >
-  <section class="hero container">
-    <div class="hero-text">
-      <span class="eyebrow">TVTC-Accredited · Since [year]</span>
-      <h1>Learn English with confidence, at every level.</h1>
+  <section class="hero zone-ink">
+    <div class="hero-inner container">
+      <span class="eyebrow editorial-mark">TVTC-Accredited · Est. 2010</span>
+      <h1 class="hero-headline">Learn English<br />with confidence.</h1>
       <p class="lead">
         From beginner to fluent — structured courses for kids, adults, and businesses,
         taught by named, credentialed instructors.
       </p>
-      <a href="/en/register" class="btn btn-primary">Book a Placement Test</a>
+      <div class="hero-actions">
+        <a href="/en/register" class="btn btn-primary">Book a Placement Test</a>
+        <a href="/en/courses" class="btn btn-outline">Browse courses</a>
+      </div>
     </div>
-    <div class="hero-visual">
-      <HeroGraphic locale="en" />
+
+    <div class="hero-graphic-wrap" aria-hidden="false">
+      <HeroGraphic locale="en" tone="ink" />
+    </div>
+
+    <div class="hero-stats container">
+      {stats.map((s) => (
+        <div class="stat">
+          <span class="stat-value numeric">{s.value}</span>
+          <span class="stat-label">{s.label}</span>
+        </div>
+      ))}
     </div>
   </section>
+
+  <hr class="fluency-rule" />
 
   <section class="container features">
     {features.map((f) => (
@@ -64,27 +85,58 @@ const features = [
 
 <style>
   .hero {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    align-items: center;
-    gap: var(--space-6);
-    padding-block: var(--space-7);
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-8) var(--space-6);
   }
-  .hero-text { text-align: start; }
-  .hero-visual { display: flex; justify-content: center; }
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 34rem;
+    text-align: start;
+  }
   .eyebrow {
-    font-family: var(--font-mono);
-    font-size: var(--fs-sm);
-    color: var(--color-amber-text);
+    display: inline-block;
+    font-size: var(--fs-lg);
+    color: var(--zone-ink-signal);
+    margin-bottom: var(--space-3);
   }
-  .lead { font-size: var(--fs-lg); color: var(--color-ink-muted); max-width: 40ch; }
+  .hero-headline {
+    font-size: var(--fs-3xl);
+    margin-bottom: var(--space-4);
+  }
+  .lead { font-size: var(--fs-lg); max-width: 38ch; margin-bottom: var(--space-5); }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+
+  .hero-graphic-wrap {
+    position: absolute;
+    inset-inline-end: -3rem;
+    top: 50%;
+    transform: translateY(-58%);
+    width: min(30rem, 42vw);
+    opacity: 0.9;
+    pointer-events: none;
+  }
+
+  .hero-stats {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--zone-ink-border);
+  }
+  .stat { display: flex; flex-direction: column; }
+  .stat-value { font-size: var(--fs-xl); font-weight: 700; color: var(--zone-ink-text); }
+  .stat-label { color: var(--zone-ink-muted); font-size: var(--fs-sm); }
 
   .features {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
     gap: var(--space-4);
     padding-block: var(--space-6);
-    border-top: 1px solid var(--color-border);
     border-bottom: 1px solid var(--color-border);
   }
   .feature { display: flex; flex-direction: column; gap: var(--space-1); }
@@ -103,7 +155,7 @@ const features = [
   .feature p { margin: 0; color: var(--color-ink-muted); font-size: var(--fs-sm); }
 
   @media (max-width: 780px) {
-    .hero { grid-template-columns: 1fr; }
-    .hero-visual { order: -1; max-width: 220px; margin-inline: auto; }
+    .hero-graphic-wrap { position: static; width: 14rem; margin: var(--space-5) auto 0; opacity: 1; transform: none; }
+    .hero-inner { max-width: none; }
   }
 </style>
