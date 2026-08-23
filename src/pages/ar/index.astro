@@ -1,6 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import Testimonials from '../../components/Testimonials.astro';
+import HeroGraphic from '../../components/HeroGraphic.astro';
+import Icon from '../../components/Icon.astro';
 import { organizationSchema } from '../../lib/schema';
 import { fetchGoogleReviews } from '../../lib/googleReviews';
 
@@ -8,6 +10,13 @@ const reviews = await fetchGoogleReviews('ar');
 const orgSchema = organizationSchema(
   reviews ? { rating: reviews.overallRating, reviewCount: reviews.totalReviewCount } : undefined
 );
+
+const features = [
+  { icon: 'certificate' as const, title: 'معتمد من TVTC', text: 'اعتماد قابل للتحقق، لا مجرد ادعاء تسويقي.' },
+  { icon: 'instructor' as const, title: 'مدرّبون بأسمائهم', text: 'مدرّبون معتمدون حقيقيون، لا "فريقنا" مجهول.' },
+  { icon: 'calendar' as const, title: 'مستويات منظمة', text: 'مسار واضح من A1 إلى C2، فتعرف دائمًا أين أنت.' },
+  { icon: 'tag' as const, title: 'أسعار شفافة', text: 'السعر والمدة معلنان مسبقًا في كل دورة.' },
+];
 ---
 
 <Layout
@@ -18,16 +27,27 @@ const orgSchema = organizationSchema(
   jsonLd={orgSchema}
 >
   <section class="hero container">
-    <span class="eyebrow">معتمدة من TVTC · منذ [عام]</span>
-    <h1>تعلّم الإنجليزية بثقة، في كل مستوى.</h1>
-    <p class="lead">
-      من المبتدئ إلى الطلاقة — دورات منظمة للأطفال والكبار والشركات، يقدّمها مدرّبون معتمدون بأسمائهم.
-    </p>
-    <a href="/ar/register" class="btn btn-primary">احجز اختبار تحديد المستوى</a>
-
-    <div class="level-meter" role="img" aria-label="مستويات الدورات من A1 للمبتدئ إلى C2 للمتقن">
-      <span class="numeric">A1</span><span class="numeric">A2</span><span class="numeric">B1</span><span class="numeric">B2</span><span class="numeric">C1</span><span class="numeric">C2</span>
+    <div class="hero-text">
+      <span class="eyebrow">معتمدة من TVTC · منذ [عام]</span>
+      <h1>تعلّم الإنجليزية بثقة، في كل مستوى.</h1>
+      <p class="lead">
+        من المبتدئ إلى الطلاقة — دورات منظمة للأطفال والكبار والشركات، يقدّمها مدرّبون معتمدون بأسمائهم.
+      </p>
+      <a href="/ar/register" class="btn btn-primary">احجز اختبار تحديد المستوى</a>
     </div>
+    <div class="hero-visual">
+      <HeroGraphic locale="ar" />
+    </div>
+  </section>
+
+  <section class="container features">
+    {features.map((f) => (
+      <div class="feature">
+        <span class="feature-icon"><Icon name={f.icon} /></span>
+        <h2>{f.title}</h2>
+        <p>{f.text}</p>
+      </div>
+    ))}
   </section>
 
   <section class="container">
@@ -42,7 +62,15 @@ const orgSchema = organizationSchema(
 </Layout>
 
 <style>
-  .hero { padding-block: var(--space-7); text-align: start; }
+  .hero {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+    gap: var(--space-6);
+    padding-block: var(--space-7);
+  }
+  .hero-text { text-align: start; }
+  .hero-visual { display: flex; justify-content: center; }
   .eyebrow {
     font-family: var(--font-mono);
     direction: ltr;
@@ -51,21 +79,32 @@ const orgSchema = organizationSchema(
     color: var(--color-amber-text);
   }
   .lead { font-size: var(--fs-lg); color: var(--color-ink-muted); max-width: 40ch; }
-  .level-meter {
-    display: flex;
-    gap: var(--space-2);
-    margin-top: var(--space-5);
-    font-family: var(--font-mono);
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-4);
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
   }
-  .level-meter span {
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--color-border);
+  .feature { display: flex; flex-direction: column; gap: var(--space-1); }
+  .feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: var(--radius);
-    color: var(--color-ink-muted);
+    background: var(--color-bg);
+    color: var(--color-crimson-text);
+    margin-bottom: var(--space-1);
   }
-  .level-meter span:last-child {
-    background: var(--color-crimson);
-    color: #fff;
-    border-color: var(--color-crimson);
+  .feature h2 { font-size: var(--fs-base); margin: 0; }
+  .feature p { margin: 0; color: var(--color-ink-muted); font-size: var(--fs-sm); }
+
+  @media (max-width: 780px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero-visual { order: -1; max-width: 220px; margin-inline: auto; }
   }
 </style>

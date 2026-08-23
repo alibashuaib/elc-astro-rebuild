@@ -1,5 +1,6 @@
 ---
 import { useTranslations, localizePath, categoryLabels, type Locale } from '../i18n/ui';
+import Icon from './Icon.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -16,6 +17,7 @@ const { title, summary, category, level, price, currency, durationWeeks, hoursPe
 
 <article class="course-card" data-category={category}>
   <div class="card-top">
+    <span class="category-icon"><Icon name={category} size={20} /></span>
     <span class="badge">{categoryLabels[locale][category]}</span>
     <span class="badge badge-level numeric">{level}</span>
   </div>
@@ -40,7 +42,17 @@ const { title, summary, category, level, price, currency, durationWeeks, hoursPe
     flex-direction: column;
     gap: var(--space-2);
   }
-  .card-top { display: flex; gap: var(--space-2); }
+  .card-top { display: flex; align-items: center; gap: var(--space-2); }
+  .category-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-crimson-text);
+  }
   .badge {
     font-size: var(--fs-sm);
     padding: 0.2rem 0.6rem;

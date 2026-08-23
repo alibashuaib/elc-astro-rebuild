@@ -1,11 +1,30 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
 import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
   { name: 'من نحن', url: 'https://elc.com.sa/ar/about' },
 ]);
+
+const blocks = [
+  {
+    icon: 'certificate' as const,
+    title: 'الاعتماد',
+    text: 'محتوى مؤقت — سيتم إضافة رابط سجل اعتماد TVTC القابل للتحقق هنا.',
+  },
+  {
+    icon: 'building' as const,
+    title: 'المرافق',
+    text: 'محتوى مؤقت — وصف وصور حقيقية للمرافق، بعد جمعها.',
+  },
+  {
+    icon: 'instructor' as const,
+    title: 'المدرّبون',
+    text: 'محتوى مؤقت — ملفات تعريف المدرّبين بأسمائهم وصورهم ومؤهلاتهم، بدلًا من "فريقنا" المجهول.',
+  },
+];
 ---
 
 <Layout
@@ -18,17 +37,44 @@ const breadcrumbs = breadcrumbSchema([
   <section class="container prose-page">
     <h1>من نحن</h1>
 
-    <h2>الاعتماد</h2>
-    <p>محتوى مؤقت — سيتم إضافة رابط سجل اعتماد TVTC القابل للتحقق هنا (البند المفتوح رقم 8 في الخطة).</p>
-
-    <h2>المرافق</h2>
-    <p>محتوى مؤقت — وصف وصور المرافق.</p>
-
-    <h2>المدرّبون</h2>
-    <p>محتوى مؤقت — ملفات تعريف المدرّبين بأسمائهم ومؤهلاتهم.</p>
+    <div class="about-grid">
+      {blocks.map((b) => (
+        <div class="about-block">
+          <span class="block-icon"><Icon name={b.icon} size={28} /></span>
+          <h2>{b.title}</h2>
+          <p>{b.text}</p>
+        </div>
+      ))}
+    </div>
   </section>
 </Layout>
 
 <style>
-  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+  .prose-page { padding-block: var(--space-6); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-5);
+    max-width: 60rem;
+  }
+  .about-block {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg-raised);
+  }
+  .block-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-crimson-text);
+    margin-bottom: var(--space-3);
+  }
+  .about-block h2 { font-size: var(--fs-lg); margin: 0 0 var(--space-2); }
+  .about-block p { margin: 0; color: var(--color-ink-muted); }
 </style>

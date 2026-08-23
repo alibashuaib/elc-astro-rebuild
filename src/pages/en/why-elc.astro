@@ -1,6 +1,14 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
 import { breadcrumbSchema } from '../../lib/schema';
+
+const criteria = [
+  'Verifiable accreditation (TVTC)',
+  'Named, credentialed instructors — not anonymous "expert teachers"',
+  'Structured curriculum with a visible CEFR level path (A1→C2)',
+  'Transparent pricing and duration, published up front',
+];
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'Home', url: 'https://elc.com.sa/en/' },
@@ -23,11 +31,10 @@ const breadcrumbs = breadcrumbSchema([
     </p>
 
     <h2>What to look for in a language center</h2>
-    <ul>
-      <li>Verifiable accreditation (TVTC)</li>
-      <li>Named, credentialed instructors — not anonymous "expert teachers"</li>
-      <li>Structured curriculum with a visible CEFR level path (A1→C2)</li>
-      <li>Transparent pricing and duration, published up front</li>
+    <ul class="criteria-list">
+      {criteria.map((item) => (
+        <li><Icon name="check" size={18} /><span>{item}</span></li>
+      ))}
     </ul>
 
     <h2>Where ELC stands on each</h2>
@@ -37,4 +44,7 @@ const breadcrumbs = breadcrumbSchema([
 
 <style>
   .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+  .criteria-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+  .criteria-list li { display: flex; align-items: flex-start; gap: var(--space-2); }
+  .criteria-list :global(svg) { color: var(--color-crimson-text); flex-shrink: 0; margin-top: 0.15em; }
 </style>

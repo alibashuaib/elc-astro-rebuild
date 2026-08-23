@@ -1,0 +1,42 @@
+---
+// Small hand-drawn icon set — inline SVG, currentColor, zero external dependency
+// (no icon font/library to load). Stroke-based, 24x24 viewBox, 1.75 stroke weight.
+interface Props {
+  name:
+    | 'kids' | 'adults' | 'business' | 'exam-prep'
+    | 'certificate' | 'instructor' | 'calendar' | 'tag'
+    | 'building' | 'check' | 'chat' | 'arrow-up' | 'star';
+  size?: number;
+}
+const { name, size = 24 } = Astro.props;
+
+const paths: Record<string, string> = {
+  kids: 'M12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm0 0c-3.5 0-6 2-6 5v7h12v-7c0-3-2.5-5-6-5Zm-3 5h6m-6 4h6',
+  adults: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 9c0-4 3-7 7-7s7 3 7 7',
+  business: 'M4 8h16v11H4V8Zm4 0V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M4 13h16',
+  'exam-prep': 'M6 3h9l5 5v13H6V3Zm9 0v5h5M9 12h6m-6 4h6m-6-8h2',
+  certificate: 'M12 2 3 6v6c0 5 4 8 9 10 5-2 9-5 9-10V6l-9-4Zm-3.5 8.5 2 2 5-5',
+  instructor: 'M12 3v3m-6 4v11m12-11v11M4 10h16M9 10 6 7l3-3m6 6 3-3-3-3',
+  calendar: 'M4 5h16v16H4V5Zm0 5h16M8 3v4m8-4v4M8 15h2m4 0h2m-8 4h2',
+  tag: 'm3 12 9-9h7v7l-9 9-7-7Zm12-5.5.01 0',
+  building: 'M4 21V4h9v17M4 21h16M4 21H2m11 0h9V10l-9-3v14M8 8h2m-2 4h2m-2 4h2',
+  check: 'm4 12 6 6L20 6',
+  chat: 'M4 5h16v11H8l-4 4V5Z',
+  'arrow-up': 'M12 20V4m0 0-6 6m6-6 6 6',
+  star: 'm12 3 2.7 5.9 6.3.9-4.6 4.5 1.1 6.4L12 17.6 6.5 20.7l1.1-6.4-4.6-4.5 6.3-.9L12 3Z',
+};
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <path d={paths[name]} />
+</svg>

@@ -1,11 +1,19 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
   { name: 'لماذا ELC', url: 'https://elc.com.sa/ar/why-elc' },
 ]);
+
+const criteria = [
+  'اعتماد قابل للتحقق (TVTC)',
+  'مدرّبون بأسماء ومؤهلات واضحة',
+  'منهج منظم بمسار مستويات CEFR واضح (A1 إلى C2)',
+  'أسعار ومدد شفافة ومعلنة مسبقًا',
+];
 ---
 
 <Layout
@@ -20,11 +28,10 @@ const breadcrumbs = breadcrumbSchema([
     <p>موجّه لمن يقارن بين مراكز اللغة قبل التسجيل — مقارنة بالحقائق، دون الإساءة للبدائل.</p>
 
     <h2>ما الذي يجب البحث عنه في مركز لغة</h2>
-    <ul>
-      <li>اعتماد قابل للتحقق (TVTC)</li>
-      <li>مدرّبون بأسماء ومؤهلات واضحة</li>
-      <li>منهج منظم بمسار مستويات CEFR واضح (A1 إلى C2)</li>
-      <li>أسعار ومدد شفافة ومعلنة مسبقًا</li>
+    <ul class="criteria-list">
+      {criteria.map((item) => (
+        <li><Icon name="check" size={18} /><span>{item}</span></li>
+      ))}
     </ul>
 
     <h2>موقف ELC في كل نقطة</h2>
@@ -34,4 +41,7 @@ const breadcrumbs = breadcrumbSchema([
 
 <style>
   .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+  .criteria-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+  .criteria-list li { display: flex; align-items: flex-start; gap: var(--space-2); }
+  .criteria-list :global(svg) { color: var(--color-crimson-text); flex-shrink: 0; margin-top: 0.15em; }
 </style>

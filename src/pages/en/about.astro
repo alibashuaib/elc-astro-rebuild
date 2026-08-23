@@ -1,11 +1,30 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
 import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'Home', url: 'https://elc.com.sa/en/' },
   { name: 'About', url: 'https://elc.com.sa/en/about' },
 ]);
+
+const blocks = [
+  {
+    icon: 'certificate' as const,
+    title: 'Accreditation',
+    text: 'Placeholder — link to the verifiable TVTC accreditation record here once available.',
+  },
+  {
+    icon: 'building' as const,
+    title: 'Facilities',
+    text: 'Placeholder — facilities description and real photography, once collected.',
+  },
+  {
+    icon: 'instructor' as const,
+    title: 'Instructors',
+    text: 'Placeholder — named, credentialed instructor profiles. Fixes the audit\'s "no named instructors" E-E-A-T gap: each instructor gets a name, photo, and credentials, not an anonymous "our team."',
+  },
+];
 ---
 
 <Layout
@@ -18,24 +37,44 @@ const breadcrumbs = breadcrumbSchema([
   <section class="container prose-page">
     <h1>About ELC</h1>
 
-    <h2>Accreditation</h2>
-    <p>
-      Placeholder — link to the verifiable TVTC accreditation record here once available
-      (plan §8: real photography and credentials still to be collected).
-    </p>
-
-    <h2>Facilities</h2>
-    <p>Placeholder — facilities description and photos.</p>
-
-    <h2>Instructors</h2>
-    <p>
-      Placeholder — named, credentialed instructor profiles go here. This directly fixes
-      the audit's "no named instructors" E-E-A-T gap; each instructor should get a name,
-      photo, and credentials, not an anonymous "our team."
-    </p>
+    <div class="about-grid">
+      {blocks.map((b) => (
+        <div class="about-block">
+          <span class="block-icon"><Icon name={b.icon} size={28} /></span>
+          <h2>{b.title}</h2>
+          <p>{b.text}</p>
+        </div>
+      ))}
+    </div>
   </section>
 </Layout>
 
 <style>
-  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+  .prose-page { padding-block: var(--space-6); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-5);
+    max-width: 60rem;
+  }
+  .about-block {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg-raised);
+  }
+  .block-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-crimson-text);
+    margin-bottom: var(--space-3);
+  }
+  .about-block h2 { font-size: var(--fs-lg); margin: 0 0 var(--space-2); }
+  .about-block p { margin: 0; color: var(--color-ink-muted); }
 </style>
