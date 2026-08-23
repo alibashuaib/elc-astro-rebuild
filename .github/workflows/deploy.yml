@@ -1,12 +1,17 @@
 name: Deploy to Hostinger
 
+# DISABLED until FTP_SERVER/FTP_USERNAME/FTP_PASSWORD repo secrets exist and
+# Hostinger hosting is actually ready — re-enable by restoring the `push`/
+# `repository_dispatch` triggers below (or run manually via workflow_dispatch
+# in the meantime).
 on:
-  push:
-    branches: [main]
-  # Lets the CMS's save-webhook trigger a rebuild+deploy too, once wired up
-  # (plan §7: "Saving triggers a webhook → GitHub Action runs → ... FTP-deployed").
-  repository_dispatch:
-    types: [cms-content-updated]
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+  # # Lets the CMS's save-webhook trigger a rebuild+deploy too, once wired up
+  # # (plan §7: "Saving triggers a webhook → GitHub Action runs → ... FTP-deployed").
+  # repository_dispatch:
+  #   types: [cms-content-updated]
 
 jobs:
   deploy:
