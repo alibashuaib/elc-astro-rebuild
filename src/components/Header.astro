@@ -132,14 +132,4 @@ const otherLocale = alternateLocale(locale);
   }
 </style>
 
-<script>
-  // Mobile nav toggle — the ONE piece of interactivity that must work with JS
-  // disabled being acceptable degradation only for hiding, never for access:
-  // nav links are plain <a> tags in the DOM regardless, so no-JS still works.
-  const toggle = document.querySelector<HTMLButtonElement>('.nav-toggle');
-  const nav = document.querySelector<HTMLElement>('.main-nav');
-  toggle?.addEventListener('click', () => {
-    const isOpen = nav?.classList.toggle('open');
-    toggle.setAttribute('aria-expanded', String(!!isOpen));
-  });
-</script>
+<script src="/scripts/mobile-nav.js" defer></script>

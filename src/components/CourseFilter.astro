@@ -47,32 +47,4 @@ const labels = categoryLabels[locale];
   .no-results { color: var(--color-ink-muted); margin-top: var(--space-4); }
 </style>
 
-<script>
-  // Progressive enhancement only: with JS disabled, every course card is already
-  // visible in the initial HTML (see .course-grid in the parent page).
-  const filterEl = document.querySelector<HTMLElement>('.course-filter');
-  const grid = document.querySelector<HTMLElement>('.course-grid');
-  const noResults = document.querySelector<HTMLElement>('.no-results');
-  if (!filterEl || !grid) {
-    // Nothing to enhance on this page.
-  } else {
-    const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-category]'));
-    const chips = Array.from(filterEl.querySelectorAll<HTMLButtonElement>('.filter-chip'));
-
-    filterEl.addEventListener('click', (e) => {
-      const chip = (e.target as HTMLElement).closest<HTMLButtonElement>('.filter-chip');
-      if (!chip) return;
-
-      chips.forEach((c) => c.classList.toggle('is-active', c === chip));
-      const filter = chip.dataset.filter;
-
-      let visibleCount = 0;
-      cards.forEach((card) => {
-        const match = filter === 'all' || card.dataset.category === filter;
-        card.hidden = !match;
-        if (match) visibleCount++;
-      });
-      if (noResults) noResults.hidden = visibleCount > 0;
-    });
-  }
-</script>
+<script src="/scripts/course-filter.js" defer></script>
