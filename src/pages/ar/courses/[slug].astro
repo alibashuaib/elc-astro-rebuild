@@ -1,0 +1,97 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import { courseSchema, breadcrumbSchema } from '../../../lib/schema';
+import { categoryLabels, useTranslations } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const courses = await getCollection('courses', (entry) => entry.id.startsWith('ar/'));
+  return courses.map((course) => ({
+    params: { slug: course.id.replace('ar/', '') },
+    props: { course },
+  }));
+}
+
+const { course } = Astro.props;
+const { slug } = Astro.params;
+const { Content } = await render(course);
+const t = useTranslations('ar');
+const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek } = course.data;
+
+const url = `https://elc.com.sa/ar/courses/${slug}`;
+
+const ldCourse = courseSchema({
+  name: title,
+  description: summary,
+  price,
+  currency,
+  durationText: `P${durationWeeks}W`,
+  url,
+});
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
+  { name: 'الدورات', url: 'https://elc.com.sa/ar/courses' },
+  { name: title, url },
+]);
+---
+
+<Layout
+  locale="ar"
+  path={`/courses/${slug}`}
+  title={`${title} — ELC`}
+  description={summary}
+  jsonLd={[ldCourse, breadcrumbs]}
+>
+  <article class="container course-detail">
+    <nav aria-label="Breadcrumb" class="breadcrumb">
+      <a href="/ar/">الرئيسية</a> / <a href="/ar/courses">الدورات</a> / <span>{title}</span>
+    </nav>
+
+    <div class="course-head">
+      <span class="badge">{categoryLabels.ar[category]}</span>
+      <span class="badge badge-level numeric">{level}</span>
+    </div>
+
+    <h1>{title}</h1>
+    <p class="lead">{summary}</p>
+
+    <dl class="stats">
+      <div><dt>السعر</dt><dd class="numeric">{price} {currency}</dd></div>
+      <div><dt>المدة</dt><dd class="numeric">{durationWeeks} أسابيع</dd></div>
+      <div><dt>الجدول</dt><dd class="numeric">{hoursPerWeek} ساعة/أسبوع</dd></div>
+    </dl>
+
+    <a href="/ar/register" class="btn btn-primary">{t('courses.enroll')}</a>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .course-detail { padding-block: var(--space-6); max-width: 42rem; }
+  .breadcrumb { font-size: var(--fs-sm); color: var(--color-ink-muted); margin-bottom: var(--space-4); }
+  .course-head { display: flex; gap: var(--space-2); margin-bottom: var(--space-2); }
+  .badge {
+    font-size: var(--fs-sm);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-ink-muted);
+  }
+  .badge-level { color: var(--color-crimson); border-color: var(--color-crimson); }
+  .lead { font-size: var(--fs-lg); color: var(--color-ink-muted); }
+  .stats {
+    display: flex;
+    gap: var(--space-5);
+    margin: var(--space-4) 0;
+    padding: var(--space-3) 0;
+    border-block: 1px solid var(--color-border);
+  }
+  .stats dt { font-size: var(--fs-sm); color: var(--color-ink-muted); margin: 0; }
+  .stats dd { margin: 0; font-weight: 700; font-size: var(--fs-lg); }
+  .prose { margin-top: var(--space-6); }
+</style>

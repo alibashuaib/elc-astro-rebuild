@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import CourseCard from '../../../components/CourseCard.astro';
+import { breadcrumbSchema } from '../../../lib/schema';
+
+const allCourses = await getCollection('courses', (entry) => {
+  return entry.id.startsWith('en/') && !entry.data.draft;
+});
+
+const collectionPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Courses',
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: allCourses.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: `https://elc.com.sa/en/courses/${c.id.replace('en/', '')}`,
+      name: c.data.title,
+    })),
+  },
+};
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', url: 'https://elc.com.sa/en/' },
+  { name: 'Courses', url: 'https://elc.com.sa/en/courses' },
+]);
+---
+
+<Layout
+  locale="en"
+  path="/courses"
+  title="Courses — ELC"
+  description="Browse ELC's full course catalog: Kids, Adults, Business English, and Exam Prep. See price, duration, and level at a glance."
+  jsonLd={[collectionPageSchema, breadcrumbs]}
+>
+  <section class="container">
+    <h1>Courses</h1>
+    <p>Find the right course by level, duration, and price.</p>
+
+    <div class="course-grid">
+      {allCourses.map((course) => (
+        <CourseCard locale="en" course={course} slug={course.id.replace('en/', '')} />
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+  }
+</style>

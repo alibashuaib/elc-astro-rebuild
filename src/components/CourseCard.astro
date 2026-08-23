@@ -1,0 +1,61 @@
+---
+import { useTranslations, localizePath, categoryLabels, type Locale } from '../i18n/ui';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  locale: Locale;
+  course: CollectionEntry<'courses'>;
+  /** slug without locale prefix, e.g. "kids-general" */
+  slug: string;
+}
+
+const { locale, course, slug } = Astro.props;
+const t = useTranslations(locale);
+const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek } = course.data;
+---
+
+<article class="course-card">
+  <div class="card-top">
+    <span class="badge">{categoryLabels[locale][category]}</span>
+    <span class="badge badge-level numeric">{level}</span>
+  </div>
+  <h3><a href={localizePath(locale, `/courses/${slug}`)}>{title}</a></h3>
+  <p>{summary}</p>
+  <dl class="meta">
+    <div>
+      <dd class="numeric price">{price} {currency}</dd>
+    </div>
+    <div class="numeric">
+      {durationWeeks} {t('courses.weeks')} · {hoursPerWeek} {t('courses.hoursPerWeek')}
+    </div>
+  </dl>
+  <a href={localizePath(locale, `/courses/${slug}`)} class="btn btn-outline">{t('courses.viewCourse')}</a>
+</article>
+
+<style>
+  .course-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    background: var(--color-bg-raised);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .card-top { display: flex; gap: var(--space-2); }
+  .badge {
+    font-size: var(--fs-sm);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    color: var(--color-ink-muted);
+  }
+  .badge-level { color: var(--color-crimson); border-color: var(--color-crimson); }
+  h3 { margin: 0; font-size: var(--fs-lg); }
+  h3 a { color: var(--color-ink); }
+  h3 a:hover { color: var(--color-crimson); text-decoration: none; }
+  .meta { margin: 0; }
+  .meta div { margin: 0; }
+  .price { font-size: var(--fs-lg); font-weight: 700; color: var(--color-crimson); }
+</style>

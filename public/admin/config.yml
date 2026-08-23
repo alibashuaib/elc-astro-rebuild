@@ -1,0 +1,89 @@
+# Decap CMS config — git-backed visual editor for non-technical staff.
+#
+# TODO before this works in production:
+#   1. Create the GitHub repo and push this project.
+#   2. Set up a Decap OAuth provider (either Netlify's free OAuth proxy, even
+#      without using Netlify for hosting, or a small self-hosted one) and
+#      replace `repo` below with the real "owner/repo".
+#   3. Point base_url at that OAuth provider.
+
+backend:
+  name: github
+  repo: TODO-owner/TODO-repo
+  branch: main
+  base_url: https://TODO-oauth-provider.example.com
+  auth_endpoint: auth
+
+# Draft/staging preview before anything goes live — important for price/schedule changes.
+publish_mode: editorial_workflow
+
+media_folder: 'src/assets/uploads'
+public_folder: '/uploads'
+
+# Every content field required in both languages before publish (plan §7 guardrail):
+# Decap's multiple_folders i18n structure enforces exactly the src/content/<type>/<locale>/ layout
+# already used by the Astro content collections, and blocks publish until both locales are filled.
+i18n:
+  structure: multiple_folders
+  locales: [en, ar]
+  default_locale: en
+
+collections:
+  - name: courses
+    label: Courses
+    folder: src/content/courses
+    i18n: true
+    create: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: Title, widget: string, i18n: true }
+      - { name: summary, label: Summary, widget: text, i18n: true }
+      - name: category
+        label: Category
+        widget: select
+        options: [kids, adults, business, exam-prep]
+      - name: level
+        label: Level
+        widget: select
+        options: [A1, A2, B1, B2, C1, C2]
+      - { name: price, label: Price, widget: number, value_type: float }
+      - { name: currency, label: Currency, widget: string, default: SAR }
+      - { name: durationWeeks, label: Duration (weeks), widget: number, value_type: int }
+      - { name: hoursPerWeek, label: Hours per week, widget: number, value_type: int }
+      - { name: image, label: Image, widget: image, required: false }
+      - { name: imageAlt, label: Image alt text, widget: string, required: true, i18n: true }
+      - { name: draft, label: Draft, widget: boolean, default: true }
+      - { name: body, label: Body, widget: markdown, i18n: true }
+
+  - name: blog
+    label: News / Blog
+    folder: src/content/blog
+    i18n: true
+    create: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: Title, widget: string, i18n: true }
+      - { name: summary, label: Summary, widget: text, i18n: true }
+      - { name: publishDate, label: Publish Date, widget: datetime }
+      - { name: image, label: Image, widget: image, required: false }
+      - { name: imageAlt, label: Image alt text, widget: string, required: true, i18n: true }
+      - { name: draft, label: Draft, widget: boolean, default: true }
+      - { name: body, label: Body, widget: markdown, i18n: true }
+
+  - name: testimonials
+    label: Testimonials
+    folder: src/content/testimonials
+    i18n: true
+    create: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: authorName, label: Author Name, widget: string, i18n: true }
+      - { name: courseTaken, label: Course Taken, widget: string, required: false }
+      - { name: rating, label: Rating (1-5), widget: number, min: 1, max: 5, value_type: int }
+      - { name: quote, label: Quote, widget: text, i18n: true }

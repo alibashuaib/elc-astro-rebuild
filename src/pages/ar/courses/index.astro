@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import CourseCard from '../../../components/CourseCard.astro';
+import { breadcrumbSchema } from '../../../lib/schema';
+
+const allCourses = await getCollection('courses', (entry) => {
+  return entry.id.startsWith('ar/') && !entry.data.draft;
+});
+
+const collectionPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'الدورات',
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: allCourses.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: `https://elc.com.sa/ar/courses/${c.id.replace('ar/', '')}`,
+      name: c.data.title,
+    })),
+  },
+};
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
+  { name: 'الدورات', url: 'https://elc.com.sa/ar/courses' },
+]);
+---
+
+<Layout
+  locale="ar"
+  path="/courses"
+  title="الدورات — ELC"
+  description="تصفّح كتالوج دورات ELC الكامل: أطفال، كبار، إنجليزي أعمال، تحضير امتحانات. شاهد السعر والمدة والمستوى بنظرة واحدة."
+  jsonLd={[collectionPageSchema, breadcrumbs]}
+>
+  <section class="container">
+    <h1>الدورات</h1>
+    <p>اختر الدورة المناسبة حسب المستوى والمدة والسعر.</p>
+
+    <div class="course-grid">
+      {allCourses.map((course) => (
+        <CourseCard locale="ar" course={course} slug={course.id.replace('ar/', '')} />
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .course-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    gap: var(--space-4);
+    margin-top: var(--space-5);
+  }
+</style>

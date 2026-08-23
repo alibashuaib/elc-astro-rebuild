@@ -11,6 +11,11 @@ export const localeDir: Record<Locale, 'ltr' | 'rtl'> = {
   ar: 'rtl',
 };
 
+export const categoryLabels: Record<Locale, Record<string, string>> = {
+  en: { kids: 'Kids', adults: 'Adults', business: 'Business', 'exam-prep': 'Exam Prep' },
+  ar: { kids: 'أطفال', adults: 'كبار', business: 'أعمال', 'exam-prep': 'تحضير امتحانات' },
+};
+
 export const ui = {
   en: {
     'nav.home': 'Home',
@@ -24,6 +29,12 @@ export const ui = {
     'nav.menu': 'Menu',
     'hero.cta': 'Book a Placement Test',
     'skip.content': 'Skip to content',
+    'courses.title': 'Courses',
+    'courses.subtitle': 'Find the right course by level, duration, and price.',
+    'courses.weeks': 'weeks',
+    'courses.hoursPerWeek': 'hrs/week',
+    'courses.viewCourse': 'View course',
+    'courses.enroll': 'Enroll',
   },
   ar: {
     'nav.home': 'الرئيسية',
@@ -37,6 +48,12 @@ export const ui = {
     'nav.menu': 'القائمة',
     'hero.cta': 'احجز اختبار تحديد المستوى',
     'skip.content': 'تخطَّ إلى المحتوى',
+    'courses.title': 'الدورات',
+    'courses.subtitle': 'اختر الدورة المناسبة حسب المستوى والمدة والسعر.',
+    'courses.weeks': 'أسابيع',
+    'courses.hoursPerWeek': 'ساعة/أسبوع',
+    'courses.viewCourse': 'عرض الدورة',
+    'courses.enroll': 'سجّل الآن',
   },
 } as const;
 
