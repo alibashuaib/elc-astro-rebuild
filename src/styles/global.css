@@ -31,12 +31,17 @@ h3 { font-size: var(--fs-lg); }
 p { margin: 0 0 var(--space-3); color: var(--color-ink); }
 
 a {
-  color: var(--color-crimson);
+  color: var(--color-crimson-text);
   text-decoration: none;
 }
 a:hover { color: var(--color-crimson-ink); text-decoration: underline; }
 
 img, svg { max-width: 100%; height: auto; display: block; }
+
+/* Breadcrumb links sit inline in muted-color text — underline them so they don't
+   rely on color alone to be distinguishable (WCAG 1.4.1). */
+.breadcrumb a { text-decoration: underline; text-decoration-color: var(--color-border); }
+.breadcrumb a:hover { text-decoration-color: currentColor; }
 
 /* Numbers (price/duration) always LTR even inside RTL layout */
 .numeric {

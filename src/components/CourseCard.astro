@@ -19,16 +19,14 @@ const { title, summary, category, level, price, currency, durationWeeks, hoursPe
     <span class="badge">{categoryLabels[locale][category]}</span>
     <span class="badge badge-level numeric">{level}</span>
   </div>
-  <h3><a href={localizePath(locale, `/courses/${slug}`)}>{title}</a></h3>
+  <h2><a href={localizePath(locale, `/courses/${slug}`)}>{title}</a></h2>
   <p>{summary}</p>
-  <dl class="meta">
-    <div>
-      <dd class="numeric price">{price} {currency}</dd>
-    </div>
-    <div class="numeric">
+  <div class="meta">
+    <p class="numeric price">{price} {currency}</p>
+    <p class="numeric duration">
       {durationWeeks} {t('courses.weeks')} · {hoursPerWeek} {t('courses.hoursPerWeek')}
-    </div>
-  </dl>
+    </p>
+  </div>
   <a href={localizePath(locale, `/courses/${slug}`)} class="btn btn-outline">{t('courses.viewCourse')}</a>
 </article>
 
@@ -51,11 +49,11 @@ const { title, summary, category, level, price, currency, durationWeeks, hoursPe
     border: 1px solid var(--color-border);
     color: var(--color-ink-muted);
   }
-  .badge-level { color: var(--color-crimson); border-color: var(--color-crimson); }
-  h3 { margin: 0; font-size: var(--fs-lg); }
-  h3 a { color: var(--color-ink); }
-  h3 a:hover { color: var(--color-crimson); text-decoration: none; }
-  .meta { margin: 0; }
-  .meta div { margin: 0; }
-  .price { font-size: var(--fs-lg); font-weight: 700; color: var(--color-crimson); }
+  .badge-level { color: var(--color-crimson-text); border-color: var(--color-crimson-text); }
+  h2 { margin: 0; font-size: var(--fs-lg); }
+  h2 a { color: var(--color-ink); }
+  h2 a:hover { color: var(--color-crimson-text); text-decoration: none; }
+  .meta p { margin: 0; }
+  .price { font-size: var(--fs-lg); font-weight: 700; color: var(--color-crimson-text); }
+  .duration { color: var(--color-ink-muted); font-size: var(--fs-sm); }
 </style>

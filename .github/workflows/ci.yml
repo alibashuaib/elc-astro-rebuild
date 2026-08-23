@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      # Gate every PR on the performance/a11y/SEO budgets from the rebuild plan —
+      # fail the build if any page drops below the thresholds in lighthouserc.json.
+      - name: Lighthouse CI
+        run: npx @lhci/cli@0.13.x autorun

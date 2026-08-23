@@ -6,8 +6,9 @@
 
 :root {
   /* Brand colors, pulled from the existing logo */
-  --color-crimson: #a31e2e;       /* primary / CTA */
+  --color-crimson: #a31e2e;       /* primary / CTA — solid backgrounds (white text on top) */
   --color-crimson-ink: #7c1723;   /* hover/active state, darker for contrast */
+  --color-crimson-text: #a31e2e;  /* crimson used AS text/links — same as --color-crimson in light mode, diverges in dark mode (see below) */
   --color-amber: #c97a1a;         /* sparing accent only — fails AA on white, never use for text on light bg */
   --color-amber-text: #8f5610;    /* darkened amber, passes AA on --color-bg for small text if ever needed */
 
@@ -53,8 +54,13 @@
     --color-ink: #f2ece2;
     --color-ink-muted: #a89e91;
     --color-border: #3a3229;
-    --color-crimson: #d64858;
-    --color-crimson-ink: #e8717e;
+    /* Tuned separately from light mode: --color-crimson stays dark enough for white
+       button text (5.87:1 vs white); --color-crimson-text is lightened so it's legible
+       as standalone text/links on the dark background (4.85:1 vs --color-bg-raised).
+       A single value can't satisfy both AA thresholds against this background. */
+    --color-crimson: #b83243;
+    --color-crimson-ink: #cc4456;
+    --color-crimson-text: #e8606d;
     --color-amber-text: #e0a24a;
   }
 }
