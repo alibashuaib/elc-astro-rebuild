@@ -9,7 +9,7 @@
 
 backend:
   name: github
-  repo: TODO-owner/TODO-repo
+  repo: alibashuaib/elc-astro-rebuild
   branch: main
   base_url: https://TODO-oauth-provider.example.com
   auth_endpoint: auth
