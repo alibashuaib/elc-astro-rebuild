@@ -25,6 +25,9 @@ build (`npm run build && npm run preview`) and confirmed again in CI.
   (Places API, New). Returns `null` gracefully if unconfigured; never fabricates data.
 - `src/components/Testimonials.astro`, `CourseFilter.astro`, `FaqAccordion.astro` —
   render only real fetched data / are progressive enhancements over plain HTML.
+- `src/components/RegistrationExperience.astro` — the `/register` form. No backend:
+  submit builds a prefilled `wa.me` link client-side and opens WhatsApp. `/contact`
+  is link-only (call/WhatsApp/email), no form. Keeps the site fully static.
 - `src/styles/tokens.css` — design tokens (color/type/space), light+dark mode.
 - `public/admin/` — Decap CMS scaffold for non-technical staff editing.
 - `public/.htaccess` — security headers for Hostinger's Apache.
@@ -60,8 +63,6 @@ plan doc's own "What's Not Yet Decided" section:
   into any page yet; its address/geo/phone fields are empty on purpose (fake
   coordinates would hurt local SEO more than no schema at all). Fill in once the
   "Knowledge Edifice Institute" vs "ELC" GBP mismatch is resolved.
-- **Contact/Register form endpoints** — currently POST to `/api/contact` and
-  `/api/register`, which don't exist yet. Needs a small serverless handler.
 - **Real copy, photography** — all current course/blog content is placeholder text,
   written to exercise the templates, not to publish as-is.
 
