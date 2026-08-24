@@ -23,4 +23,8 @@ import PageHero from '../../../components/PageHero.astro';
   .legal-page { max-width: 52rem; padding-block: clamp(3rem, 7vw, 6rem); }
   h2 { margin: 2.25rem 0 .65rem; color: var(--color-navy); font-size: 1.4rem; }
   p { color: var(--color-ink-muted); line-height: 1.95; }
+  /* Inline links in body text — underline so they don't rely on color alone
+     to be distinguishable (WCAG 1.4.1), matching .breadcrumb a. */
+  p a { text-decoration: underline; text-decoration-color: var(--color-border); }
+  p a:hover { text-decoration-color: currentColor; }
 </style>
