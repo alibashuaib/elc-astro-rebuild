@@ -31,7 +31,7 @@ function stars(rating: number) {
 
     {data.reviews.length > 0 && (
       <div class="testimonial-grid">
-        {data.reviews.slice(0, 6).map((review) => (
+        {data.reviews.slice(0, 8).map((review) => (
           <blockquote class="testimonial-card">
             <p class="stars" aria-label={`${review.rating} / 5`}>{stars(review.rating)}</p>
             <p class="quote">{review.text}</p>
