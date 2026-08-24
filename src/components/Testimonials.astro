@@ -14,7 +14,11 @@ function stars(rating: number) {
 }
 ---
 
-{data && data.reviews.length > 0 && (
+{/* Rating badge alone is enough to render — Places API can return the
+    aggregate (rating/count) without individual review text, e.g. while
+    Enterprise+Atmosphere-tier access is still being sorted out. The quote
+    cards only appear once real review text actually comes back. */}
+{data && data.overallRating > 0 && (
   <section class="testimonials">
     <div class="testimonials-head">
       <h2>{t('testimonials.title')}</h2>
@@ -25,18 +29,20 @@ function stars(rating: number) {
       </p>
     </div>
 
-    <div class="testimonial-grid">
-      {data.reviews.slice(0, 6).map((review) => (
-        <blockquote class="testimonial-card">
-          <p class="stars" aria-label={`${review.rating} / 5`}>{stars(review.rating)}</p>
-          <p class="quote">{review.text}</p>
-          <footer>
-            <cite>{review.authorName}</cite>
-            <span class="time">{review.relativeTime}</span>
-          </footer>
-        </blockquote>
-      ))}
-    </div>
+    {data.reviews.length > 0 && (
+      <div class="testimonial-grid">
+        {data.reviews.slice(0, 6).map((review) => (
+          <blockquote class="testimonial-card">
+            <p class="stars" aria-label={`${review.rating} / 5`}>{stars(review.rating)}</p>
+            <p class="quote">{review.text}</p>
+            <footer>
+              <cite>{review.authorName}</cite>
+              <span class="time">{review.relativeTime}</span>
+            </footer>
+          </blockquote>
+        ))}
+      </div>
+    )}
 
     <a
       href="https://www.google.com/maps/search/?api=1&query=ELC"
