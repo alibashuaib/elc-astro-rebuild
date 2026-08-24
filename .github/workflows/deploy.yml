@@ -2,8 +2,8 @@ name: Deploy to Hostinger
 
 # DISABLED until FTP_SERVER/FTP_USERNAME/FTP_PASSWORD repo secrets exist and
 # Hostinger hosting is actually ready — re-enable by restoring the `push`/
-# `repository_dispatch` triggers below (or run manually via workflow_dispatch
-# in the meantime).
+# `repository_dispatch`/`schedule` triggers below (or run manually via
+# workflow_dispatch in the meantime).
 on:
   workflow_dispatch:
   # push:
@@ -12,6 +12,11 @@ on:
   # # (plan §7: "Saving triggers a webhook → GitHub Action runs → ... FTP-deployed").
   # repository_dispatch:
   #   types: [cms-content-updated]
+  # # Rebuilds the Google reviews baked into the homepage weekly, even with no
+  # # code changes — reviews are fetched at build time (lib/googleReviews.ts),
+  # # not live, so this is what keeps them from going stale between pushes.
+  # schedule:
+  #   - cron: '0 3 * * 1' # Mondays 03:00 UTC (06:00 Riyadh)
 
 jobs:
   deploy:

@@ -64,7 +64,10 @@ plan doc's own "What's Not Yet Decided" section:
   `public/admin/config.yml`'s `base_url` updated to the deployed Worker URL.
 - **Hostinger FTP secrets** — `.github/workflows/deploy.yml` needs `FTP_SERVER`,
   `FTP_USERNAME`, `FTP_PASSWORD` repo secrets before it can deploy (currently
-  disabled — manual `workflow_dispatch` only).
+  disabled — manual `workflow_dispatch` only). Once live, uncomment the `push`
+  and weekly `schedule` triggers in that file — the schedule keeps the
+  homepage's Google reviews (build-time fetch, not live) from going stale
+  between code pushes.
 - **Real copy, photography** — all current course/blog content is placeholder text,
   written to exercise the templates, not to publish as-is.
 
