@@ -51,11 +51,14 @@ These are tracked inline as `TODO` comments at the relevant file, plus the sourc
 plan doc's own "What's Not Yet Decided" section:
 
 - **Google Business Profile reviews** — `GOOGLE_PLACES_API_KEY` + `GOOGLE_PLACE_ID`
-  aren't set anywhere yet (not locally, not as repo secrets), so the homepage
+  still aren't set (not locally, not as repo secrets), so the homepage
   testimonials section currently renders nothing. Needs a Places API (New) key and
   this business's real Place ID (the GBP listing is "Knowledge Edifice Institute
   (ELC)" / معهد صرح المعرفة, 4.6★, 409 reviews, Al Fayha, Jeddah — confirmed live on
-  Google Maps).
+  Google Maps). A `GOOGLE_MAPS_API_KEY` repo secret is now set (pulled from the
+  live site's Rank Math config, used there only for its Maps *embed* widget) —
+  worth checking in Google Cloud Console whether Places API (New) is enabled on
+  that same key/project before requesting a separate one.
 - **Decap CMS OAuth** — `cms-oauth-worker/` is written but not deployed; needs your
   Cloudflare login (`npx wrangler login`) plus a GitHub OAuth App, then
   `public/admin/config.yml`'s `base_url` updated to the deployed Worker URL.
