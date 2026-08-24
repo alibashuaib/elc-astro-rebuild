@@ -83,7 +83,7 @@ const formattedPrice = price?.toLocaleString('en-US');
     border-radius: 999px;
     background: var(--color-surface-soft);
     border: 1px solid var(--color-border);
-    color: var(--color-ink-muted);
+    color: #5a5d63; /* darker than --color-ink-muted to meet 4.5:1 contrast on --color-surface-soft */
   }
   .badge-level { color: var(--color-primary); border-color: #e8bcc5; background: var(--color-blue-soft); }
   h2 { margin: 0; font-size: clamp(1.25rem, 2vw, 1.45rem); line-height: 1.3; }
