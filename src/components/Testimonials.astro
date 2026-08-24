@@ -31,7 +31,10 @@ function stars(rating: number) {
 
     {data.reviews.length > 0 && (
       <div class="testimonial-grid">
-        {data.reviews.slice(0, 8).map((review) => (
+        {/* Google's Places API never returns more than 5 reviews per place
+            regardless of tier — this slice just makes that limit explicit
+            rather than relying on the API to always cap it for us. */}
+        {data.reviews.slice(0, 5).map((review) => (
           <blockquote class="testimonial-card">
             <p class="stars" aria-label={`${review.rating} / 5`}>{stars(review.rating)}</p>
             <p class="quote">{review.text}</p>
