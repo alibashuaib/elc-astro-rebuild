@@ -9,7 +9,7 @@
         "http://localhost/en/courses/kids-general/index.html",
         "http://localhost/en/contact/index.html"
       ],
-      "numberOfRuns": 1
+      "numberOfRuns": 3
     },
     "assert": {
       "assertions": {
