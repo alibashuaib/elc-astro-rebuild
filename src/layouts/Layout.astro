@@ -21,10 +21,15 @@ const t = useTranslations(locale);
 const dir = localeDir[locale];
 
 const site = Astro.site ?? new URL('https://elc.com.sa');
-const canonicalPath = `/${locale}${path === '/' ? '' : path}`;
+// Build output is directory-format (/foo/index.html, served as /foo/), and the
+// sitemap already uses trailing slashes — keep canonical/hreflang matching that
+// exact served URL instead of the pre-redirect /foo (Apache's DirectorySlash
+// 301s it, but there's no reason to send crawlers through that extra hop).
+const withTrailingSlash = (p: string) => (p === '/' ? '/' : `${p.replace(/\/$/, '')}/`);
+const canonicalPath = `/${locale}${withTrailingSlash(path)}`;
 const canonicalUrl = new URL(canonicalPath, site).toString();
-const enUrl = new URL(`/en${path === '/' ? '' : path}`, site).toString();
-const arUrl = new URL(`/ar${path === '/' ? '' : path}`, site).toString();
+const enUrl = new URL(`/en${withTrailingSlash(path)}`, site).toString();
+const arUrl = new URL(`/ar${withTrailingSlash(path)}`, site).toString();
 
 const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
