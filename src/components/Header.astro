@@ -1,4 +1,6 @@
 ---
+import { Image } from 'astro:assets';
+import logoMark from '../assets/logo-e-mark.png';
 import { useTranslations, localizePath, alternateLocale, type Locale } from '../i18n/ui';
 
 interface Props {
@@ -15,6 +17,7 @@ const otherLocale = alternateLocale(locale);
 <header class="site-header">
   <div class="container header-inner">
     <a href={localizePath(locale, '/')} class="logo" aria-label="ELC">
+      <Image src={logoMark} alt="" width={28} height={25} densities={[1, 2, 3]} class="logo-mark" />
       ELC
     </a>
 
@@ -65,11 +68,18 @@ const otherLocale = alternateLocale(locale);
     padding-block: var(--space-3);
   }
   .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
     font-family: var(--font-display);
     font-weight: 700;
     font-size: var(--fs-lg);
     color: var(--color-crimson-text);
     text-decoration: none;
+  }
+  .logo-mark {
+    width: 1.75rem;
+    height: auto;
   }
   .main-nav ul {
     display: flex;
