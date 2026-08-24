@@ -66,7 +66,7 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
 
     <dl class="stats">
         {price !== undefined && <div class="price-stat"><dt>السعر</dt><dd><strong class="numeric">{formattedPrice}</strong><span>{currency}</span></dd></div>}
-        {durationWeeks !== undefined && <div><dt>المدة</dt><dd><strong class="numeric">{durationWeeks}</strong><span>أسابيع</span></dd></div>}
+        {durationWeeks !== undefined && <div class="duration-stat"><dt>المدة</dt><dd><strong class="numeric">{durationWeeks}</strong><span>أسابيع</span></dd></div>}
         {hoursPerMonth ? (
           <div class="monthly-stat"><dt>الساعات الشهرية</dt><dd><strong class="numeric">{hoursPerMonth}</strong><span>ساعة/شهر</span></dd></div>
         ) : (
@@ -132,9 +132,10 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
   .stats dd { display: flex; align-items: baseline; gap: .38rem; margin: 0; }
   .stats dd strong { color: var(--color-navy); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 850; line-height: 1; letter-spacing: -.045em; }
   .stats .price-stat dd strong, .stats .price-stat dd span { color: var(--color-primary); }
+  .stats .duration-stat::before { background: linear-gradient(90deg, #f7b75f, var(--color-coral)); }
   .stats .monthly-stat::before { background: linear-gradient(90deg, var(--color-coral), #f7b75f); }
   .stats .daily-stat::before { background: linear-gradient(90deg, var(--color-primary), #d95f35); }
-  .stats .days-stat::before { background: linear-gradient(90deg, var(--color-navy), #64769b); }
+  .stats .days-stat::before { background: linear-gradient(90deg, #d95f35, var(--color-primary)); }
   .stats .days-stat dd strong { font-size: clamp(1rem, 1.8vw, 1.25rem); line-height: 1.2; letter-spacing: -.02em; }
   .stats .is-variable dd strong { color: var(--color-border-strong); }
   .stats .is-variable dd span { white-space: normal; }
