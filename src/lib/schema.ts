@@ -15,6 +15,7 @@ export function organizationSchema(
   return {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
+    '@id': `${SITE_URL}/#organization`,
     name: locale === 'ar' ? 'معهد صرح المعرفة' : 'ELC',
     alternateName: locale === 'ar' ? 'ELC' : 'معهد صرح المعرفة',
     url: SITE_URL,
@@ -54,30 +55,6 @@ export function organizationSchema(
         reviewCount: aggregateRating.reviewCount,
       },
     }),
-  };
-}
-
-export function localBusinessSchema() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'EducationalOrganization',
-    '@id': `${SITE_URL}/#organization`,
-    name: 'ELC',
-    alternateName: 'معهد صرح المعرفة',
-    url: SITE_URL,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
-      addressLocality: 'Jeddah',
-      addressRegion: 'Makkah Province',
-      addressCountry: 'SA',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: 21.4971147,
-      longitude: 39.2156796,
-    },
-    telephone: '+966591799917',
   };
 }
 

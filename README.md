@@ -19,8 +19,9 @@ build (`npm run build && npm run preview`) and confirmed again in CI.
   No `testimonials` collection — reviews come from Google (see below), not the CMS.
 - `src/i18n/ui.ts` — translation dictionary + locale-path helpers. No i18n library.
 - `src/layouts/Layout.astro` — canonical/hreflang/OG/JSON-LD, shared shell, fonts.
-- `src/lib/schema.ts` — JSON-LD builders (Organization+AggregateRating, LocalBusiness,
-  Course, Article, FAQPage, Breadcrumb). Several fields are TODO placeholders.
+- `src/lib/schema.ts` — JSON-LD builders (EducationalOrganization with real NAP +
+  AggregateRating, Course, Article, FAQPage, Breadcrumb). Organization schema is
+  wired into both homepages; a few `sameAs`/social fields are still TODO.
 - `src/lib/googleReviews.ts` — build-time fetch of Google Business Profile reviews
   (Places API, New). Returns `null` gracefully if unconfigured; never fabricates data.
 - `src/components/Testimonials.astro`, `CourseFilter.astro`, `FaqAccordion.astro` —
@@ -52,17 +53,15 @@ plan doc's own "What's Not Yet Decided" section:
 - **Google Business Profile reviews** — `GOOGLE_PLACES_API_KEY` + `GOOGLE_PLACE_ID`
   aren't set anywhere yet (not locally, not as repo secrets), so the homepage
   testimonials section currently renders nothing. Needs a Places API (New) key and
-  this business's real Place ID — same GBP listing that needs the NAP fix below.
+  this business's real Place ID (the GBP listing is "Knowledge Edifice Institute
+  (ELC)" / معهد صرح المعرفة, 4.6★, 409 reviews, Al Fayha, Jeddah — confirmed live on
+  Google Maps).
 - **Decap CMS OAuth** — `cms-oauth-worker/` is written but not deployed; needs your
   Cloudflare login (`npx wrangler login`) plus a GitHub OAuth App, then
   `public/admin/config.yml`'s `base_url` updated to the deployed Worker URL.
 - **Hostinger FTP secrets** — `.github/workflows/deploy.yml` needs `FTP_SERVER`,
   `FTP_USERNAME`, `FTP_PASSWORD` repo secrets before it can deploy (currently
   disabled — manual `workflow_dispatch` only).
-- **Real NAP/GBP data** — `localBusinessSchema()` in `src/lib/schema.ts` is not wired
-  into any page yet; its address/geo/phone fields are empty on purpose (fake
-  coordinates would hurt local SEO more than no schema at all). Fill in once the
-  "Knowledge Edifice Institute" vs "ELC" GBP mismatch is resolved.
 - **Real copy, photography** — all current course/blog content is placeholder text,
   written to exercise the templates, not to publish as-is.
 
