@@ -1,0 +1,57 @@
+---
+// The site's recurring background signature: oversized, low-opacity Arabic +
+// Latin letterforms overlapping — literalizing "two scripts, one school"
+// rather than a generic decorative pattern.
+//
+// Rendered as a CSS background-image (inline SVG data URI), not DOM text:
+// a color-contrast checker (axe/Lighthouse) evaluates any element with real
+// text content regardless of aria-hidden — aria-hidden only removes it from
+// the accessibility tree, it doesn't exempt visually-rendered text from
+// WCAG 1.4.3, so a low-opacity <span> here was a genuine (if borderline)
+// finding, not a false positive. A background-image has no text node to
+// evaluate, which is the correct fix for genuinely decorative glyphs rather
+// than fighting the checker with a higher, less-subtle opacity.
+const signalColor = '%23e35866'; // URL-encoded var(--zone-ink-signal) — data URIs can't reference CSS custom properties
+
+function glyphSvg(char: string, opacity: number) {
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' font-family='Arial' font-weight='700' font-size='340' fill='${signalColor}' fill-opacity='${opacity}'%3E${encodeURIComponent(char)}%3C/text%3E%3C/svg%3E`;
+}
+---
+
+<div class="ghost-script" aria-hidden="true">
+  <span class="glyph glyph-ar" style={`background-image: url("${glyphSvg('ب', 0.09)}")`}></span>
+  <span class="glyph glyph-la" style={`background-image: url("${glyphSvg('Aa', 0.07)}")`}></span>
+</div>
+
+<style>
+  .ghost-script {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .glyph {
+    position: absolute;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+  .glyph-ar {
+    width: 34rem;
+    height: 34rem;
+    inset-inline-end: -6rem;
+    top: -10rem;
+  }
+  .glyph-la {
+    width: 22rem;
+    height: 22rem;
+    inset-inline-start: -2rem;
+    bottom: -8rem;
+  }
+
+  @media (max-width: 780px) {
+    .glyph-ar { width: 20rem; height: 20rem; }
+    .glyph-la { width: 12rem; height: 12rem; }
+  }
+</style>

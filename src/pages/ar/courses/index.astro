@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
 import CourseCard from '../../../components/CourseCard.astro';
 import CourseFilter from '../../../components/CourseFilter.astro';
 import { breadcrumbSchema } from '../../../lib/schema';
@@ -38,10 +39,9 @@ const breadcrumbs = breadcrumbSchema([
   description="تصفّح كتالوج دورات ELC الكامل: أطفال، كبار، إنجليزي أعمال، تحضير امتحانات. شاهد السعر والمدة والمستوى بنظرة واحدة."
   jsonLd={[collectionPageSchema, breadcrumbs]}
 >
-  <section class="container">
-    <h1>الدورات</h1>
-    <p>اختر الدورة المناسبة حسب المستوى والمدة والسعر.</p>
+  <PageHero title="الدورات" subtitle="اختر الدورة المناسبة حسب المستوى والمدة والسعر." />
 
+  <section class="container">
     <CourseFilter locale="ar" categories={categories} />
 
     <div class="course-grid">
@@ -53,6 +53,7 @@ const breadcrumbs = breadcrumbSchema([
 </Layout>
 
 <style>
+  .container { padding-top: var(--space-5); }
   .course-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));

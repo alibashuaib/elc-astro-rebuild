@@ -85,6 +85,30 @@ const arrowPolygon = `${tipX},${tipY} ${leftX},${leftY} ${rightX},${rightY}`;
   .dot { fill: var(--color-bg-raised); stroke: var(--color-crimson-text); }
   .dot-final { fill: var(--color-crimson); }
   .arrowhead { fill: var(--color-crimson); }
+
+  /* Draws itself in on load — part of the homepage hero's one orchestrated
+     moment (see .hero-animate in global.css). 500 comfortably exceeds the
+     path's actual length at any locale's mirrored coordinates. */
+  @media (prefers-reduced-motion: no-preference) {
+    .climb-line {
+      stroke-dasharray: 500;
+      stroke-dashoffset: 500;
+      animation: draw-climb-line 1.1s var(--ease) 0.3s forwards;
+    }
+    .dot, .dot-final, .arrowhead {
+      opacity: 0;
+      animation: graphic-fade-in var(--motion-slow) var(--ease) 1.1s forwards;
+    }
+    @keyframes draw-climb-line {
+      to { stroke-dashoffset: 0; }
+    }
+    /* Named distinctly from global.css's .hero-animate keyframes (also called
+       "rise-in" there but with a translateY term) — Astro doesn't scope
+       @keyframes names, so a shared name would collide across stylesheets. */
+    @keyframes graphic-fade-in {
+      to { opacity: 1; }
+    }
+  }
   .level-label {
     font-family: var(--font-mono);
     font-size: 13px;

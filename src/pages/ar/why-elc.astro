@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
 import Icon from '../../components/Icon.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 
@@ -23,10 +24,12 @@ const criteria = [
   description="كيف تقارن ELC من حيث الاعتماد وهيكل الدورات والنتائج — لمن يقارن بين الخيارات."
   jsonLd={breadcrumbs}
 >
-  <section class="container prose-page">
-    <h1>لماذا ELC</h1>
-    <p>موجّه لمن يقارن بين مراكز اللغة قبل التسجيل — مقارنة بالحقائق، دون الإساءة للبدائل.</p>
+  <PageHero
+    title="لماذا ELC"
+    subtitle="موجّه لمن يقارن بين مراكز اللغة قبل التسجيل — مقارنة بالحقائق، دون الإساءة للبدائل."
+  />
 
+  <section class="container prose-page">
     <h2>ما الذي يجب البحث عنه في مركز لغة</h2>
     <ul class="criteria-list">
       {criteria.map((item) => (

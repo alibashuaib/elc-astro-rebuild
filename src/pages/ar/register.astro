@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 
 const courses = await getCollection('courses', (e) => e.id.startsWith('ar/') && !e.data.draft);
@@ -18,10 +19,9 @@ const breadcrumbs = breadcrumbSchema([
   description="سجّل في ELC أو احجز اختبار تحديد مستوى مجاني."
   jsonLd={breadcrumbs}
 >
-  <section class="container prose-page">
-    <h1>التسجيل</h1>
-    <p>تسجيل مبسّط — ربط CRM/باك إند حقيقي خطوة لاحقة؛ هذا النموذج يُرسل إلى نقطة نهاية مؤقتة حاليًا.</p>
+  <PageHero title="التسجيل" subtitle="تسجيل مبسّط — احجز مكانك أو اختبار تحديد مستوى مجاني." />
 
+  <section class="container prose-page">
     <form class="register-form" method="POST" action="/api/register">
       <label>
         الاسم الكامل

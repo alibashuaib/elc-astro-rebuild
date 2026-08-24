@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 
 const courses = await getCollection('courses', (e) => e.id.startsWith('en/') && !e.data.draft);
@@ -18,10 +19,9 @@ const breadcrumbs = breadcrumbSchema([
   description="Enroll at ELC or book a free placement test."
   jsonLd={breadcrumbs}
 >
-  <section class="container prose-page">
-    <h1>Register</h1>
-    <p>Streamlined enrollment — a real backend/CRM hookup is a later step; this form posts to a placeholder endpoint for now.</p>
+  <PageHero title="Register" subtitle="Streamlined enrollment — book your spot or a free placement test." />
 
+  <section class="container prose-page">
     <form class="register-form" method="POST" action="/api/register">
       <label>
         Full name

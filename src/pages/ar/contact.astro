@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 
 const breadcrumbs = breadcrumbSchema([
@@ -15,9 +16,9 @@ const breadcrumbs = breadcrumbSchema([
   description="تواصل مع ELC — الموقع وساعات العمل ونموذج التواصل."
   jsonLd={breadcrumbs}
 >
-  <section class="container prose-page">
-    <h1>اتصل بنا</h1>
+  <PageHero title="اتصل بنا" subtitle="الموقع وساعات العمل وطريقة للتواصل معنا." />
 
+  <section class="container prose-page">
     <div class="contact-grid">
       <div>
         <h2>الموقع</h2>

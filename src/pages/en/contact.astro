@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 // NOTE: localBusinessSchema() is intentionally NOT emitted here yet — its NAP/geo
 // fields are still placeholders (see lib/schema.ts TODOs). Emitting fake address/
@@ -19,9 +20,9 @@ const breadcrumbs = breadcrumbSchema([
   description="Get in touch with ELC — location, hours, and contact form."
   jsonLd={breadcrumbs}
 >
-  <section class="container prose-page">
-    <h1>Contact</h1>
+  <PageHero title="Contact" subtitle="Location, hours, and a way to reach us." />
 
+  <section class="container prose-page">
     <div class="contact-grid">
       <div>
         <h2>Location</h2>

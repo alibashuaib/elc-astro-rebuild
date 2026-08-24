@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
 import { breadcrumbSchema } from '../../../lib/schema';
 import { localizePath } from '../../../i18n/ui';
 
@@ -20,8 +21,9 @@ const breadcrumbs = breadcrumbSchema([
   description="مقالات ونصائح وتحديثات من ELC."
   jsonLd={breadcrumbs}
 >
+  <PageHero title="الأخبار" subtitle="مقالات ونصائح وتحديثات من ELC." />
+
   <section class="container prose-page">
-    <h1>الأخبار</h1>
     <ul class="post-list">
       {posts.map((post) => (
         <li>

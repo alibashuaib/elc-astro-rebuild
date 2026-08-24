@@ -58,6 +58,29 @@ h3 { font-size: var(--fs-lg); }
   background: linear-gradient(90deg, var(--color-crimson-text), var(--color-amber-text));
 }
 
+/* Homepage hero load-in — one orchestrated moment, not scattered effects.
+   Eyebrow/lead/actions stagger up; the fluency-line graphic draws itself in
+   via stroke-dashoffset (see HeroGraphic's .climb-line, animated in that
+   component). Fully inert under prefers-reduced-motion.
+
+   Deliberately excludes .hero-headline: an element animating in from
+   opacity:0 doesn't count toward Largest Contentful Paint until it reaches
+   meaningful opacity, and the h1 is this page's LCP candidate — animating
+   it measurably regressed LCP/FCP in testing. It renders at full opacity
+   immediately; only the surrounding elements get the entrance motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .hero-animate > *:not(.hero-headline) {
+    animation: rise-in var(--motion-slow) var(--ease) both;
+  }
+  .hero-animate > *:nth-child(1) { animation-delay: 0ms; }
+  .hero-animate > *:nth-child(3) { animation-delay: 120ms; }
+  .hero-animate > *:nth-child(4) { animation-delay: 200ms; }
+}
+
 /* Fixed-tone editorial band — chalkboard zone, independent of light/dark OS
    preference (see tokens.css). Used sparingly: hero, one stats strip. */
 .zone-ink {
@@ -135,7 +158,14 @@ img, svg { max-width: 100%; height: auto; display: block; }
 /* Skip link for keyboard/screen reader users */
 .skip-link {
   position: absolute;
-  left: -9999px;
+  /* Logical, not physical (left/top): a physical `left: -9999px` on an RTL
+     page (dir="rtl") blows document scrollWidth out to ~8x the viewport —
+     confirmed via getBoundingClientRect(), the RTL writing mode's negative-
+     offset handling forces the browser to allocate scrollable canvas to
+     reach it, which then shifts the initial scroll position away from the
+     real content on fresh navigation. inset-inline-start doesn't have this
+     problem in either direction. */
+  inset-inline-start: -9999px;
   top: 0;
   background: var(--color-crimson);
   color: #fff;
@@ -143,7 +173,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
   z-index: 100;
 }
 .skip-link:focus {
-  left: var(--space-3);
+  inset-inline-start: var(--space-3);
   top: var(--space-3);
 }
 

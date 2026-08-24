@@ -1,0 +1,41 @@
+---
+// Shared ink-zone header band for interior pages — gives every page the same
+// visual weight the homepage hero has, instead of a plain white h1. Keeps the
+// site's signature texture (GhostScript) and fluency-line motif consistent
+// across the whole site rather than living only on the homepage.
+import GhostScript from './GhostScript.astro';
+
+interface Props {
+  title: string;
+  subtitle?: string;
+}
+const { title, subtitle } = Astro.props;
+---
+
+<header class="page-hero zone-ink">
+  <GhostScript />
+  <div class="container page-hero-inner">
+    <h1>{title}</h1>
+    {subtitle && <p class="subtitle">{subtitle}</p>}
+  </div>
+</header>
+<hr class="fluency-rule" />
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-6);
+  }
+  .page-hero-inner {
+    position: relative;
+    z-index: 1;
+  }
+  .page-hero h1 { margin-bottom: var(--space-2); }
+  .subtitle {
+    font-size: var(--fs-lg);
+    color: var(--zone-ink-muted);
+    max-width: 48ch;
+    margin: 0;
+  }
+</style>

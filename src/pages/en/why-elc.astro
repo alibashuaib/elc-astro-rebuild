@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
 import Icon from '../../components/Icon.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 
@@ -23,13 +24,12 @@ const breadcrumbs = breadcrumbSchema([
   description="How ELC compares on accreditation, class structure, and outcomes — for learners weighing their options."
   jsonLd={breadcrumbs}
 >
-  <section class="container prose-page">
-    <h1>Why ELC</h1>
-    <p>
-      Written for the "Comparison Shopper" — someone weighing a few language centers
-      before enrolling. Compare on facts, not by disparaging alternatives.
-    </p>
+  <PageHero
+    title="Why ELC"
+    subtitle="For anyone weighing a few language centers before enrolling — compared on facts, not by disparaging alternatives."
+  />
 
+  <section class="container prose-page">
     <h2>What to look for in a language center</h2>
     <ul class="criteria-list">
       {criteria.map((item) => (

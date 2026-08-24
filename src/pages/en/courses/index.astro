@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
 import CourseCard from '../../../components/CourseCard.astro';
 import CourseFilter from '../../../components/CourseFilter.astro';
 import { breadcrumbSchema } from '../../../lib/schema';
@@ -38,10 +39,9 @@ const breadcrumbs = breadcrumbSchema([
   description="Browse ELC's full course catalog: Kids, Adults, Business English, and Exam Prep. See price, duration, and level at a glance."
   jsonLd={[collectionPageSchema, breadcrumbs]}
 >
-  <section class="container">
-    <h1>Courses</h1>
-    <p>Find the right course by level, duration, and price.</p>
+  <PageHero title="Courses" subtitle="Find the right course by level, duration, and price." />
 
+  <section class="container">
     <CourseFilter locale="en" categories={categories} />
 
     <div class="course-grid">
@@ -53,6 +53,7 @@ const breadcrumbs = breadcrumbSchema([
 </Layout>
 
 <style>
+  .container { padding-top: var(--space-5); }
   .course-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
