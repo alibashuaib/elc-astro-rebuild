@@ -58,14 +58,20 @@ export async function fetchGoogleReviews(locale: 'en' | 'ar'): Promise<GoogleRev
 
     const data = await res.json();
 
-    const reviews: GoogleReview[] = (data.reviews ?? []).map((r: any) => ({
-      authorName: r.authorAttribution?.displayName ?? 'Google user',
-      authorPhotoUrl: r.authorAttribution?.photoUri ?? null,
-      rating: r.rating ?? 0,
-      text: r.text?.text ?? r.originalText?.text ?? '',
-      relativeTime: r.relativePublishTimeDescription ?? '',
-      publishTime: r.publishTime ?? '',
-    }));
+    const reviews: GoogleReview[] = (data.reviews ?? [])
+      .map((r: any) => ({
+        authorName: r.authorAttribution?.displayName ?? 'Google user',
+        authorPhotoUrl: r.authorAttribution?.photoUri ?? null,
+        rating: r.rating ?? 0,
+        text: r.text?.text ?? r.originalText?.text ?? '',
+        relativeTime: r.relativePublishTimeDescription ?? '',
+        publishTime: r.publishTime ?? '',
+      }))
+      // Only the displayed testimonial cards are curated to 4★+ — overallRating
+      // and totalReviewCount below stay the true, unfiltered Google aggregate
+      // (also what schema.org/AggregateRating reports), so the site never shows
+      // a rating number that doesn't match what's actually on the GBP listing.
+      .filter((r) => r.rating >= 4);
 
     return {
       overallRating: data.rating ?? 0,
