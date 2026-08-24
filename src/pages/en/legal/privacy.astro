@@ -1,19 +1,26 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
 ---
 
-<Layout
-  locale="en"
-  path="/legal/privacy"
-  title="Privacy Policy — ELC"
-  description="How ELC collects, uses, and protects your data."
->
-  <section class="container prose-page">
-    <h1>Privacy Policy</h1>
-    <p>Placeholder — legal text to be provided by the client / legal counsel before launch.</p>
+<Layout locale="en" path="/legal/privacy" title="Privacy Notice — ELC" description="How ELC handles contact information and third-party services on this website.">
+  <PageHero title="Privacy Notice" subtitle="A clear summary of the information used when you contact ELC through this website." />
+  <section class="container legal-page">
+    <h2>Information you choose to provide</h2>
+    <p>When you call, email, or message ELC, you may provide your name, contact details, course interest, and information needed to answer your request. The registration form on this site does not save data on the website; it prepares a WhatsApp message that you review and send yourself.</p>
+    <h2>How information is used</h2>
+    <p>Information you send is used to answer enquiries, recommend a course or placement test, support registration, and provide requested educational services.</p>
+    <h2>External services</h2>
+    <p>The site embeds Google Maps and links to WhatsApp, the student portal, and social platforms. These providers may process technical or account information under their own privacy policies when you load or use their services.</p>
+    <h2>Retention and sharing</h2>
+    <p>ELC retains communications only as needed for admissions, service delivery, administration, and applicable legal obligations. Information is not sold. It may be handled by service providers used to deliver communications or requested services.</p>
+    <h2>Your questions and requests</h2>
+    <p>To ask about personal information you have shared, request correction, or request deletion where applicable, email <a href="mailto:info@elc.com.sa">info@elc.com.sa</a> or call <a class="numeric" href="tel:+966591799917">059 179 9917</a>.</p>
   </section>
 </Layout>
 
 <style>
-  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+  .legal-page { max-width: 52rem; padding-block: clamp(3rem, 7vw, 6rem); }
+  h2 { margin: 2.25rem 0 .65rem; color: var(--color-navy); font-size: 1.4rem; }
+  p { color: var(--color-ink-muted); line-height: 1.85; }
 </style>

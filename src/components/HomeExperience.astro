@@ -1,0 +1,344 @@
+---
+import type { GoogleReviewsResult } from '../lib/googleReviews';
+import type { Locale } from '../i18n/ui';
+import HeroGraphic from './HeroGraphic.astro';
+import Icon from './Icon.astro';
+import Testimonials from './Testimonials.astro';
+import AnimatedNumber from './AnimatedNumber.astro';
+
+interface Props {
+  locale: Locale;
+  reviews: GoogleReviewsResult | null;
+}
+
+const { locale, reviews } = Astro.props;
+const isArabic = locale === 'ar';
+const rtlA1 = '\u2066A1\u2069';
+const rtlC2 = '\u2066C2\u2069';
+
+const copy = isArabic ? {
+  badge: 'معتمد من المؤسسة العامة للتدريب التقني والمهني · منذ 2010',
+  titleStart: 'الإنجليزية التي تفتح لك',
+  titleAccent: 'آفاقًا أوسع.',
+  lead: `مسارات تعليمية واضحة من ${rtlA1} إلى ${rtlC2}، يقودها مدرّبون معتمدون للأطفال والكبار وفرق العمل.`,
+  primaryCta: 'احجز اختبار تحديد المستوى',
+  secondaryCta: 'استكشف الدورات',
+  proof: [`مسار واضح من ${rtlA1} إلى ${rtlC2}`, 'مدرّبون معتمدون', 'تعلم يناسب هدفك'],
+  stats: [
+    { value: '+15,000', label: 'متعلّم وثق بنا' },
+    { value: '+9', label: 'برامج تعليمية' },
+    { value: '2010', label: 'عام التأسيس' },
+  ],
+  whyKicker: 'لماذا معهد صرح المعرفة؟',
+  whyTitle: 'تعليم حديث، بنتائج يمكنك ملاحظتها.',
+  whyText: 'تجربة تعليمية مصممة حول مستوى المتعلم وهدفه، وليست منهجًا واحدًا للجميع.',
+  features: [
+    { icon: 'certificate' as const, title: 'اعتماد موثوق', text: 'معتمدون من TVTC بمعايير تدريب قابلة للتحقق.' },
+    { icon: 'instructor' as const, title: 'خبرة إنسانية', text: 'مدرّبون مؤهلون يعرفون أسماء طلابهم وأهدافهم.' },
+    { icon: 'pathway' as const, title: 'تقدّم منظم', text: 'مراحل واضحة تساعدك على معرفة مستواك وخطوتك التالية.' },
+    { icon: 'details' as const, title: 'تفاصيل واضحة', text: 'المدة والسعر ومخرجات التعلم واضحة قبل التسجيل.' },
+  ],
+  coursesKicker: 'اختر مسارك',
+  coursesTitle: 'برنامج مناسب لكل مرحلة وطموح.',
+  coursesText: 'ابدأ من مستواك الحالي وتقدّم بخطة عملية نحو هدفك.',
+  courseCta: 'اكتشف البرنامج',
+  allCourses: 'عرض جميع الدورات',
+  courses: [
+    { icon: 'kids' as const, title: 'إنجليزي عام للأطفال', text: 'أساس قوي، تعلّم تفاعلي، وثقة تدوم.', meta: 'تعلم ممتع', href: '/ar/courses/kids-general', tone: 'coral' },
+    { icon: 'adults' as const, title: 'إنجليزي عام للكبار', text: 'تواصل أفضل للحياة والدراسة والعمل.', meta: `من ${rtlA1} إلى ${rtlC2}`, href: '/ar/courses/adults-general', tone: 'blue' },
+    { icon: 'business' as const, title: 'إنجليزي الأعمال', text: 'لغة مهنية للاجتماعات والعروض والفرص.', meta: 'للفرق والأفراد', href: '/ar/courses/business-english', tone: 'mint' },
+    { icon: 'exam-prep' as const, title: 'تحضير الجامعة والاختبارات (PUP)', text: 'استعداد مركز لأهداف القبول والدرجات.', meta: 'تحضير موجّه', href: '/ar/courses/university-exam-prep', tone: 'yellow' },
+    { icon: 'exam-prep' as const, title: 'التحضير لاختبار IELTS', text: 'تدريب موجه على الاستماع والقراءة والكتابة والمحادثة.', meta: 'أكاديمي وعام', href: '/ar/courses/ielts-preparation', tone: 'coral' },
+    { icon: 'exam-prep' as const, title: 'التحضير لاختبار STEP', text: 'مراجعة منظمة للغة واستراتيجيات الاختبار والتدريب المحدد بالوقت.', meta: 'اختبار الكفايات', href: '/ar/courses/step-exam-preparation', tone: 'blue' },
+  ],
+  ctaKicker: 'خطوتك الأولى بسيطة',
+  ctaTitle: 'اعرف مستواك، وابنِ خطتك.',
+  ctaText: 'اختبار تحديد المستوى يساعدنا على توجيهك إلى البرنامج الأنسب دون تخمين.',
+  ctaButton: 'ابدأ باختبار تحديد المستوى',
+} : {
+  badge: 'TVTC accredited · Learning since 2010',
+  titleStart: 'English that opens',
+  titleAccent: 'bigger possibilities.',
+  lead: 'Clear learning pathways from A1 to C2, led by credentialed instructors for children, adults, and teams.',
+  primaryCta: 'Book a placement test',
+  secondaryCta: 'Explore courses',
+  proof: ['Clear A1–C2 pathway', 'Credentialed instructors', 'Goal-led learning'],
+  stats: [
+    { value: '15,000+', label: 'learners taught' },
+    { value: '9+', label: 'learning programs' },
+    { value: '2010', label: 'established' },
+  ],
+  whyKicker: 'Why ELC',
+  whyTitle: 'Modern learning, with progress you can see.',
+  whyText: 'An education experience built around each learner’s level and goal—not a one-size-fits-all syllabus.',
+  features: [
+    { icon: 'certificate' as const, title: 'Trusted accreditation', text: 'TVTC-accredited training standards you can verify.' },
+    { icon: 'instructor' as const, title: 'Human expertise', text: 'Qualified instructors who know their learners and goals.' },
+    { icon: 'pathway' as const, title: 'Structured progress', text: 'Clear stages show where you are and what comes next.' },
+    { icon: 'details' as const, title: 'Transparent details', text: 'Duration, pricing, and outcomes are clear before you enroll.' },
+  ],
+  coursesKicker: 'Choose your pathway',
+  coursesTitle: 'A program for every stage and ambition.',
+  coursesText: 'Start at your current level and move toward your goal with a practical plan.',
+  courseCta: 'Discover the program',
+  allCourses: 'View all courses',
+  courses: [
+    { icon: 'kids' as const, title: 'Kids General English', text: 'Strong foundations, active learning, lasting confidence.', meta: 'Joyful learning', href: '/en/courses/kids-general', tone: 'coral' },
+    { icon: 'adults' as const, title: 'Adults General English', text: 'Better communication for life, study, and work.', meta: 'A1 to C2', href: '/en/courses/adults-general', tone: 'blue' },
+    { icon: 'business' as const, title: 'Business English', text: 'Professional language for meetings, pitches, and growth.', meta: 'Teams & individuals', href: '/en/courses/business-english', tone: 'mint' },
+    { icon: 'exam-prep' as const, title: 'University & Exam Prep (PUP)', text: 'Focused preparation for admissions and target scores.', meta: 'Goal-focused prep', href: '/en/courses/university-exam-prep', tone: 'yellow' },
+    { icon: 'exam-prep' as const, title: 'IELTS Exam Preparation', text: 'Focused practice across listening, reading, writing, and speaking.', meta: 'Academic & General', href: '/en/courses/ielts-preparation', tone: 'coral' },
+    { icon: 'exam-prep' as const, title: 'STEP Exam Preparation', text: 'Structured language review, test strategy, and timed practice.', meta: 'Saudi proficiency test', href: '/en/courses/step-exam-preparation', tone: 'blue' },
+  ],
+  ctaKicker: 'Your first step is simple',
+  ctaTitle: 'Know your level. Build your plan.',
+  ctaText: 'A placement test helps us guide you to the right program without guesswork.',
+  ctaButton: 'Start with a placement test',
+};
+
+const basePath = `/${locale}`;
+---
+
+<section class="hero">
+  <div class="hero-orb hero-orb-one" aria-hidden="true"></div>
+  <div class="hero-orb hero-orb-two" aria-hidden="true"></div>
+  <div class="container hero-grid">
+    <div class="hero-copy hero-animate">
+      <span class="eyebrow"><span class="eyebrow-dot"></span>{copy.badge}</span>
+      <h1>{copy.titleStart}<br />{' '}<span>{copy.titleAccent}</span></h1>
+      <p class="hero-lead">{copy.lead}</p>
+      <div class="hero-actions">
+        <a href={`${basePath}/register`} class="btn btn-primary">{copy.primaryCta}<span aria-hidden="true">↗</span></a>
+        <a href={`${basePath}/courses`} class="btn btn-soft">{copy.secondaryCta}</a>
+      </div>
+      <ul class="hero-proof" aria-label={isArabic ? 'مزايا البرنامج' : 'Program benefits'}>
+        {copy.proof.map((item) => <li><Icon name="check" size={16} />{item}</li>)}
+      </ul>
+    </div>
+
+    <div class="hero-visual">
+      <div class="visual-card">
+        <div class="visual-card-head">
+          <div>
+            <span>{isArabic ? 'رحلتك التعليمية' : 'Your learning journey'}</span>
+            <strong>{isArabic ? 'من الأساس إلى الطلاقة' : 'From foundation to fluency'}</strong>
+          </div>
+          <span class="live-pill"><i></i>{isArabic ? 'مسار واضح' : 'Clear pathway'}</span>
+        </div>
+        <HeroGraphic locale={locale} tone="paper" />
+        <div class="visual-footer">
+          <span class="avatar-stack" aria-hidden="true"><i>R</i><i>S</i><i>M</i></span>
+          <p><strong>15,000+</strong> {isArabic ? 'متعلّم بدأ رحلته معنا' : 'learners started here'}</p>
+        </div>
+      </div>
+      <div class="floating-card floating-top"><Icon name="certificate" size={20} /><span><strong>TVTC</strong>{isArabic ? 'اعتماد موثوق' : 'Accredited'}</span></div>
+      <div class="floating-card floating-bottom"><span class="mini-chart" aria-hidden="true">↗</span><span><strong dir="ltr">A1 → C2</strong>{isArabic ? 'تقدّم خطوة بخطوة' : 'Step-by-step progress'}</span></div>
+    </div>
+  </div>
+
+  <div class="container stats-panel">
+    {copy.stats.map((stat) => (
+      <div class="stat"><AnimatedNumber class="numeric" value={stat.value} /><span>{stat.label}</span></div>
+    ))}
+    <div class="stat"><AnimatedNumber class="numeric" value="100%" /><span>{isArabic ? 'تعليم حضوري' : 'in-person learning'}</span></div>
+  </div>
+</section>
+
+<section class="section why-section">
+  <div class="container">
+    <div class="section-heading split-heading">
+      <div><span class="section-kicker">{copy.whyKicker}</span><h2>{copy.whyTitle}</h2></div>
+      <p>{copy.whyText}</p>
+    </div>
+    <div class="feature-grid">
+      {copy.features.map((feature, index) => (
+        <article class={`feature-card feature-${index + 1}`}>
+          <span class="icon-box"><Icon name={feature.icon} size={25} /></span>
+          <span class="feature-number numeric">0{index + 1}</span>
+          <h3>{feature.title}</h3>
+          <p>{feature.text}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="section courses-section">
+  <div class="container">
+    <div class="section-heading courses-heading">
+      <div><span class="section-kicker">{copy.coursesKicker}</span><h2>{copy.coursesTitle}</h2></div>
+      <div><p>{copy.coursesText}</p><a href={`${basePath}/courses`} class="text-link">{copy.allCourses}<span aria-hidden="true">↗</span></a></div>
+    </div>
+    <div class="course-grid">
+      {copy.courses.map((course, index) => (
+        <a class={`course-card tone-${course.tone}`} href={course.href}>
+          <span class="course-watermark" aria-hidden="true"><Icon name={course.icon} size={118} /></span>
+          <div class="course-top">
+            <span class="course-icon"><Icon name={course.icon} size={28} /></span>
+            <div class="course-badges"><span class="course-number numeric">0{index + 1}</span><span class="course-meta">{course.meta}</span></div>
+          </div>
+          <div><h3>{course.title}</h3><p>{course.text}</p></div>
+          <span class="course-link">{copy.courseCta}<b aria-hidden="true">↗</b></span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+{reviews && <div class="container reviews-wrap"><Testimonials locale={locale} data={reviews} /></div>}
+
+<section class="container final-cta">
+  <div class="cta-pattern" aria-hidden="true"></div>
+  <div>
+    <span class="section-kicker">{copy.ctaKicker}</span>
+    <h2>{copy.ctaTitle}</h2>
+    <p>{copy.ctaText}</p>
+  </div>
+  <a href={`${basePath}/register`} class="btn btn-light">{copy.ctaButton}<span aria-hidden="true">↗</span></a>
+</section>
+
+<style>
+  .hero { position: relative; overflow: hidden; padding: clamp(4.5rem, 8vw, 7.5rem) 0 0; background: linear-gradient(145deg, #faf9f7 0%, #f7f4f0 48%, #fff7ec 100%); }
+  .hero::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgb(78 71 67 / 0.1) 1px, transparent 0); background-size: 28px 28px; mask-image: linear-gradient(to bottom, black, transparent 72%); pointer-events: none; }
+  .hero-orb { position: absolute; border-radius: 999px; filter: blur(2px); pointer-events: none; }
+  .hero-orb-one { width: 23rem; height: 23rem; background: rgb(182 23 51 / 0.11); inset-inline-end: -8rem; top: -7rem; }
+  .hero-orb-two { width: 17rem; height: 17rem; background: rgb(242 148 32 / 0.13); inset-inline-start: -8rem; bottom: 4rem; }
+  .hero-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(25rem, .9fr); align-items: center; gap: clamp(3rem, 7vw, 7rem); }
+  .hero-copy { position: relative; z-index: 2; max-width: 43rem; }
+  .eyebrow, .section-kicker { display: inline-flex; align-items: center; gap: .55rem; color: var(--color-primary); font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  :global(:lang(ar)) .eyebrow, :global(:lang(ar)) .section-kicker { letter-spacing: 0; }
+  .eyebrow { padding: .55rem .85rem; border: 1px solid rgb(182 23 51 / .17); border-radius: 999px; background: rgb(255 255 255 / .72); box-shadow: 0 8px 30px rgb(66 54 49 / .08); }
+  .eyebrow-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-coral); box-shadow: 0 0 0 4px rgb(242 148 32 / .14); }
+  h1 { margin: 1.5rem 0; max-width: 12ch; color: var(--color-navy); font-size: clamp(3.35rem, 6.6vw, 6.85rem); line-height: .96; letter-spacing: -.065em; }
+  h1 span { color: var(--color-primary); }
+  :global(:lang(ar)) h1 { max-width: 15ch; font-size: clamp(3rem, 5vw, 5.25rem); line-height: 1.22; letter-spacing: -.035em; }
+  .hero-lead { max-width: 55ch; margin-bottom: 1.8rem; color: var(--color-ink-muted); font-size: clamp(1.08rem, 1.6vw, 1.3rem); line-height: 1.75; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+  .hero-actions .btn span, .btn-light span { font-size: 1.1em; }
+  :global(:dir(rtl)) .hero-actions .btn span, :global(:dir(rtl)) .btn-light span, :global(:dir(rtl)) .text-link span, :global(:dir(rtl)) .course-link b { transform: scaleX(-1); }
+  .hero-proof { display: flex; flex-wrap: wrap; gap: .85rem 1.25rem; padding: 0; margin: 1.6rem 0 0; list-style: none; color: var(--color-ink-muted); font-size: .84rem; font-weight: 650; }
+  .hero-proof li { display: inline-flex; align-items: center; gap: .35rem; }
+  .hero-proof :global(svg) { color: var(--color-mint-ink); padding: 2px; border-radius: 50%; background: var(--color-mint-soft); }
+  .hero-visual { position: relative; z-index: 1; padding: 3rem 1.25rem; }
+  .visual-card { position: relative; padding: 1.4rem; border: 1px solid rgb(255 255 255 / .9); border-radius: 2rem; background: rgb(255 255 255 / .88); box-shadow: 0 35px 90px rgb(73 58 52 / .17), inset 0 1px 0 #fff; backdrop-filter: blur(16px); transform: rotate(1.2deg); }
+  .visual-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+  .visual-card-head div { display: flex; flex-direction: column; gap: .15rem; }
+  .visual-card-head span { color: var(--color-ink-muted); font-size: .72rem; }
+  .visual-card-head strong { color: var(--color-navy); font-size: .97rem; }
+  .live-pill { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .55rem; border-radius: 999px; background: var(--color-mint-soft); color: var(--color-mint-ink) !important; font-weight: 750; white-space: nowrap; }
+  .live-pill i { width: .42rem; height: .42rem; border-radius: 50%; background: var(--color-mint); }
+  .visual-card :global(.hero-graphic) { max-width: none; margin: .5rem auto 0; }
+  .visual-footer { display: flex; align-items: center; gap: .8rem; padding: .9rem 1rem; border-radius: 1rem; background: var(--color-surface-soft); }
+  .visual-footer p { margin: 0; color: var(--color-ink-muted); font-size: .75rem; }
+  .visual-footer strong { color: var(--color-navy); }
+  .avatar-stack { display: flex; direction: ltr; }
+  .avatar-stack i { display: grid; place-items: center; width: 1.85rem; height: 1.85rem; margin-left: -.42rem; border: 2px solid #fff; border-radius: 50%; color: #fff; background: var(--color-primary); font-size: .62rem; font-style: normal; font-weight: 800; }
+  .avatar-stack i:nth-child(2) { background: var(--color-coral); }
+  .avatar-stack i:nth-child(3) { background: var(--color-mint-ink); }
+  .floating-card { position: absolute; z-index: 2; display: flex; align-items: center; gap: .65rem; min-width: 9.5rem; padding: .8rem .95rem; border: 1px solid rgb(255 255 255 / .9); border-radius: 1rem; background: rgb(255 255 255 / .94); box-shadow: 0 16px 45px rgb(73 58 52 / .15); }
+  .floating-card :global(svg) { color: var(--color-primary); }
+  .floating-card span { display: flex; flex-direction: column; color: var(--color-ink-muted); font-size: .66rem; }
+  .floating-card strong { color: var(--color-navy); font-size: .8rem; }
+  .floating-top { inset-inline-end: -1rem; top: .35rem; transform: rotate(-2deg); }
+  .floating-bottom { inset-inline-start: -.9rem; bottom: 1.5rem; transform: rotate(2deg); }
+  .mini-chart { display: grid !important; place-items: center; width: 2rem; height: 2rem; border-radius: .65rem; color: var(--color-coral) !important; background: var(--color-coral-soft); font-size: 1rem !important; font-weight: 900; }
+  .stats-panel { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(4, 1fr); align-items: stretch; gap: 1rem; margin-top: 4rem; padding-block: 1.4rem; }
+  .stat { position: relative; display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: .45rem; padding: 1.25rem 1.35rem; overflow: hidden; border: 1px solid rgb(77 69 65 / .12); border-radius: 1.25rem; background: rgb(255 255 255 / .78); box-shadow: 0 14px 35px rgb(62 48 42 / .08); transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease); }
+  .stat::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--color-primary), var(--color-coral)); transform-origin: left; }
+  :global(:dir(rtl)) .stat::before { transform-origin: right; }
+  .stat:hover { transform: translateY(-4px); box-shadow: 0 20px 45px rgb(62 48 42 / .12); }
+  .stat :global(strong) { color: var(--color-primary); font-size: clamp(2rem, 3.2vw, 3rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
+  .stat span { color: var(--color-ink-muted); font-size: .78rem; font-weight: 700; }
+  .section { padding-block: clamp(5rem, 9vw, 8rem); }
+  .why-section, .courses-section, .final-cta { content-visibility: auto; contain-intrinsic-size: auto 850px; }
+  .section-heading { margin-bottom: 2.5rem; }
+  .section-heading h2, .final-cta h2 { margin: .65rem 0 0; color: var(--color-navy); font-size: clamp(2.2rem, 4vw, 4rem); line-height: 1.08; letter-spacing: -.045em; }
+  :global(:lang(ar)) .section-heading h2, :global(:lang(ar)) .final-cta h2 { line-height: 1.35; letter-spacing: -.025em; }
+  .split-heading, .courses-heading { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(18rem, .75fr); align-items: end; gap: 3rem; }
+  .split-heading p, .courses-heading p { margin: 0; color: var(--color-ink-muted); line-height: 1.75; }
+  .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  .feature-card { position: relative; min-height: 17rem; padding: 1.45rem; overflow: hidden; border: 1px solid var(--color-border); border-radius: 1.5rem; background: #fff; box-shadow: var(--shadow-sm); transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease); }
+  .feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
+  .feature-card::after { content: ''; position: absolute; width: 7rem; height: 7rem; inset-inline-end: -3.5rem; bottom: -3.5rem; border-radius: 50%; background: var(--card-soft, var(--color-blue-soft)); }
+  .icon-box { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; margin-bottom: 2.4rem; border-radius: 1rem; color: var(--card-color, var(--color-primary)); background: var(--card-soft, var(--color-blue-soft)); }
+  .feature-number { position: absolute; display: grid; width: 2.45rem; height: 2.45rem; place-items: center; inset-inline-end: 1.25rem; top: 1.25rem; border: 1px solid var(--card-soft, var(--color-blue-soft)); border-radius: .8rem; color: var(--card-color, var(--color-primary)); background: #fff; box-shadow: 0 8px 20px rgb(35 42 61 / .09); font-size: .82rem; font-weight: 850; transition: transform var(--motion-base) var(--ease), color var(--motion-base) var(--ease), background var(--motion-base) var(--ease); }
+  .feature-card:hover .feature-number { color: #fff; background: var(--card-color, var(--color-primary)); transform: rotate(-7deg) scale(1.08); }
+  .feature-card h3 { margin-bottom: .6rem; color: var(--color-navy); font-size: 1.15rem; }
+  .feature-card p { margin: 0; color: var(--color-ink-muted); font-size: .88rem; line-height: 1.7; }
+  .feature-2 { --card-color: var(--color-coral); --card-soft: var(--color-coral-soft); }
+  .feature-3 { --card-color: var(--color-mint-ink); --card-soft: var(--color-mint-soft); }
+  .feature-4 { --card-color: var(--color-yellow-ink); --card-soft: var(--color-yellow-soft); }
+  .courses-section { background: var(--color-navy); color: #fff; }
+  .courses-section .section-kicker { color: #f7b75f; }
+  .courses-section .section-heading h2 { color: #fff; }
+  .courses-section .section-heading p { color: #d0ccc7; }
+  .courses-heading > div:last-child { align-self: end; }
+  .text-link { display: inline-flex; align-items: center; gap: .45rem; margin-top: .8rem; color: #fff; font-size: .85rem; font-weight: 750; }
+  .text-link:hover { color: #fff; text-decoration: none; gap: .7rem; }
+  .course-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .course-card { position: relative; isolation: isolate; display: flex; min-height: 18rem; flex-direction: column; justify-content: space-between; padding: 1.3rem; overflow: hidden; border: 1px solid rgb(255 255 255 / .42); border-radius: 1.5rem; color: var(--color-navy); background: linear-gradient(145deg, var(--course-bg-start), var(--course-bg-end)); box-shadow: inset 0 1px 0 rgb(255 255 255 / .62), 0 14px 35px rgb(0 0 0 / .11); transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease); }
+  .course-card::before { content: ''; position: absolute; z-index: -1; width: 10rem; height: 10rem; inset-inline-end: -4rem; top: -5rem; border-radius: 50%; background: var(--course-glow); filter: blur(1px); opacity: .7; transition: transform .5s var(--ease); }
+  .course-card::after { content: ''; position: absolute; z-index: -1; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgb(25 39 69 / .12) 1px, transparent 0); background-size: 18px 18px; mask-image: linear-gradient(145deg, transparent 35%, black 100%); opacity: .35; }
+  .course-card:hover { color: var(--color-navy); text-decoration: none; transform: translateY(-8px) rotate(-.45deg); box-shadow: inset 0 1px 0 rgb(255 255 255 / .72), 0 24px 55px rgb(0 0 0 / .19); }
+  .course-card:hover::before { transform: scale(1.25); }
+  .course-card > :not(.course-watermark) { position: relative; z-index: 2; }
+  .course-watermark { position: absolute; z-index: 0; inset-inline-end: -1.8rem; bottom: -1.6rem; color: var(--course-ink); opacity: .075; transform: rotate(-8deg) scale(.9); transition: opacity .45s var(--ease), transform .55s var(--ease); }
+  :global(:dir(rtl)) .course-watermark { transform: rotate(8deg) scale(.9); }
+  .course-card:hover .course-watermark { opacity: .13; transform: rotate(-2deg) scale(1.04); }
+  :global(:dir(rtl)) .course-card:hover .course-watermark { transform: rotate(2deg) scale(1.04); }
+  .course-top { display: flex; align-items: flex-start; justify-content: space-between; gap: .8rem; }
+  .course-icon { display: grid; width: 3.25rem; height: 3.25rem; flex: 0 0 auto; place-items: center; border: 1px solid rgb(255 255 255 / .64); border-radius: 1rem; color: var(--course-ink); background: rgb(255 255 255 / .64); box-shadow: 0 9px 22px rgb(48 38 34 / .1); transition: transform var(--motion-base) var(--ease), background var(--motion-base) var(--ease); }
+  .course-card:hover .course-icon { background: #fff; transform: rotate(-7deg) scale(1.06); }
+  .course-badges { display: flex; max-width: 70%; flex-wrap: wrap; justify-content: flex-end; gap: .35rem; }
+  .course-number, .course-meta { display: inline-flex; min-height: 1.7rem; align-items: center; padding: .3rem .52rem; border: 1px solid rgb(255 255 255 / .5); border-radius: 999px; color: var(--course-ink); background: rgb(255 255 255 / .58); font-size: .64rem; font-weight: 850; }
+  .course-number { min-width: 1.9rem; justify-content: center; }
+  .course-card h3 { max-width: 16ch; margin-bottom: .5rem; font-size: clamp(1.2rem, 2vw, 1.42rem); line-height: 1.25; }
+  :global(:lang(ar)) .course-card h3 { line-height: 1.45; }
+  .course-card p { max-width: 34ch; margin: 0; color: rgb(25 39 69 / .74); font-size: .82rem; line-height: 1.58; }
+  .course-link { display: flex; align-items: center; justify-content: space-between; padding-top: .75rem; border-top: 1px solid rgb(25 39 69 / .16); font-size: .72rem; font-weight: 850; }
+  .course-link b { display: grid; width: 1.85rem; height: 1.85rem; place-items: center; border-radius: 50%; color: #fff; background: var(--course-ink); font-size: .95rem; box-shadow: 0 7px 16px rgb(25 39 69 / .16); transition: transform var(--motion-fast) var(--ease); }
+  .course-card:hover .course-link b { transform: translate(2px, -2px); }
+  :global(:dir(rtl)) .course-card:hover .course-link b { transform: translate(-2px, -2px) scaleX(-1); }
+  .tone-coral { --course-bg-start: #fbe8eb; --course-bg-end: #f2c4cd; --course-ink: #921229; --course-glow: #fff4f6; }
+  .tone-blue { --course-bg-start: #f5f6f8; --course-bg-end: #d9dde4; --course-ink: #394867; --course-glow: #fff; }
+  .tone-mint { --course-bg-start: #f7f1eb; --course-bg-end: #e5d4c2; --course-ink: #6f5035; --course-glow: #fff8ed; }
+  .tone-yellow { --course-bg-start: #fff3dc; --course-bg-end: #ffd58f; --course-ink: #895411; --course-glow: #fffaf0; }
+  .reviews-wrap { padding-top: 1rem; }
+  .final-cta { position: relative; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2rem; margin-top: clamp(5rem, 9vw, 8rem); padding-block: clamp(2.5rem, 6vw, 4.5rem); padding-inline: clamp(1.5rem, 5vw, 4rem); overflow: hidden; border-radius: 2rem; color: #fff; background: linear-gradient(125deg, var(--color-primary), #d96f1d); box-shadow: 0 30px 70px rgb(130 31 36 / .24); }
+  .final-cta > :not(.cta-pattern) { position: relative; z-index: 1; }
+  .final-cta .section-kicker { color: #ffe3bd; }
+  .final-cta h2 { color: #fff; }
+  .final-cta p { max-width: 55ch; margin: .8rem 0 0; color: #fff1e1; }
+  .cta-pattern { position: absolute; z-index: 0; width: 25rem; height: 25rem; inset-inline-end: -8rem; top: -8rem; border: 3rem solid rgb(255 255 255 / .08); border-radius: 50%; box-shadow: 0 0 0 3rem rgb(255 255 255 / .05), 0 0 0 6rem rgb(255 255 255 / .03); }
+  .btn-light { flex-shrink: 0; background: #fff; color: var(--color-primary); }
+  .btn-light:hover { color: var(--color-primary); background: #fff4e8; text-decoration: none; }
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-copy { max-width: 47rem; }
+    .hero-visual { max-width: 38rem; margin-inline: auto; width: 100%; }
+    .feature-grid, .course-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-panel { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (max-width: 680px) {
+    .hero { padding-top: 3.5rem; }
+    .hero-grid { gap: 1.2rem; }
+    h1 { font-size: clamp(3rem, 14vw, 4.25rem); }
+    :global(:lang(ar)) h1 { font-size: clamp(2.75rem, 12vw, 3.8rem); }
+    .hero-actions .btn { width: 100%; justify-content: center; }
+    .hero-proof { display: grid; grid-template-columns: 1fr; }
+    .hero-visual { padding: 2.5rem .6rem 2.8rem; }
+    .visual-card { padding: 1rem; border-radius: 1.5rem; }
+    .floating-top { inset-inline-end: -.3rem; top: .2rem; }
+    .floating-bottom { inset-inline-start: -.25rem; bottom: 1.4rem; }
+    .stats-panel { grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; padding-block: 1.2rem; }
+    .stat { min-height: 7.5rem; padding: 1rem; gap: .4rem; }
+    .stat :global(strong) { font-size: clamp(1.65rem, 9vw, 2.25rem); }
+    .stat span { font-size: .7rem; }
+    .split-heading, .courses-heading { grid-template-columns: 1fr; gap: 1.2rem; }
+    .feature-grid, .course-grid { grid-template-columns: 1fr; }
+    .feature-card { min-height: 14rem; }
+    .course-card { min-height: 16.5rem; }
+    .final-cta { grid-template-columns: 1fr; margin-inline: 1rem; border-radius: 1.5rem; }
+    .final-cta .btn { width: 100%; justify-content: center; }
+  }
+</style>

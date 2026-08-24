@@ -1,19 +1,39 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
+
+const terms = [
+  'Course fees must be paid in full before a trainee begins studying.',
+  'Trainees must follow the institute’s standards of conduct. The institute may suspend a trainee for misconduct.',
+  'Trainees must use the institute’s furniture, equipment, and learning tools responsibly and may be charged for damage they cause.',
+  'A trainee may receive a refund if the registered course is unavailable or if withdrawal is requested at least one week before the course begins.',
+  'If a trainee withdraws during the first five days after a course begins, 50% of the course and transportation registration fees will be deducted.',
+  'No withdrawal or refund is available after the first five days of the course.',
+  'A replacement course book or learning kit costs SAR 170.',
+  'A trainee who does not pass may receive a 50% discount when repeating the course within three months of its end date.',
+  'Trainees must attend at least 80% of scheduled study hours. Exceeding the permitted absence may affect course completion and certificate eligibility.',
+  'Certificates must be collected within three months after the course ends.',
+  'A trainee who stops attending is not entitled to a refund.',
+  'Continuation after a long interruption or suspension is subject to the institute’s enrollment rules and the validity of the original course period.',
+  'A trainee who has stopped studying for more than two months must complete a new level assessment.',
+  'If a trainee withdraws from a promotional package, course fees return to the standard non-package rate.',
+];
 ---
 
-<Layout
-  locale="en"
-  path="/legal/terms"
-  title="Terms & Conditions — ELC"
-  description="Terms and conditions for using ELC's services and website."
->
-  <section class="container prose-page">
-    <h1>Terms & Conditions</h1>
-    <p>Placeholder — legal text to be provided by the client / legal counsel before launch.</p>
+<Layout locale="en" path="/legal/terms" title="Terms & Conditions — ELC" description="Enrollment, attendance, withdrawal, refund, and certificate terms for ELC trainees.">
+  <PageHero title="Terms & Conditions" subtitle="The current enrollment rules for course fees, attendance, withdrawal, and certificates." />
+  <section class="container legal-page">
+    <p class="intro">These terms apply to course enrollment and study at ELC. Contact admissions before payment if you need clarification about a course, package, transportation option, or refund eligibility.</p>
+    <ol>{terms.map((term) => <li>{term}</li>)}</ol>
+    <p class="contact-note">Questions? Call <a class="numeric" href="tel:+966591799917">059 179 9917</a> or email <a href="mailto:info@elc.com.sa">info@elc.com.sa</a>.</p>
   </section>
 </Layout>
 
 <style>
-  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
+  .legal-page { max-width: 52rem; padding-block: clamp(3rem, 7vw, 6rem); }
+  .intro { color: var(--color-ink-muted); font-size: 1.05rem; line-height: 1.8; }
+  ol { display: grid; gap: 1rem; margin: 2rem 0; padding-inline-start: 1.5rem; }
+  li { padding-inline-start: .5rem; color: var(--color-ink); line-height: 1.75; }
+  li::marker { color: var(--color-primary); font-weight: 800; }
+  .contact-note { padding: 1.25rem; border-radius: 1rem; color: var(--color-navy); background: var(--color-blue-soft); }
 </style>

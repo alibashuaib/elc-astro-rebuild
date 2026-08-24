@@ -1,0 +1,102 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import type { Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  courses: CollectionEntry<'courses'>[];
+}
+
+const { locale, courses } = Astro.props;
+const isArabic = locale === 'ar';
+const copy = isArabic ? {
+  heading: 'أرسل طلب التسجيل عبر واتساب',
+  intro: 'أدخل بيانات التواصل الأساسية واختر الدورة. سنفتح رسالة واتساب جاهزة لإرسالها إلى فريق القبول.',
+  name: 'الاسم الكامل',
+  email: 'البريد الإلكتروني',
+  phone: 'رقم الهاتف',
+  course: 'الدورة',
+  choose: 'اختر دورة',
+  submit: 'متابعة عبر واتساب',
+  privacy: 'لا تُخزن هذه البيانات في الموقع؛ تُضاف فقط إلى رسالة واتساب التي ترسلها بنفسك.',
+} : {
+  heading: 'Send your registration request on WhatsApp',
+  intro: 'Add your basic contact details and choose a course. We’ll open a ready-to-send WhatsApp message to admissions.',
+  name: 'Full name',
+  email: 'Email',
+  phone: 'Phone number',
+  course: 'Course',
+  choose: 'Select a course',
+  submit: 'Continue on WhatsApp',
+  privacy: 'This information is not stored on the website; it is only added to the WhatsApp message you choose to send.',
+};
+---
+
+<section class="container registration-wrap">
+  <div class="registration-intro">
+    <span class="section-kicker">{isArabic ? 'القبول والتسجيل' : 'Admissions'}</span>
+    <h2>{copy.heading}</h2>
+    <p>{copy.intro}</p>
+    <a class="phone-link numeric" href="tel:+966591799917">059 179 9917</a>
+  </div>
+
+  <form class="register-form" data-registration-form data-locale={locale}>
+    <label>
+      {copy.name}
+      <input type="text" name="name" autocomplete="name" required />
+    </label>
+    <label>
+      {copy.email}
+      <input type="email" name="email" autocomplete="email" required />
+    </label>
+    <label>
+      {copy.phone}
+      <input class="numeric" type="tel" name="phone" autocomplete="tel" inputmode="tel" required />
+    </label>
+    <label>
+      {copy.course}
+      <select name="course" required>
+        <option value="">{copy.choose}</option>
+        {courses.map((course) => <option value={course.data.title}>{course.data.title}</option>)}
+      </select>
+    </label>
+    <button type="submit" class="btn btn-primary">{copy.submit}</button>
+    <p class="privacy-note">{copy.privacy}</p>
+  </form>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('[data-registration-form]').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const locale = form.dataset.locale;
+      const name = String(data.get('name') ?? '');
+      const email = String(data.get('email') ?? '');
+      const phone = String(data.get('phone') ?? '');
+      const course = String(data.get('course') ?? '');
+      const message = locale === 'ar'
+        ? `طلب تسجيل جديد\nالاسم: ${name}\nالهاتف: ${phone}\nالبريد الإلكتروني: ${email}\nالدورة: ${course}`
+        : `New registration request\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nCourse: ${course}`;
+      window.open(`https://wa.me/966546656000?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+    });
+  });
+</script>
+
+<style>
+  .registration-wrap { display: grid; grid-template-columns: minmax(18rem, .75fr) minmax(0, 1.25fr); gap: clamp(3rem, 8vw, 7rem); padding-block: clamp(4rem, 8vw, 7rem); }
+  .registration-intro { align-self: start; }
+  .section-kicker { color: var(--color-primary); font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+  :global(:lang(ar)) .section-kicker { letter-spacing: 0; }
+  .registration-intro h2 { max-width: 12ch; margin: .75rem 0 1rem; color: var(--color-navy); font-size: clamp(2.1rem, 4vw, 3.6rem); line-height: 1.1; letter-spacing: -.045em; }
+  :global(:lang(ar)) .registration-intro h2 { line-height: 1.35; letter-spacing: -.025em; }
+  .registration-intro p { color: var(--color-ink-muted); line-height: 1.75; }
+  .phone-link { display: inline-flex; margin-top: 1rem; color: var(--color-primary); font-weight: 800; }
+  .register-form { display: grid; gap: 1rem; padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid var(--color-border); border-radius: 1.5rem; background: #fff; box-shadow: var(--shadow-sm); }
+  .register-form label { display: flex; flex-direction: column; gap: .45rem; color: var(--color-navy); font-size: .88rem; font-weight: 700; }
+  .register-form input, .register-form select { width: 100%; min-height: 3.25rem; padding: .75rem .9rem; border: 1px solid var(--color-border); border-radius: .85rem; color: var(--color-ink); background: var(--color-surface-soft); font: inherit; }
+  .register-form input:focus, .register-form select:focus { outline: 3px solid rgb(182 23 51 / .12); border-color: var(--color-primary); }
+  .register-form .btn { justify-content: center; margin-top: .5rem; }
+  .privacy-note { margin: 0; color: var(--color-ink-muted); font-size: .75rem; line-height: 1.6; }
+  @media (max-width: 760px) { .registration-wrap { grid-template-columns: 1fr; gap: 2rem; } }
+</style>

@@ -1,0 +1,59 @@
+---
+import type { Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  summary: string;
+  publishDate: Date;
+}
+
+const { locale, title, summary, publishDate } = Astro.props;
+const isArabic = locale === 'ar';
+const formattedDate = publishDate.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+---
+
+<article class="container article-page">
+  <nav aria-label="Breadcrumb" class="breadcrumb">
+    <a href={`/${locale}/`}>{isArabic ? 'الرئيسية' : 'Home'}</a><span>/</span><a href={`/${locale}/blog`}>{isArabic ? 'الأخبار' : 'News'}</a>
+  </nav>
+  <header class="article-header">
+    <span class="article-orb orb-one" aria-hidden="true"></span>
+    <span class="article-orb orb-two" aria-hidden="true"></span>
+    <div class="article-meta"><span>{isArabic ? 'رؤى معهد صرح المعرفة' : 'ELC insights'}</span><time class:list={[{ numeric: !isArabic }]} datetime={publishDate.toISOString()}>{formattedDate}</time></div>
+    <h1>{title}</h1>
+    <p>{summary}</p>
+    <span class="article-mark" aria-hidden="true">{isArabic ? 'أب' : 'Aa'}</span>
+  </header>
+  <div class="article-body prose"><slot /></div>
+  <footer class="article-footer"><a href={`/${locale}/blog`}><span aria-hidden="true">←</span>{isArabic ? 'العودة إلى الأخبار' : 'Back to news'}</a></footer>
+</article>
+
+<style>
+  .article-page { max-width: 74rem; padding-block: clamp(2rem, 5vw, 4.5rem) clamp(5rem, 9vw, 8rem); }
+  .breadcrumb { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; color: var(--color-ink-muted); font-size: .78rem; }
+  .article-header { position: relative; padding: clamp(2rem, 6vw, 5.5rem); overflow: hidden; border: 1px solid var(--color-border); border-radius: 2rem; background: linear-gradient(145deg, #faf8f5, #fff1dd); box-shadow: 0 25px 65px rgb(73 58 52 / .12); }
+  .article-header > :not(.article-orb, .article-mark) { position: relative; z-index: 2; }
+  .article-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 2.5rem; color: var(--color-primary); font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+  :global(:lang(ar)) .article-meta { letter-spacing: 0; }
+  .article-meta time { display: inline-flex; min-height: 2.2rem; align-items: center; padding: .45rem .7rem; border: 1px solid rgb(182 23 51 / .14); border-radius: .7rem; color: var(--color-navy); background: rgb(255 255 255 / .74); box-shadow: 0 7px 18px rgb(73 58 52 / .07); font-size: .76rem; font-weight: 800; letter-spacing: 0; }
+  .article-header h1 { max-width: 14ch; margin-bottom: 1.25rem; color: var(--color-navy); font-size: clamp(2.6rem, 6vw, 6rem); line-height: .98; letter-spacing: -.06em; }
+  :global(:lang(ar)) .article-header h1 { max-width: 17ch; line-height: 1.28; letter-spacing: -.03em; }
+  .article-header p { max-width: 58ch; margin: 0; color: var(--color-ink-muted); font-size: clamp(1rem, 1.8vw, 1.2rem); line-height: 1.8; }
+  .article-mark { position: absolute; inset-inline-end: 3%; bottom: -2.5rem; color: rgb(182 23 51 / .07); font-family: var(--font-display); font-size: clamp(10rem, 22vw, 19rem); font-weight: 850; letter-spacing: -.15em; transform: rotate(-8deg); }
+  .article-orb { position: absolute; border-radius: 50%; pointer-events: none; }
+  .orb-one { width: 16rem; height: 16rem; inset-inline-end: -5rem; top: -7rem; background: rgb(182 23 51 / .1); }
+  .orb-two { width: 10rem; height: 10rem; inset-inline-start: -4rem; bottom: -5rem; border: 1.7rem solid rgb(242 148 32 / .12); }
+  .article-body { max-width: 48rem; margin: 0 auto; padding-top: clamp(3rem, 7vw, 6rem); color: var(--color-ink); font-size: 1.02rem; line-height: 1.9; }
+  .article-body :global(p) { margin: 0 0 1.4rem; }
+  .article-body :global(h2) { position: relative; margin: 3.6rem 0 1.2rem; padding-top: 1.15rem; color: var(--color-navy); font-size: clamp(1.65rem, 3vw, 2.35rem); line-height: 1.25; }
+  .article-body :global(h2::before) { content: ''; position: absolute; width: 3rem; height: 4px; inset-inline-start: 0; top: 0; border-radius: 999px; background: linear-gradient(90deg, var(--color-primary), var(--color-coral)); }
+  .article-body :global(h2:has(.article-step)) { display: flex; align-items: flex-start; gap: .75rem; }
+  .article-body :global(.article-step) { display: grid; width: 2.5rem; height: 2.5rem; flex: 0 0 auto; place-items: center; border-radius: .8rem .8rem .25rem .8rem; color: #fff; background: linear-gradient(135deg, var(--color-primary), var(--color-coral)); box-shadow: 0 8px 20px rgb(182 23 51 / .18); font-size: .76rem; font-weight: 800; }
+  .article-body :global(ul), .article-body :global(ol) { padding-inline-start: 1.35rem; }
+  .article-body :global(li) { margin-bottom: .65rem; padding-inline-start: .35rem; }
+  .article-footer { max-width: 48rem; margin: 4rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--color-border); }
+  .article-footer a { display: inline-flex; align-items: center; gap: .65rem; color: var(--color-primary); font-size: .85rem; font-weight: 800; }
+  :global(:dir(rtl)) .article-footer a span { transform: scaleX(-1); }
+  @media (max-width: 560px) { .article-header { border-radius: 1.5rem; } .article-meta { align-items: flex-start; flex-direction: column; margin-bottom: 1.7rem; } }
+</style>

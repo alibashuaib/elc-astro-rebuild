@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import { breadcrumbSchema } from '../../../lib/schema';
+import ArticleExperience from '../../../components/ArticleExperience.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', (e) => e.id.startsWith('ar/'));
@@ -22,7 +23,7 @@ const articleSchema = {
   headline: title,
   description: summary,
   datePublished: publishDate.toISOString(),
-  author: { '@type': 'Organization', name: 'ELC' },
+  author: { '@type': 'Organization', name: 'معهد صرح المعرفة' },
 };
 
 const breadcrumbs = breadcrumbSchema([
@@ -35,26 +36,9 @@ const breadcrumbs = breadcrumbSchema([
 <Layout
   locale="ar"
   path={`/blog/${slug}`}
-  title={`${title} — ELC`}
+  title={`${title} — معهد صرح المعرفة`}
   description={summary}
   jsonLd={[articleSchema, breadcrumbs]}
 >
-  <article class="container prose-page">
-    <nav aria-label="Breadcrumb" class="breadcrumb">
-      <a href="/ar/">الرئيسية</a> / <a href="/ar/blog">الأخبار</a> / <span>{title}</span>
-    </nav>
-    <h1>{title}</h1>
-    <time datetime={publishDate.toISOString()} class="numeric">
-      {publishDate.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })}
-    </time>
-    <div class="prose">
-      <Content />
-    </div>
-  </article>
+  <ArticleExperience locale="ar" title={title} summary={summary} publishDate={publishDate}><Content /></ArticleExperience>
 </Layout>
-
-<style>
-  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
-  .breadcrumb { font-size: var(--fs-sm); color: var(--color-ink-muted); margin-bottom: var(--space-3); }
-  time { color: var(--color-ink-muted); font-size: var(--fs-sm); display: block; margin-bottom: var(--space-4); }
-</style>

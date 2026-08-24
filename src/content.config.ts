@@ -7,12 +7,16 @@ import { glob } from 'astro/loaders';
 const courseSchema = z.object({
   title: z.string(),
   summary: z.string(),
-  category: z.enum(['kids', 'adults', 'business', 'exam-prep']),
-  level: z.enum(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']),
-  price: z.number(),
+  category: z.enum(['kids', 'adults', 'women', 'business', 'exam-prep']),
+  level: z.enum(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']).optional(),
+  price: z.number().optional(),
   currency: z.string().default('SAR'),
-  durationWeeks: z.number(),
-  hoursPerWeek: z.number(),
+  durationWeeks: z.number().optional(),
+  hoursPerWeek: z.number().optional(),
+  hoursPerMonth: z.string().optional(),
+  hoursPerDay: z.number().optional(),
+  scheduleDays: z.string().optional(),
+  classTimes: z.array(z.object({ label: z.string(), start: z.string(), end: z.string(), meridiem: z.string() })).optional(),
   image: z.string().optional(),
   imageAlt: z.string().optional(), // required in practice via CMS field config — see admin/config.yml
   // Structured FAQs, not markdown headings — lets the page render a real accordion

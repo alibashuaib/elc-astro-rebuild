@@ -1,0 +1,350 @@
+---
+import PageHero from './PageHero.astro';
+import Icon from './Icon.astro';
+import AnimatedNumber from './AnimatedNumber.astro';
+import type { Locale } from '../i18n/ui';
+
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+
+const content = locale === 'ar' ? {
+  kicker: 'من نحن ولماذا معهد صرح المعرفة',
+  title: 'تعليم يفتح لك آفاقاً أوسع',
+  subtitle: 'منذ عام 2010، نساعد المتعلمين على اكتساب الإنجليزية بثقة عبر تجربة تعليمية معتمدة، عملية، ومصممة حول أهدافهم.',
+  storyKicker: 'قصتنا',
+  storyTitle: 'بيئة يتقدم فيها كل متعلم',
+  story: 'معهد صرح المعرفة مؤسسة تعليمية معتمدة لتعليم اللغة الإنجليزية من المؤسسة العامة للتدريب التقني والمهني (TVTC). نجمع بين مدرّبين مؤهلين، مناهج منظمة، وفصول حديثة لنحوّل تعلم اللغة إلى تقدم ملموس في الدراسة والعمل والحياة.',
+  missionLabel: 'رسالتنا',
+  mission: 'تقديم تعليم عالي الجودة للغة الإنجليزية يحقق طموحات المتدربين الأكاديمية والمهنية عبر فريق مؤهل، وتطوير مستمر لأساليب التدريس والتقييم، وتقنيات حديثة، وبيئة تعليمية آمنة ومحفزة، وشراكات أكاديمية وتدريبية فاعلة.',
+  visionLabel: 'رؤيتنا',
+  vision: 'ريادة تعليمية برؤية عالمية.',
+  valuesKicker: 'قيمنا',
+  valuesTitle: 'مبادئ تقود كل تجربة تعليمية',
+  valuesLead: 'ست قيم مؤسسية توجّه طريقة عملنا مع المتعلمين، وأولياء الأمور، والشركاء.',
+  values: [
+    { icon: 'target' as const, title: 'المبادرة' },
+    { icon: 'star' as const, title: 'التفرّد' },
+    { icon: 'certificate' as const, title: 'الاحترافية' },
+    { icon: 'details' as const, title: 'الشفافية' },
+    { icon: 'adults' as const, title: 'العمل بروح الفريق' },
+    { icon: 'check' as const, title: 'الالتزام' },
+  ],
+  stats: [
+    { value: '+15,000', label: 'متعلم' },
+    { value: '+9', label: 'برامج تعليمية' },
+    { value: '2010', label: 'عام التأسيس' },
+  ],
+  whyKicker: 'لماذا معهد صرح المعرفة',
+  whyTitle: 'كل ما تحتاجه لتتعلم بثقة',
+  whyLead: 'جمعنا الجودة الأكاديمية والتجربة الإنسانية في مكان واحد، لتعرف دائماً أين أنت وما الخطوة التالية.',
+  reasons: [
+    { icon: 'instructor' as const, title: 'فريق تعليمي مؤهل', text: 'مدرّبون يحملون مؤهلات دولية مثل CELTA وTESOL وDELTA، مع تطوير مهني مستمر.' },
+    { icon: 'chat' as const, title: 'تعلم تفاعلي', text: 'محادثة وممارسة وأنشطة متنوعة تجعل المتعلم مشاركاً فاعلاً في كل حصة.' },
+    { icon: 'building' as const, title: 'بيئة تعليمية حديثة', text: 'فصول مجهزة بالتقنيات الحديثة، وأقسام مخصصة للأطفال والفتيات، وكتب حديثة، ومكتبة قراءة، وساعات دعم إضافية عند الحاجة.' },
+    { icon: 'target' as const, title: 'مناهج مصممة لهدفك', text: 'مسارات واضحة تناسب المستوى والعمر والهدف، من الإنجليزية العامة إلى التحضير للاختبارات.' },
+    { icon: 'star' as const, title: 'التزام بالجودة', text: 'اعتماد TVTC، معايير واضحة، ومتابعة مستمرة لضمان تجربة تعليمية موثوقة.' },
+  ],
+  faqKicker: 'أسئلة شائعة',
+  faqTitle: 'إجابات واضحة قبل أن تبدأ',
+  faqs: [
+    { question: 'هل الشهادات معتمدة؟', answer: 'نعم. الشهادات معتمدة من جهات رسمية مثل المؤسسة العامة للتدريب التقني والمهني (TVTC)، بحسب البرنامج، ومعترف بها داخل المملكة العربية السعودية.' },
+    { question: 'هل تختلف طرق التدريس حسب العمر؟', answer: 'نعم. يتعلم الأطفال من خلال اللعب والأدوات البصرية والأنشطة العملية، بينما يركز تدريب الكبار على المواقف الواقعية والمناقشة وبناء الثقة في التحدث.' },
+    { question: 'ما المناهج والمستويات المتاحة؟', answer: 'نعتمد مناهج منظمة وفق الإطار الأوروبي المرجعي العام للغات (CEFR) لبناء مهارات القراءة والكتابة والاستماع والتحدث خطوة بخطوة. يحدد اختبار المستوى نقطة البداية المناسبة، وتوضح صفحة كل دورة هيكل البرنامج الحالي.' },
+    { question: 'من يقدّم الحصص؟', answer: 'يقدّمها مدرّبون معتمدون من خلفيات عربية ودولية، يتم اختيارهم وفق المؤهلات والخبرة الصفية والقدرة على التواصل مع المتعلمين، مع تدريب مهني منتظم.' },
+  ],
+  closeTitle: 'التقدم الحقيقي يبدأ بخطوة واضحة.',
+  closeText: 'اكتشف البرنامج المناسب لمستواك وهدفك، ودع فريقنا يساعدك على اختيار البداية الصحيحة.',
+  courses: 'استكشف البرامج',
+  contact: 'تحدث معنا',
+} : {
+  kicker: 'About us & why ELC',
+  title: 'Education that opens wider horizons',
+  subtitle: 'Since 2010, we have helped learners build confident English through an accredited, practical experience designed around their goals.',
+  storyKicker: 'Our story',
+  storyTitle: 'A place where every learner can move forward',
+  story: 'ELC is a TVTC-accredited English learning centre. We bring qualified teachers, structured curricula, and modern classrooms together to turn language learning into visible progress for study, work, and everyday life.',
+  missionLabel: 'Our mission',
+  mission: 'To provide high-quality English education that advances learners’ academic and professional ambitions through a qualified team, continuous improvement in teaching and assessment, modern technology, a safe and motivating environment, and effective academic and training partnerships.',
+  visionLabel: 'Our vision',
+  vision: 'Educational leadership with a global vision.',
+  valuesKicker: 'Our values',
+  valuesTitle: 'Principles behind every learning experience',
+  valuesLead: 'Six institutional values guide how we work with learners, families, and partners.',
+  values: [
+    { icon: 'target' as const, title: 'Initiative' },
+    { icon: 'star' as const, title: 'Uniqueness' },
+    { icon: 'certificate' as const, title: 'Professionalism' },
+    { icon: 'details' as const, title: 'Transparency' },
+    { icon: 'adults' as const, title: 'Teamwork' },
+    { icon: 'check' as const, title: 'Commitment' },
+  ],
+  stats: [
+    { value: '15,000+', label: 'learners taught' },
+    { value: '9+', label: 'learning programs' },
+    { value: '2010', label: 'founded' },
+  ],
+  whyKicker: 'Why ELC',
+  whyTitle: 'Everything you need to learn with confidence',
+  whyLead: 'Academic quality and a genuinely supportive experience come together, so you always know where you are and what comes next.',
+  reasons: [
+    { icon: 'instructor' as const, title: 'Qualified teaching team', text: 'Teachers hold international qualifications such as CELTA, TESOL, and DELTA, supported by ongoing development.' },
+    { icon: 'chat' as const, title: 'Engaging learning', text: 'Conversation, practice, and varied activities make every learner an active participant in class.' },
+    { icon: 'building' as const, title: 'Modern learning environment', text: 'Technology-equipped classrooms, dedicated children’s and girls’ sections, modern books, a reading library, and added support hours when needed.' },
+    { icon: 'target' as const, title: 'Curricula built for your goal', text: 'Clear paths for different levels, ages, and outcomes—from general English to exam preparation.' },
+    { icon: 'star' as const, title: 'Commitment to quality', text: 'TVTC accreditation, clear standards, and continuous follow-up create a learning experience you can trust.' },
+  ],
+  faqKicker: 'Common questions',
+  faqTitle: 'Clear answers before you begin',
+  faqs: [
+    { question: 'Are ELC certificates accredited?', answer: 'Yes. Certificates are accredited by official authorities such as the Technical and Vocational Training Corporation (TVTC), depending on the program, and are recognized within Saudi Arabia.' },
+    { question: 'Do teaching methods change by age?', answer: 'Yes. Children learn through play, visual tools, and hands-on activities. Adult classes emphasize real-life application, discussion, and confidence in speaking.' },
+    { question: 'Which curricula and levels are available?', answer: 'Structured CEFR-aligned curricula build reading, writing, listening, and speaking step by step. A placement test identifies the right starting point, and each course page shows the current program structure.' },
+    { question: 'Who teaches the classes?', answer: 'Certified instructors from Arab and international backgrounds are selected for their qualifications, classroom experience, and ability to connect with learners, with regular professional training.' },
+  ],
+  closeTitle: 'Real progress starts with a clear next step.',
+  closeText: 'Explore the program that fits your level and goal, or let our team help you choose the right place to begin.',
+  courses: 'Explore programs',
+  contact: 'Talk to us',
+};
+
+const basePath = `/${locale}`;
+---
+
+<PageHero kicker={content.kicker} title={content.title} subtitle={content.subtitle} />
+
+<section class="story-section section">
+  <div class="container story-grid">
+    <div class="story-copy">
+      <span class="section-kicker">{content.storyKicker}</span>
+      <h2>{content.storyTitle}</h2>
+      <p>{content.story}</p>
+    </div>
+    <div class="purpose-grid">
+      <article class="purpose-card mission-card">
+        <div class="purpose-top">
+          <span class="purpose-number">01</span>
+          <span class="purpose-icon" aria-hidden="true"><Icon name="target" size={25} /></span>
+        </div>
+        <h3>{content.missionLabel}</h3>
+        <p>{content.mission}</p>
+      </article>
+      <article class="purpose-card vision-card">
+        <div class="purpose-top">
+          <span class="purpose-number">02</span>
+          <span class="purpose-icon" aria-hidden="true"><Icon name="pathway" size={25} /></span>
+        </div>
+        <h3>{content.visionLabel}</h3>
+        <p>{content.vision}</p>
+      </article>
+      <article class="purpose-card values-card">
+        <div class="purpose-top">
+          <span class="purpose-number">03</span>
+          <span class="purpose-icon" aria-hidden="true"><Icon name="star" size={25} /></span>
+        </div>
+        <h3>{content.valuesKicker}</h3>
+        <ul class="purpose-values">
+          {content.values.map((value) => (
+            <li><Icon name={value.icon} size={18} /><b>{value.title}</b></li>
+          ))}
+        </ul>
+      </article>
+    </div>
+  </div>
+  <div class="container stats-row">
+    {content.stats.map((stat) => (
+      <div class="stat"><AnimatedNumber class="numeric" value={stat.value} /><span>{stat.label}</span></div>
+    ))}
+    <div class="stat-line" aria-hidden="true"></div>
+  </div>
+</section>
+
+<section class="why-section section">
+  <div class="container">
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">{content.whyKicker}</span>
+        <h2>{content.whyTitle}</h2>
+      </div>
+      <p>{content.whyLead}</p>
+    </div>
+    <div class="reason-grid">
+      {content.reasons.map((reason, index) => (
+        <article class={`reason-card reason-${index + 1}`}>
+          <div class="reason-top">
+            <span class="reason-icon"><Icon name={reason.icon} size={26} /></span>
+            <span class="reason-number">0{index + 1}</span>
+          </div>
+          <h3>{reason.title}</h3>
+          <p>{reason.text}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="faq-section section">
+  <div class="container faq-grid">
+    <div class="faq-heading">
+      <span class="section-kicker">{content.faqKicker}</span>
+      <h2>{content.faqTitle}</h2>
+    </div>
+    <div class="faq-list">
+      {content.faqs.map((faq, index) => (
+        <details name="about-faq" open={index === 0}>
+          <summary><span class="numeric">0{index + 1}</span>{faq.question}</summary>
+          <p>{faq.answer}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="container closing-section">
+  <div>
+    <span class="section-kicker">{locale === 'ar' ? 'معهد صرح المعرفة' : 'ELC'}</span>
+    <h2>{content.closeTitle}</h2>
+    <p>{content.closeText}</p>
+  </div>
+  <div class="closing-actions">
+    <a class="btn btn-primary" href={`${basePath}/courses`}>{content.courses}</a>
+    <a class="btn btn-outline" href={`${basePath}/contact`}>{content.contact}</a>
+  </div>
+</section>
+
+<style>
+  .section { padding-block: clamp(4.5rem, 8vw, 7.5rem); }
+  .section-kicker { color: var(--color-primary); font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  :global(:lang(ar)) .section-kicker { letter-spacing: 0; }
+  .story-section { position: relative; overflow: hidden; background: #fff; }
+  .story-section::after { content: ''; position: absolute; width: 22rem; height: 22rem; inset-inline-start: -12rem; bottom: -13rem; border: 3rem solid rgb(242 148 32 / .08); border-radius: 50%; pointer-events: none; }
+  .story-grid { display: grid; grid-template-columns: 1fr; gap: clamp(2.5rem, 5vw, 4rem); }
+  .story-copy { max-width: 68rem; }
+  .story-copy h2, .section-heading h2, .closing-section h2 { color: var(--color-navy); font-size: clamp(2.2rem, 4vw, 4rem); line-height: 1.08; letter-spacing: -.045em; }
+  :global(:lang(ar)) .story-copy h2, :global(:lang(ar)) .section-heading h2, :global(:lang(ar)) .closing-section h2 { line-height: 1.35; letter-spacing: -.025em; }
+  .story-copy h2 { margin: .75rem 0 1.2rem; }
+  .story-copy p { margin: 0; color: var(--color-ink-muted); font-size: 1.05rem; line-height: 1.85; }
+  .purpose-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(14rem, .7fr) minmax(0, 1fr); align-items: stretch; gap: 1rem; }
+  .purpose-card { position: relative; display: flex; min-height: 23rem; flex-direction: column; padding: clamp(1.5rem, 2.5vw, 2rem); overflow: hidden; border-radius: 1.75rem; transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease); }
+  .purpose-card:hover { transform: translateY(-5px); box-shadow: 0 24px 55px rgb(39 32 31 / .16); }
+  .purpose-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: auto; }
+  .purpose-number, .purpose-icon { display: grid; width: 3rem; height: 3rem; flex: 0 0 auto; place-items: center; border-radius: .9rem; }
+  .purpose-number { border: 1px solid rgb(182 23 51 / .14); color: var(--color-primary); background: #fff; font-size: .86rem; font-weight: 850; box-shadow: 0 10px 24px rgb(39 32 31 / .14); transition: transform var(--motion-base) var(--ease); }
+  .purpose-icon { position: relative; border: 1px solid rgb(255 255 255 / .22); color: #fff; background: rgb(255 255 255 / .13); transition: transform var(--motion-base) var(--ease), background var(--motion-base) var(--ease); }
+  .purpose-icon::after { content: ''; position: absolute; inset: -.35rem; border: 1px solid currentColor; border-radius: 1.15rem; opacity: .18; }
+  .vision-card .purpose-icon { border-color: rgb(182 23 51 / .15); color: var(--color-primary); background: rgb(255 255 255 / .56); }
+  .values-card .purpose-icon { color: #f7b75f; }
+  .purpose-card:hover .purpose-number { transform: rotate(-6deg) scale(1.06); }
+  .purpose-card:hover .purpose-icon { background: rgb(255 255 255 / .22); transform: rotate(8deg) scale(1.1); }
+  .vision-card:hover .purpose-icon { background: #fff; }
+  .purpose-card h3 { margin: 3rem 0 .75rem; font-size: 1.45rem; }
+  .purpose-card p { margin: 0; line-height: 1.75; }
+  .mission-card { color: #fff; background: var(--color-primary); }
+  .mission-card p { color: #fce5ea; }
+  .vision-card { color: var(--color-navy); background: var(--color-coral-soft); }
+  .vision-card p { color: #76532e; }
+  .values-card { color: #fff; background: var(--color-navy); }
+  .purpose-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; padding: 0; margin: 0; list-style: none; }
+  .purpose-values li { display: flex; min-width: 0; align-items: center; gap: .55rem; padding: .65rem .7rem; border: 1px solid #4d5060; border-radius: .85rem; color: #f3f1ee; background: rgb(255 255 255 / .06); }
+  .purpose-values :global(svg) { flex: 0 0 auto; color: #f7b75f; }
+  .purpose-values b { font-size: .76rem; line-height: 1.35; }
+  @media (prefers-reduced-motion: no-preference) {
+    .purpose-grid.motion-ready .purpose-card:not(.arrived) { opacity: 0; transform: translateY(1.5rem) scale(.975); }
+    .purpose-grid.motion-ready.is-visible .purpose-card:not(.arrived) { animation: purpose-arrive .72s var(--ease) forwards; }
+    .purpose-grid.motion-ready.is-visible .purpose-card:nth-child(2) { animation-delay: .1s; }
+    .purpose-grid.motion-ready.is-visible .purpose-card:nth-child(3) { animation-delay: .2s; }
+    .purpose-grid.is-visible .purpose-icon::after { animation: icon-breathe 2.8s ease-in-out infinite; }
+  }
+  @keyframes purpose-arrive {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes icon-breathe {
+    0%, 100% { opacity: .12; transform: scale(.92); }
+    50% { opacity: .3; transform: scale(1.08); }
+  }
+  .stats-row { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; gap: 1rem; margin-top: clamp(3rem, 6vw, 5rem); }
+  .stat { position: relative; display: flex; min-width: 0; flex-direction: column; gap: .5rem; padding: 1.35rem 1.45rem; overflow: hidden; border: 1px solid var(--color-border); border-radius: 1.25rem; background: #fff; box-shadow: var(--shadow-sm); transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease); }
+  .stat::after { content: ''; position: absolute; width: 5rem; height: 5rem; inset-inline-end: -2.5rem; bottom: -2.5rem; border-radius: 50%; background: var(--color-coral-soft); transition: transform var(--motion-base) var(--ease); }
+  .stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  .stat:hover::after { transform: scale(1.2); }
+  .stat :global(strong) { position: relative; z-index: 1; color: var(--color-primary); font-size: clamp(2rem, 3.6vw, 3.2rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
+  .stat span { position: relative; z-index: 1; color: var(--color-ink-muted); font-size: .8rem; font-weight: 700; }
+  .stat-line { display: none; }
+  .why-section { background: var(--color-navy); color: #fff; }
+  .why-section .section-kicker { color: #f7b75f; }
+  .section-heading { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(18rem, .8fr); align-items: end; gap: 3rem; margin-bottom: 2.5rem; }
+  .section-heading h2 { max-width: 14ch; margin: .75rem 0 0; color: #fff; }
+  .section-heading > p { margin: 0; color: #d0ccc7; line-height: 1.75; }
+  .reason-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; }
+  .reason-card { grid-column: span 2; min-height: 18rem; padding: 1.45rem; border: 1px solid #494b50; border-radius: 1.5rem; background: #323439; }
+  .reason-card:nth-last-child(-n + 2) { grid-column: span 3; }
+  .reason-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem; }
+  .reason-icon { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border-radius: 1rem; color: var(--color-primary); background: #fff; }
+  .reason-number { display: grid; width: 2.45rem; height: 2.45rem; place-items: center; border: 1px solid #5b5e64; border-radius: .8rem; color: #fff; background: #404248; font-size: .8rem; font-weight: 850; transition: transform var(--motion-base) var(--ease), border-color var(--motion-base) var(--ease); }
+  .reason-card:hover .reason-number { border-color: #f7b75f; transform: rotate(7deg) scale(1.08); }
+  .reason-card:nth-child(even) .reason-icon { color: #8a5513; background: var(--color-coral-soft); }
+  .reason-card h3 { margin-bottom: .7rem; color: #fff; font-size: 1.2rem; }
+  .reason-card p { margin: 0; color: #c6c3bf; font-size: .9rem; line-height: 1.75; }
+  .faq-section { background: #fff; }
+  .faq-grid { display: grid; grid-template-columns: minmax(16rem, .7fr) minmax(0, 1.3fr); gap: clamp(3rem, 8vw, 8rem); }
+  .faq-heading { align-self: start; position: sticky; top: 8rem; }
+  .faq-heading h2 { max-width: 10ch; margin: .75rem 0 0; color: var(--color-navy); font-size: clamp(2.2rem, 4vw, 4rem); line-height: 1.08; letter-spacing: -.045em; }
+  :global(:lang(ar)) .faq-heading h2 { line-height: 1.35; letter-spacing: -.025em; }
+  .faq-list { border-top: 1px solid var(--color-border); }
+  details { border-bottom: 1px solid var(--color-border); }
+  summary { display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 1rem; padding-block: 1.5rem; color: var(--color-navy); font-size: 1.05rem; font-weight: 750; cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; grid-column: 3; color: var(--color-primary); font-size: 1.4rem; font-weight: 500; transition: transform var(--motion-fast) var(--ease); }
+  details[open] summary::after { transform: rotate(45deg); }
+  summary span { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border: 1px solid rgb(182 23 51 / .14); border-radius: .75rem; color: var(--color-primary); background: var(--color-blue-soft); font-size: .76rem; font-weight: 850; transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); }
+  details[open] summary span { color: #fff; background: var(--color-primary); }
+  details p { max-width: 65ch; margin: -.45rem 0 1.5rem 3.5rem; color: var(--color-ink-muted); line-height: 1.8; }
+  :global(:dir(rtl)) details p { margin-right: 3.5rem; margin-left: 0; }
+  .closing-section { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3rem; padding-block: clamp(4.5rem, 8vw, 7rem); }
+  .closing-section h2 { max-width: 16ch; margin: .65rem 0 .8rem; }
+  .closing-section p { max-width: 56ch; margin: 0; color: var(--color-ink-muted); line-height: 1.75; }
+  .closing-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
+  @media (max-width: 880px) {
+    .section-heading, .faq-grid, .closing-section { grid-template-columns: 1fr; }
+    .purpose-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .values-card { grid-column: 1 / -1; min-height: auto; }
+    .faq-heading { position: static; }
+    .reason-card, .reason-card:nth-last-child(-n + 2) { grid-column: span 3; }
+    .closing-actions { justify-content: flex-start; }
+  }
+  @media (max-width: 620px) {
+    .purpose-grid { grid-template-columns: 1fr; }
+    .values-card { grid-column: auto; }
+    .purpose-card { min-height: 15rem; }
+    .purpose-card h3 { margin-top: 2.5rem; }
+    .stats-row { grid-template-columns: repeat(3, 1fr); gap: .75rem; }
+    .stat { padding: 1rem; }
+    .stat :global(strong) { font-size: clamp(1.6rem, 8vw, 2.25rem); }
+    .stat-line { display: none; }
+    .reason-grid { grid-template-columns: 1fr; }
+    .reason-card, .reason-card:nth-last-child(-n + 2) { grid-column: auto; min-height: 15rem; }
+    .closing-actions .btn { width: 100%; justify-content: center; }
+  }
+</style>
+
+<script>
+  const purposeGrids = document.querySelectorAll<HTMLElement>('.purpose-grid');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  purposeGrids.forEach((grid) => {
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      grid.classList.add('is-visible');
+      return;
+    }
+
+    grid.classList.add('motion-ready');
+    grid.querySelectorAll('.purpose-card').forEach((card) => {
+      card.addEventListener('animationend', () => card.classList.add('arrived'), { once: true });
+    });
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      grid.classList.add('is-visible');
+      observer.disconnect();
+    }, { threshold: .2 });
+    observer.observe(grid);
+  });
+</script>

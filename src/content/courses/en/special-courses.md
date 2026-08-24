@@ -1,20 +1,16 @@
 ---
 title: Special Courses
-summary: Short, focused courses outside the standard track — conversation clubs, intensive short courses, custom group training.
+summary: Focused English programs scheduled for specific learner groups, goals, and timetables outside the standard general-English pathway.
 category: adults
-level: B1
-price: 700
-currency: SAR
-durationWeeks: 4
-hoursPerWeek: 3
-imageAlt: A small-group conversation club session at ELC
+imageAlt: A focused small-group English session at ELC
 faqs:
-  - question: What happens if I miss a class?
-    answer: Placeholder answer — replace with the real make-up-class policy.
-  - question: Is there a certificate at the end?
-    answer: Placeholder answer — replace with the real certification details.
+  - question: Which special courses are currently available?
+    answer: Topics and schedules change according to learner demand. Contact admissions for the current list, target group, timetable, and entry requirements.
+  - question: Are special courses suitable for groups?
+    answer: Programs may be organized for specific learner groups and needs. The team can confirm whether a current or tailored option fits your group.
 draft: false
 ---
 
-Full curriculum breakdown, schedule, and enrollment details go here — placeholder
-content until real copy is written (plan doc §8, open item).
+Special Courses extend beyond the standard general-English track. They are organized around specific learner groups, needs, and timetables to provide focused development and more varied learning options.
+
+Because topics and schedules change, contact ELC for the current course list, dates, entry requirements, and pricing.

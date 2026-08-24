@@ -1,165 +1,23 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import Testimonials from '../../components/Testimonials.astro';
-import HeroGraphic from '../../components/HeroGraphic.astro';
-import Icon from '../../components/Icon.astro';
+import HomeExperience from '../../components/HomeExperience.astro';
 import { organizationSchema } from '../../lib/schema';
 import { fetchGoogleReviews } from '../../lib/googleReviews';
 
 const reviews = await fetchGoogleReviews('ar');
 const orgSchema = organizationSchema(
-  reviews ? { rating: reviews.overallRating, reviewCount: reviews.totalReviewCount } : undefined
+  reviews ? { rating: reviews.overallRating, reviewCount: reviews.totalReviewCount } : undefined,
+  'ar'
 );
 
-const features = [
-  { icon: 'certificate' as const, title: 'معتمد من TVTC', text: 'اعتماد قابل للتحقق، لا مجرد ادعاء تسويقي.' },
-  { icon: 'instructor' as const, title: 'مدرّبون بأسمائهم', text: 'مدرّبون معتمدون حقيقيون، لا "فريقنا" مجهول.' },
-  { icon: 'calendar' as const, title: 'مستويات منظمة', text: 'مسار واضح من A1 إلى C2، فتعرف دائمًا أين أنت.' },
-  { icon: 'tag' as const, title: 'أسعار شفافة', text: 'السعر والمدة معلنان مسبقًا في كل دورة.' },
-];
-
-const stats = [
-  { value: '+15,000', label: 'طالب تم تدريبهم' },
-  { value: '+9', label: 'برامج دراسية' },
-  { value: '2010', label: 'التأسيس' },
-];
 ---
 
 <Layout
   locale="ar"
   path="/"
-  title="ELC — دورات اللغة الإنجليزية في السعودية"
+  title="معهد صرح المعرفة — دورات اللغة الإنجليزية في السعودية"
   description="دورات إنجليزية معتمدة للأطفال والكبار والشركات. احجز اختبار تحديد المستوى مجانًا."
   jsonLd={orgSchema}
 >
-  <section class="hero zone-ink">
-    <div class="hero-inner hero-animate container">
-      <span class="eyebrow">معتمدة من TVTC · تأسست 2010</span>
-      <h1 class="hero-headline">تعلم الإنجليزية<br />بثقة.</h1>
-      <p class="lead">
-        من المبتدئ إلى الطلاقة — دورات منظمة للأطفال والكبار والشركات، يقدّمها مدرّبون معتمدون بأسمائهم.
-      </p>
-      <div class="hero-actions">
-        <a href="/ar/register" class="btn btn-primary">احجز اختبار تحديد المستوى</a>
-        <a href="/ar/courses" class="btn btn-outline">تصفّح الدورات</a>
-      </div>
-    </div>
-
-    <div class="hero-graphic-wrap">
-      <HeroGraphic locale="ar" tone="ink" />
-    </div>
-
-    <div class="hero-stats container">
-      {stats.map((s) => (
-        <div class="stat">
-          <span class="stat-value numeric">{s.value}</span>
-          <span class="stat-label">{s.label}</span>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <hr class="fluency-rule" />
-
-  <section class="container features">
-    {features.map((f) => (
-      <div class="feature">
-        <span class="feature-icon"><Icon name={f.icon} /></span>
-        <h2>{f.title}</h2>
-        <p>{f.text}</p>
-      </div>
-    ))}
-  </section>
-
-  <section class="container">
-    <h2>الدورات</h2>
-    <p>أطفال · كبار · إنجليزي أعمال · تحضير امتحانات.</p>
-    <a href="/ar/courses" class="btn btn-outline">تصفّح جميع الدورات</a>
-  </section>
-
-  <div class="container">
-    <Testimonials locale="ar" data={reviews} />
-  </div>
+  <HomeExperience locale="ar" reviews={reviews} />
 </Layout>
-
-<style>
-  .hero {
-    position: relative;
-    overflow: hidden;
-    padding-block: var(--space-8) var(--space-6);
-  }
-  .hero-inner {
-    position: relative;
-    z-index: 1;
-    max-width: 34rem;
-    text-align: start;
-  }
-  .eyebrow {
-    display: inline-block;
-    font-size: var(--fs-lg);
-    color: var(--zone-ink-signal);
-    margin-bottom: var(--space-3);
-  }
-  .hero-headline {
-    /* Capped below --fs-3xl: the Cairo webfont mis-renders a stray/orphaned
-       glyph in "الإنجليزية" at the full display size and 700 weight — a font
-       hinting issue, not a content bug. */
-    font-size: var(--fs-2xl);
-    font-weight: 600;
-    line-height: 1.4;
-    margin-bottom: var(--space-4);
-  }
-  .lead { font-size: var(--fs-lg); max-width: 38ch; margin-bottom: var(--space-5); }
-  .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
-
-  .hero-graphic-wrap {
-    position: absolute;
-    inset-inline-end: -3rem;
-    top: 50%;
-    transform: translateY(-58%);
-    width: min(30rem, 42vw);
-    opacity: 0.9;
-    pointer-events: none;
-  }
-
-  .hero-stats {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-6);
-    margin-top: var(--space-7);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--zone-ink-border);
-  }
-  .stat { display: flex; flex-direction: column; }
-  .stat-value { font-size: var(--fs-xl); font-weight: 700; color: var(--zone-ink-text); }
-  .stat-label { color: var(--zone-ink-muted); font-size: var(--fs-sm); }
-
-  .features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-    gap: var(--space-4);
-    padding-block: var(--space-6);
-    border-bottom: 1px solid var(--color-border);
-  }
-  .feature { display: flex; flex-direction: column; gap: var(--space-1); }
-  .feature-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: var(--radius);
-    background: var(--color-bg);
-    color: var(--color-crimson-text);
-    margin-bottom: var(--space-1);
-  }
-  .feature h2 { font-size: var(--fs-base); margin: 0; }
-  .feature p { margin: 0; color: var(--color-ink-muted); font-size: var(--fs-sm); }
-
-  @media (max-width: 780px) {
-    .hero-graphic-wrap { position: static; width: 14rem; margin: var(--space-5) auto 0; opacity: 1; transform: none; }
-    .hero-inner { max-width: none; }
-  }
-</style>

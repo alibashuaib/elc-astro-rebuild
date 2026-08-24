@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import PageHero from '../../components/PageHero.astro';
+import ContactExperience from '../../components/ContactExperience.astro';
 import { breadcrumbSchema } from '../../lib/schema';
 
 const breadcrumbs = breadcrumbSchema([
@@ -12,77 +12,9 @@ const breadcrumbs = breadcrumbSchema([
 <Layout
   locale="ar"
   path="/contact"
-  title="اتصل بنا — ELC"
-  description="تواصل مع ELC — الموقع وساعات العمل ونموذج التواصل."
+  title="تواصل مع معهد صرح المعرفة في جدة"
+  description="اتصل أو تواصل عبر واتساب أو البريد الإلكتروني أو زُر معهد صرح المعرفة في جدة للاستفسار عن دورات الإنجليزية واختبار تحديد المستوى والتسجيل."
   jsonLd={breadcrumbs}
 >
-  <PageHero title="اتصل بنا" subtitle="الموقع وساعات العمل وطريقة للتواصل معنا." />
-
-  <section class="container prose-page">
-    <div class="contact-grid">
-      <div>
-        <h2>الموقع</h2>
-        <p>
-          جدة، حي الفيحاء، خلف البنك الأهلي.
-          <br />
-          <em>هذا وصف تقريبي من الموقع الحالي — يجب استبداله بعنوان رسمي بعد حل مشكلة تطابق NAP/GBP (البند 8 في الخطة)، وإضافة خريطة حقيقية هنا.</em>
-        </p>
-
-        <h2>الهاتف والبريد الإلكتروني</h2>
-        <ul class="contact-list">
-          <li><a class="numeric" href="tel:+966126305553">012 630 5553</a></li>
-          <li><a class="numeric" href="tel:+966126306030">012 630 6030</a></li>
-          <li><a class="numeric" href="tel:+966591799917">059 179 9917</a></li>
-          <li><a href="mailto:info@elc.com.sa">info@elc.com.sa</a></li>
-        </ul>
-
-        <h2>واتساب</h2>
-        <p>استخدم زر واتساب العائم في أي صفحة للحصول على أسرع رد.</p>
-
-        <h2>ساعات العمل</h2>
-        <p><em>غير معلنة على الموقع الحالي — تحتاج إلى الجدول الفعلي.</em></p>
-      </div>
-
-      <form class="contact-form" method="POST" action="/api/contact">
-        <label>
-          الاسم
-          <input type="text" name="name" required />
-        </label>
-        <label>
-          البريد الإلكتروني
-          <input type="email" name="email" required />
-        </label>
-        <label>
-          الرسالة
-          <textarea name="message" rows="5" required></textarea>
-        </label>
-        <button type="submit" class="btn btn-primary">إرسال الرسالة</button>
-      </form>
-    </div>
-  </section>
+  <ContactExperience locale="ar" />
 </Layout>
-
-<style>
-  .prose-page { padding-block: var(--space-6); }
-  .contact-list { list-style: none; padding: 0; margin: 0 0 var(--space-4); }
-  .contact-list li { margin-bottom: var(--space-1); }
-  .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-6);
-    max-width: 60rem;
-  }
-  .contact-form { display: flex; flex-direction: column; gap: var(--space-3); }
-  .contact-form label { display: flex; flex-direction: column; gap: var(--space-1); font-weight: 600; }
-  .contact-form input, .contact-form textarea {
-    font: inherit;
-    padding: var(--space-2);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    background: var(--color-bg-raised);
-    color: var(--color-ink);
-  }
-  @media (max-width: 720px) {
-    .contact-grid { grid-template-columns: 1fr; }
-  }
-</style>

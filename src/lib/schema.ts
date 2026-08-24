@@ -8,26 +8,36 @@ const SITE_URL = 'https://elc.com.sa';
  *   GoogleReviewsResult — never fabricated. Omit entirely if reviews aren't
  *   configured yet (the build already does this — see src/pages/{en,ar}/index.astro).
  */
-export function organizationSchema(aggregateRating?: { rating: number; reviewCount: number }) {
+export function organizationSchema(
+  aggregateRating?: { rating: number; reviewCount: number },
+  locale: 'en' | 'ar' = 'en'
+) {
   return {
     '@context': 'https://schema.org',
     '@type': 'EducationalOrganization',
-    name: 'ELC',
+    name: locale === 'ar' ? 'معهد صرح المعرفة' : 'ELC',
+    alternateName: locale === 'ar' ? 'ELC' : 'معهد صرح المعرفة',
     url: SITE_URL,
     foundingDate: '2010', // real, from the live site's About page
     email: 'info@elc.com.sa', // real
-    telephone: '+966546656000', // real (primary/WhatsApp number)
-    // TODO: replace with the corrected legal/GBP name once the NAP mismatch is resolved
-    // ("Knowledge Edifice Institute" vs "ELC" — see plan doc section 8).
-    // Locality is real (from the live site); street/region/postal/geo need the
-    // corrected GBP listing — a landmark description ("behind Al Ahli Bank") isn't
-    // a valid structured streetAddress, so it stays as visible page copy instead
-    // (see src/pages/{en,ar}/contact.astro), not schema.
+    telephone: '+966591799917',
+    contactPoint: [
+      { '@type': 'ContactPoint', telephone: '+966591799917', contactType: 'admissions' },
+      { '@type': 'ContactPoint', telephone: '+966546656000', contactType: 'WhatsApp' },
+      { '@type': 'ContactPoint', telephone: '+966126305553', contactType: 'customer service' },
+      { '@type': 'ContactPoint', telephone: '+966126306030', contactType: 'customer service' },
+    ],
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '', // TODO: fill from corrected GBP listing
+      streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
       addressLocality: 'Jeddah',
+      addressRegion: 'Makkah Province',
       addressCountry: 'SA',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 21.4971147,
+      longitude: 39.2156796,
     },
     // Real, from the live site's footer/social links.
     sameAs: [
@@ -53,28 +63,21 @@ export function localBusinessSchema() {
     '@type': 'EducationalOrganization',
     '@id': `${SITE_URL}/#organization`,
     name: 'ELC',
+    alternateName: 'معهد صرح المعرفة',
     url: SITE_URL,
-    // NAP must exactly match the corrected Google Business Profile listing —
-    // do not fill this in until the "Knowledge Edifice Institute" vs "ELC" mismatch
-    // (plan §8) is resolved with the client, or the mismatch gets baked back in.
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '', // TODO — "Al Fayahaa district, behind Al Ahli Bank" isn't a valid streetAddress
-      addressLocality: 'Jeddah', // real
-      addressRegion: '', // TODO
-      postalCode: '', // TODO
+      streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
+      addressLocality: 'Jeddah',
+      addressRegion: 'Makkah Province',
       addressCountry: 'SA',
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 0, // TODO — must match GBP exactly
-      longitude: 0, // TODO
+      latitude: 21.4971147,
+      longitude: 39.2156796,
     },
-    telephone: '+966546656000', // real
-    priceRange: '$$', // TODO — confirm band once pricing is finalized
-    openingHoursSpecification: [
-      // TODO — real hours, per corrected GBP listing
-    ],
+    telephone: '+966591799917',
   };
 }
 
@@ -106,27 +109,30 @@ export function breadcrumbSchema(items: { name: string; url: string }[]) {
 export function courseSchema(course: {
   name: string;
   description: string;
-  price: number;
+  price?: number;
   currency?: string;
-  durationText: string;
+  durationText?: string;
   url: string;
+  providerName?: string;
 }) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Course',
     name: course.name,
     description: course.description,
-    provider: { '@type': 'EducationalOrganization', name: 'ELC', sameAs: SITE_URL },
+    provider: { '@type': 'EducationalOrganization', name: course.providerName ?? 'ELC', sameAs: SITE_URL },
     hasCourseInstance: {
       '@type': 'CourseInstance',
       courseMode: 'Onsite',
-      duration: course.durationText,
+      ...(course.durationText ? { duration: course.durationText } : {}),
     },
-    offers: {
-      '@type': 'Offer',
-      price: course.price,
-      priceCurrency: course.currency ?? 'SAR',
-      url: course.url,
-    },
+    ...(course.price !== undefined ? {
+      offers: {
+        '@type': 'Offer',
+        price: course.price,
+        priceCurrency: course.currency ?? 'SAR',
+        url: course.url,
+      },
+    } : {}),
   };
 }

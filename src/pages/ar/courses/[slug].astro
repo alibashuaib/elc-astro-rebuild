@@ -2,6 +2,8 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import FaqAccordion from '../../../components/FaqAccordion.astro';
+import Icon from '../../../components/Icon.astro';
+import CourseContentPanel from '../../../components/CourseContentPanel.astro';
 import { courseSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
 import { categoryLabels, useTranslations } from '../../../i18n/ui';
 
@@ -17,7 +19,8 @@ const { course } = Astro.props;
 const { slug } = Astro.params;
 const { Content } = await render(course);
 const t = useTranslations('ar');
-const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek, faqs } = course.data;
+const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek, hoursPerMonth, hoursPerDay, scheduleDays, classTimes, faqs } = course.data;
+const formattedPrice = price?.toLocaleString('en-US');
 
 const url = `https://elc.com.sa/ar/courses/${slug}`;
 
@@ -26,8 +29,9 @@ const ldCourse = courseSchema({
   description: summary,
   price,
   currency,
-  durationText: `P${durationWeeks}W`,
+  durationText: durationWeeks !== undefined ? `P${durationWeeks}W` : undefined,
   url,
+  providerName: 'معهد صرح المعرفة',
 });
 
 const breadcrumbs = breadcrumbSchema([
@@ -42,7 +46,7 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
 <Layout
   locale="ar"
   path={`/courses/${slug}`}
-  title={`${title} — ELC`}
+  title={`${title} — معهد صرح المعرفة`}
   description={summary}
   jsonLd={ldEntries}
 >
@@ -51,33 +55,57 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
       <a href="/ar/">الرئيسية</a> / <a href="/ar/courses">الدورات</a> / <span>{title}</span>
     </nav>
 
-    <div class="course-head">
-      <span class="badge">{categoryLabels.ar[category]}</span>
-      <span class="badge badge-level numeric">{level}</span>
-    </div>
-
-    <h1>{title}</h1>
-    <p class="lead">{summary}</p>
+    <header class="course-intro">
+      <div class="course-head">
+        <span class="badge">{categoryLabels.ar[category]}</span>
+        {level && <span class="badge badge-level numeric">{level}</span>}
+      </div>
+      <h1>{title}</h1>
+      <p class="lead">{summary}</p>
+    </header>
 
     <dl class="stats">
-      <div><dt>السعر</dt><dd class="numeric">{price} {currency}</dd></div>
-      <div><dt>المدة</dt><dd class="numeric">{durationWeeks} أسابيع</dd></div>
-      <div><dt>الجدول</dt><dd class="numeric">{hoursPerWeek} ساعة/أسبوع</dd></div>
+        {price !== undefined && <div class="price-stat"><dt>السعر</dt><dd><strong class="numeric">{formattedPrice}</strong><span>{currency}</span></dd></div>}
+        {durationWeeks !== undefined && <div><dt>المدة</dt><dd><strong class="numeric">{durationWeeks}</strong><span>أسابيع</span></dd></div>}
+        {hoursPerMonth ? (
+          <div class="monthly-stat"><dt>الساعات الشهرية</dt><dd><strong class="numeric">{hoursPerMonth}</strong><span>ساعة/شهر</span></dd></div>
+        ) : (
+          <div class="monthly-stat is-variable"><dt>الساعات الشهرية</dt><dd><strong>—</strong><span>تختلف حسب الدفعة</span></dd></div>
+        )}
+        {hoursPerDay !== undefined && <div class="daily-stat"><dt>الساعات اليومية</dt><dd><strong class="numeric">{hoursPerDay}</strong><span>ساعة/يوم</span></dd></div>}
+        {scheduleDays && <div class="days-stat"><dt>أيام الدراسة</dt><dd><strong>{scheduleDays}</strong></dd></div>}
     </dl>
+    {hoursPerDay !== undefined && scheduleDays && (
+      <section class="course-schedule" aria-labelledby="course-schedule-title">
+        {classTimes && classTimes.length > 0 && (
+          <div class:list={['time-options', { single: classTimes.length === 1 }]}>
+            <div class="times-heading"><strong id="course-schedule-title">فترات الدراسة المتاحة</strong><span>{classTimes.length > 1 ? 'اختر الفترة المناسبة لك' : 'فترة الدراسة الحالية'}</span></div>
+            <div class="time-grid">
+              {classTimes.map((period) => (
+                <div class="time-card"><span class="time-icon"><Icon name="clock" size={20} /></span><span><small>{period.label}</small><strong class="time-value" dir="rtl"><span>من</span><bdi class="numeric" dir="ltr">{period.start}</bdi><span>إلى</span><bdi class="numeric" dir="ltr">{period.end}</bdi><span>{period.meridiem}</span></strong></span></div>
+              ))}
+            </div>
+          </div>
+        )}
+        <p>يؤكد فريق القبول وقت الحصة المتاح وتاريخ بدء الدفعة القادمة.</p>
+      </section>
+    )}
+    {price === undefined && durationWeeks === undefined && hoursPerWeek === undefined && <p class="details-note">تواصل معنا لمعرفة الجدول والسعر الحاليين.</p>}
 
     <a href="/ar/register" class="btn btn-primary">{t('courses.enroll')}</a>
 
-    <div class="prose">
-      <Content />
-    </div>
+    <CourseContentPanel locale="ar" Content={Content} />
 
     <FaqAccordion faqs={faqs} title="الأسئلة الشائعة" />
   </article>
 </Layout>
 
 <style>
-  .course-detail { padding-block: var(--space-6); max-width: 42rem; }
+  .course-detail { width: 100%; max-width: var(--max-width); padding-block: var(--space-6); }
   .breadcrumb { font-size: var(--fs-sm); color: var(--color-ink-muted); margin-bottom: var(--space-4); }
+  .course-intro { position: relative; margin-bottom: var(--space-4); padding: clamp(1.4rem, 4vw, 2.5rem); overflow: hidden; border: 1px solid var(--color-border); border-radius: 1.6rem; background: linear-gradient(135deg, #fff, var(--color-blue-soft)); box-shadow: var(--shadow-sm); }
+  .course-intro::after { content: ''; position: absolute; width: 9rem; height: 9rem; inset-inline-end: -3rem; top: -4rem; border-radius: 50%; background: rgb(182 23 51 / .08); }
+  .course-intro h1 { position: relative; z-index: 1; margin-bottom: .65rem; }
   .course-head { display: flex; gap: var(--space-2); margin-bottom: var(--space-2); }
   .badge {
     font-size: var(--fs-sm);
@@ -88,15 +116,44 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
     color: var(--color-ink-muted);
   }
   .badge-level { color: var(--color-crimson-text); border-color: var(--color-crimson-text); }
-  .lead { font-size: var(--fs-lg); color: var(--color-ink-muted); }
+  .lead { position: relative; z-index: 1; max-width: 62ch; margin: 0; font-size: var(--fs-lg); color: var(--color-ink-muted); }
   .stats {
-    display: flex;
-    gap: var(--space-5);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: .75rem;
     margin: var(--space-4) 0;
-    padding: var(--space-3) 0;
-    border-block: 1px solid var(--color-border);
+    padding: 0;
   }
-  .stats dt { font-size: var(--fs-sm); color: var(--color-ink-muted); margin: 0; }
-  .stats dd { margin: 0; font-weight: 700; font-size: var(--fs-lg); }
-  .prose { margin-top: var(--space-6); }
+  .stats > div { position: relative; padding: 1.15rem 1.25rem; overflow: hidden; border: 1px solid var(--color-border); border-radius: 1rem; background: #fff; box-shadow: var(--shadow-sm); }
+  .stats > div::before { content: ''; position: absolute; inset: 0 0 auto; height: 3px; background: var(--color-border-strong); }
+  .stats .price-stat { background: linear-gradient(145deg, #fff, var(--color-blue-soft)); }
+  .stats .price-stat::before { background: linear-gradient(90deg, var(--color-primary), var(--color-coral)); }
+  .stats dt { margin: 0 0 .55rem; color: var(--color-ink-muted); font-size: .72rem; font-weight: 750; }
+  .stats dd { display: flex; align-items: baseline; gap: .38rem; margin: 0; }
+  .stats dd strong { color: var(--color-navy); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 850; line-height: 1; letter-spacing: -.045em; }
+  .stats .price-stat dd strong, .stats .price-stat dd span { color: var(--color-primary); }
+  .stats .monthly-stat::before { background: linear-gradient(90deg, var(--color-coral), #f7b75f); }
+  .stats .daily-stat::before { background: linear-gradient(90deg, var(--color-primary), #d95f35); }
+  .stats .days-stat::before { background: linear-gradient(90deg, var(--color-navy), #64769b); }
+  .stats .days-stat dd strong { font-size: clamp(1rem, 1.8vw, 1.25rem); line-height: 1.2; letter-spacing: -.02em; }
+  .stats .is-variable dd strong { color: var(--color-border-strong); }
+  .stats .is-variable dd span { white-space: normal; }
+  .stats dd span { color: var(--color-ink-muted); font-size: .72rem; font-weight: 750; }
+  .course-schedule { margin: var(--space-4) 0; padding: 1.25rem; border: 1px solid rgb(182 23 51 / .16); border-radius: 1.25rem; background: linear-gradient(135deg, rgb(182 23 51 / .055), rgb(242 148 32 / .09)); box-shadow: var(--shadow-sm); }
+  .time-options { width: 100%; }
+  .times-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .7rem; }
+  .times-heading strong { color: var(--color-navy); font-size: .9rem; }
+  .times-heading span { color: var(--color-ink-muted); font-size: .72rem; }
+  .time-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
+  .time-options.single .time-grid { grid-template-columns: 1fr; }
+  .time-card { display: flex; min-height: 4.5rem; align-items: center; gap: .75rem; padding: .8rem 1rem; border: 1px solid rgb(182 23 51 / .14); border-radius: 1rem; background: #fff; box-shadow: 0 8px 22px rgb(25 39 69 / .06); }
+  .time-icon { display: grid; width: 2.5rem; height: 2.5rem; flex: 0 0 auto; place-items: center; border-radius: .8rem; color: #fff; background: linear-gradient(135deg, var(--color-primary), var(--color-coral)); }
+  .time-card > span:last-child { display: grid; gap: .12rem; }
+  .time-card small { color: var(--color-ink-muted); font-size: .68rem; font-weight: 750; }
+  .time-card strong { color: var(--color-primary); font-size: clamp(1.05rem, 2vw, 1.3rem); font-weight: 900; }
+  .time-value { display: flex; align-items: baseline; gap: .35rem; }
+  .time-value > span { font-family: var(--font-body); font-size: .72em; }
+  .course-schedule > p { margin: .85rem 0 0; color: var(--color-ink-muted); font-size: .75rem; }
+  .details-note { margin: var(--space-4) 0; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); color: var(--color-primary); background: var(--color-blue-soft); font-weight: 700; }
+  @media (max-width: 620px) { .stats { grid-template-columns: 1fr; } .time-grid { grid-template-columns: 1fr; } .times-heading { align-items: flex-start; flex-direction: column; gap: .15rem; } }
 </style>

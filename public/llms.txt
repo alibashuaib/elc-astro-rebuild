@@ -11,5 +11,5 @@ site is written natively in both English and Arabic, not machine-translated.
 
 - [Courses](https://elc.com.sa/en/courses): Full course catalog with pricing, duration, and level.
 - [About](https://elc.com.sa/en/about): Accreditation, facilities, and instructor credentials.
-- [Why ELC](https://elc.com.sa/en/why-elc): How ELC compares to alternatives.
+- [About & Why ELC](https://elc.com.sa/en/about): ELC's story, accreditation, teaching approach, learning environment, and quality standards.
 - [Register](https://elc.com.sa/en/register): Enrollment and placement testing.

@@ -1,11 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import PageHero from '../../components/PageHero.astro';
+import ContactExperience from '../../components/ContactExperience.astro';
 import { breadcrumbSchema } from '../../lib/schema';
-// NOTE: localBusinessSchema() is intentionally NOT emitted here yet — its NAP/geo
-// fields are still placeholders (see lib/schema.ts TODOs). Emitting fake address/
-// coordinates would actively hurt local SEO. Wire it in once the GBP NAP mismatch
-// (plan §8) is resolved with real data.
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'Home', url: 'https://elc.com.sa/en/' },
@@ -16,85 +12,9 @@ const breadcrumbs = breadcrumbSchema([
 <Layout
   locale="en"
   path="/contact"
-  title="Contact ELC"
-  description="Get in touch with ELC — location, hours, and contact form."
+  title="Contact ELC in Jeddah"
+  description="Call, WhatsApp, email, or visit ELC in Jeddah for English course information, placement testing, and registration support."
   jsonLd={breadcrumbs}
 >
-  <PageHero title="Contact" subtitle="Location, hours, and a way to reach us." />
-
-  <section class="container prose-page">
-    <div class="contact-grid">
-      <div>
-        <h2>Location</h2>
-        <p>
-          Jeddah, Al Fayahaa district, behind Al Ahli Bank.
-          <br />
-          <em>This is the landmark description from the current site — it should be
-          replaced with a formal street address once the GBP NAP mismatch (plan §8)
-          is resolved, and a real map embedded here.</em>
-        </p>
-
-        <h2>Phone &amp; email</h2>
-        <ul class="contact-list">
-          <li><a class="numeric" href="tel:+966126305553">012 630 5553</a></li>
-          <li><a class="numeric" href="tel:+966126306030">012 630 6030</a></li>
-          <li><a class="numeric" href="tel:+966591799917">059 179 9917</a></li>
-          <li><a href="mailto:info@elc.com.sa">info@elc.com.sa</a></li>
-        </ul>
-
-        <h2>WhatsApp</h2>
-        <p>Use the floating WhatsApp button on any page for the fastest response.</p>
-
-        <h2>Hours</h2>
-        <p><em>Not published on the current site — needs the real schedule.</em></p>
-      </div>
-
-      <form class="contact-form" method="POST" action="/api/contact">
-        <!--
-          Static form, works with JS fully disabled (plain POST). Action target is a
-          placeholder — plan calls for "lightweight serverless form handling, no full
-          backend" (e.g. a small Cloudflare/Netlify function or a service like Formspree).
-          Not wired to a real endpoint yet — see project TODOs.
-        -->
-        <label>
-          Name
-          <input type="text" name="name" required />
-        </label>
-        <label>
-          Email
-          <input type="email" name="email" required />
-        </label>
-        <label>
-          Message
-          <textarea name="message" rows="5" required></textarea>
-        </label>
-        <button type="submit" class="btn btn-primary">Send message</button>
-      </form>
-    </div>
-  </section>
+  <ContactExperience locale="en" />
 </Layout>
-
-<style>
-  .prose-page { padding-block: var(--space-6); }
-  .contact-list { list-style: none; padding: 0; margin: 0 0 var(--space-4); }
-  .contact-list li { margin-bottom: var(--space-1); }
-  .contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-6);
-    max-width: 60rem;
-  }
-  .contact-form { display: flex; flex-direction: column; gap: var(--space-3); }
-  .contact-form label { display: flex; flex-direction: column; gap: var(--space-1); font-weight: 600; }
-  .contact-form input, .contact-form textarea {
-    font: inherit;
-    padding: var(--space-2);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    background: var(--color-bg-raised);
-    color: var(--color-ink);
-  }
-  @media (max-width: 720px) {
-    .contact-grid { grid-template-columns: 1fr; }
-  }
-</style>

@@ -23,11 +23,18 @@
   # CMS OAuth Worker origin for /admin's popup flow. Update *.workers.dev to the
   # real deployed Worker origin once known, and drop 'unsafe-inline' on style-src
   # if Astro's scoped styles ever move to external files instead of <style> tags.
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.github.com https://*.workers.dev; frame-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://api.github.com https://*.workers.dev; frame-src 'self' https://www.google.com; base-uri 'self'; form-action 'self'; object-src 'none'"
 </IfModule>
 
 # Directory listing off.
 Options -Indexes
+
+# “Why ELC” now lives inside About; keep existing bookmarks and search links valid.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^en/why-elc/?$ /en/about/ [R=301,L]
+  RewriteRule ^ar/why-elc/?$ /ar/about/ [R=301,L]
+</IfModule>
 
 # Standard Astro `format: "directory"` output — Apache serves /foo/index.html for /foo/ already;
 # this just makes /foo (no trailing slash) resolve the same way.

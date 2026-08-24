@@ -40,7 +40,7 @@ collections:
       - name: category
         label: Category
         widget: select
-        options: [kids, adults, business, exam-prep]
+        options: [kids, adults, women, business, exam-prep]
       - name: level
         label: Level
         widget: select
@@ -49,6 +49,7 @@ collections:
       - { name: currency, label: Currency, widget: string, default: SAR }
       - { name: durationWeeks, label: Duration (weeks), widget: number, value_type: int }
       - { name: hoursPerWeek, label: Hours per week, widget: number, value_type: int }
+      - { name: hoursPerMonth, label: Hours per month, widget: string, required: false }
       - { name: image, label: Image, widget: image, required: false }
       - { name: imageAlt, label: Image alt text, widget: string, required: true, i18n: true }
       - name: faqs

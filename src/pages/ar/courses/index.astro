@@ -35,11 +35,11 @@ const breadcrumbs = breadcrumbSchema([
 <Layout
   locale="ar"
   path="/courses"
-  title="الدورات — ELC"
-  description="تصفّح كتالوج دورات ELC الكامل: أطفال، كبار، إنجليزي أعمال، تحضير امتحانات. شاهد السعر والمدة والمستوى بنظرة واحدة."
+  title="الدورات — معهد صرح المعرفة"
+  description="تصفّح كتالوج دورات معهد صرح المعرفة الكامل: أطفال، كبار، إنجليزي عام للسيدات، إنجليزي أعمال، وتحضير اختبارات."
   jsonLd={[collectionPageSchema, breadcrumbs]}
 >
-  <PageHero title="الدورات" subtitle="اختر الدورة المناسبة حسب المستوى والمدة والسعر." />
+  <PageHero kicker="معهد صرح المعرفة" title="الدورات" subtitle="اختر الدورة المناسبة حسب المستوى والمدة والسعر." />
 
   <section class="container">
     <CourseFilter locale="ar" categories={categories} />
@@ -56,7 +56,7 @@ const breadcrumbs = breadcrumbSchema([
   .container { padding-top: var(--space-5); }
   .course-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
     gap: var(--space-4);
     margin-top: var(--space-5);
   }

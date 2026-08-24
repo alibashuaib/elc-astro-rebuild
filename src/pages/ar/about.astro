@@ -1,109 +1,20 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import PageHero from '../../components/PageHero.astro';
-import Icon from '../../components/Icon.astro';
+import AboutExperience from '../../components/AboutExperience.astro';
 import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
   { name: 'من نحن', url: 'https://elc.com.sa/ar/about' },
 ]);
-
-// محتوى حقيقي مأخوذ من صفحة "من نحن" في الموقع الحالي elc.com.sa.
-const blocks = [
-  {
-    icon: 'certificate' as const,
-    title: 'الاعتماد',
-    text: 'معتمدون من TVTC منذ التأسيس عام 2010. الشهادات معترف بها داخل السعودية ومقبولة لدى المؤسسات التعليمية وأصحاب العمل. TODO: إضافة رابط سجل TVTC القابل للتحقق.',
-  },
-  {
-    icon: 'building' as const,
-    title: 'المرافق',
-    text: 'أقسام مخصصة للأطفال وللطالبات، فصول مجهزة بتقنيات حديثة وأجهزة عرض، مكتبة للقراءة، كافيتيريا داخلية، ساعات دعم إضافية، وخدمات نقل. ما زالت هناك حاجة لصور حقيقية (البند 8).',
-  },
-  {
-    icon: 'instructor' as const,
-    title: 'المدرّبون',
-    text: 'يحمل المدرّبون شهادات معتمدة دوليًا — CELTA أو TESOL أو DELTA أو ما يعادلها — ويشاركون في تدريب مستمر. TODO: هذا لا يحل فجوة "عدم وجود مدرّبين بأسمائهم" — الأسماء والصور والمؤهلات الفردية غير منشورة على الموقع الحالي أيضًا، وتحتاج إلى جمعها.',
-  },
-];
-
-const mission = 'تقديم تعليم عالي الجودة للغة الإنجليزية يمكّن المتعلمين من تحقيق طموحاتهم الأكاديمية والمهنية.';
-const stats = [
-  { value: '+15,000', label: 'طالب تم تدريبهم' },
-  { value: '+9', label: 'برامج دراسية' },
-  { value: '2010', label: 'التأسيس' },
-];
 ---
 
 <Layout
   locale="ar"
   path="/about"
-  title="من نحن — ELC"
-  description="ELC مركز لغة إنجليزية معتمد من TVTC. تعرّف على اعتمادنا ومرافقنا ومدرّبينا."
-  jsonLd={[organizationSchema(), breadcrumbs]}
+  title="من نحن ولماذا معهد صرح المعرفة"
+  description="تعرّف على معهد صرح المعرفة واكتشف لماذا يختار المتعلمون برامجنا المعتمدة ومدرّبينا المؤهلين وبيئتنا التعليمية الحديثة ومناهجنا المصممة لأهدافهم."
+  jsonLd={[organizationSchema(undefined, 'ar'), breadcrumbs]}
 >
-  <PageHero title="من نحن" subtitle={mission} />
-
-  <section class="container prose-page">
-    <div class="stats-row">
-      {stats.map((s) => (
-        <div class="stat">
-          <span class="stat-value numeric">{s.value}</span>
-          <span class="stat-label">{s.label}</span>
-        </div>
-      ))}
-    </div>
-
-    <div class="about-grid">
-      {blocks.map((b) => (
-        <div class="about-block">
-          <span class="block-icon"><Icon name={b.icon} size={28} /></span>
-          <h2>{b.title}</h2>
-          <p>{b.text}</p>
-        </div>
-      ))}
-    </div>
-  </section>
+  <AboutExperience locale="ar" />
 </Layout>
-
-<style>
-  .prose-page { padding-block: var(--space-6); }
-  .stats-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-6);
-    margin: 0 0 var(--space-5);
-    padding-bottom: var(--space-4);
-    border-bottom: 1px solid var(--color-border);
-  }
-  .stat { display: flex; flex-direction: column; }
-  .stat-value { font-size: var(--fs-xl); font-weight: 700; color: var(--color-crimson-text); }
-  .stat-label { color: var(--color-ink-muted); font-size: var(--fs-sm); }
-  .about-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    gap: var(--space-5);
-    margin-top: var(--space-5);
-    max-width: 60rem;
-  }
-  .about-block {
-    padding: var(--space-4);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    background: var(--color-bg-raised);
-  }
-  .block-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: var(--radius);
-    background: var(--color-bg);
-    color: var(--color-crimson-text);
-    margin-bottom: var(--space-3);
-  }
-  .about-block h2 { font-size: var(--fs-lg); margin: 0 0 var(--space-2); }
-  .about-block p { margin: 0; color: var(--color-ink-muted); }
-</style>

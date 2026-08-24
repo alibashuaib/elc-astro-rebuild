@@ -1,0 +1,157 @@
+---
+import PageHero from './PageHero.astro';
+import Icon from './Icon.astro';
+import type { Locale } from '../i18n/ui';
+
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const isArabic = locale === 'ar';
+
+const content = isArabic ? {
+  kicker: 'تواصل مع معهد صرح المعرفة',
+  title: 'لنحدد خطوتك التالية معاً',
+  subtitle: 'اسأل عن البرامج أو اختبار تحديد المستوى أو التسجيل. اختر طريقة التواصل الأنسب لك وسيساعدك فريقنا.',
+  actions: [
+    { icon: 'phone' as const, label: 'اتصل بالقبول', value: '059 179 9917', note: 'للاستفسار عن البرامج والتسجيل', href: 'tel:+966591799917' },
+    { icon: 'whatsapp' as const, label: 'واتساب', value: '054 665 6000', note: 'للحصول على رد سريع', href: 'https://wa.me/966546656000' },
+    { icon: 'mail' as const, label: 'البريد الإلكتروني', value: 'info@elc.com.sa', note: 'للرسائل والتعاون', href: 'mailto:info@elc.com.sa' },
+  ],
+  visitKicker: 'زورونا',
+  visitTitle: 'في قلب جدة',
+  address: 'حي الفيحاء، شارع عبدالله السليمان، خلف البنك الأهلي، جدة، المملكة العربية السعودية.',
+  landlineLabel: 'الهاتف الثابت',
+  landlines: [
+    { label: '012 630 5553', href: 'tel:+966126305553' },
+    { label: '012 630 6030', href: 'tel:+966126306030' },
+  ],
+  directions: 'فتح الاتجاهات',
+  mapTitle: 'موقع معهد صرح المعرفة في جدة',
+  ready: 'جاهز للبدء؟',
+  readyText: 'سجّل بياناتك وسنساعدك على اختيار البرنامج والمستوى المناسبين.',
+  register: 'ابدأ التسجيل',
+} : {
+  kicker: 'Contact ELC',
+  title: 'Let’s find your next step together',
+  subtitle: 'Ask about programs, placement testing, or registration. Choose the channel that suits you and our team will help.',
+  actions: [
+    { icon: 'phone' as const, label: 'Call admissions', value: '059 179 9917', note: 'For programs and registration', href: 'tel:+966591799917' },
+    { icon: 'whatsapp' as const, label: 'WhatsApp', value: '054 665 6000', note: 'For the fastest response', href: 'https://wa.me/966546656000' },
+    { icon: 'mail' as const, label: 'Email us', value: 'info@elc.com.sa', note: 'For messages and partnerships', href: 'mailto:info@elc.com.sa' },
+  ],
+  visitKicker: 'Visit us',
+  visitTitle: 'In the heart of Jeddah',
+  address: 'Abdullah Al-Suleiman Street, Al Fayahaa District, behind Al Ahli Bank, Jeddah, Saudi Arabia.',
+  landlineLabel: 'Landlines',
+  landlines: [
+    { label: '012 630 5553', href: 'tel:+966126305553' },
+    { label: '012 630 6030', href: 'tel:+966126306030' },
+  ],
+  directions: 'Open directions',
+  mapTitle: 'ELC location in Jeddah',
+  ready: 'Ready to begin?',
+  readyText: 'Share your details and we’ll help match you with the right program and level.',
+  register: 'Start registration',
+};
+
+const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d649.9556553176023!2d39.2156796444935!3d21.49711472954436!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x15c3ce5da2479d91%3A0xd16f09184a682373!2sKnowledge%20Edifice%20Institute!5e0!3m2!1sen!2ssa!4v1748933853229!5m2!1sen!2ssa';
+const directionsUrl = 'https://www.google.com/maps/search/?api=1&query=21.4971147%2C39.2156796';
+---
+
+<PageHero kicker={content.kicker} title={content.title} subtitle={content.subtitle} />
+
+<section class="container contact-actions">
+  {content.actions.map((action, index) => (
+    <a class={`contact-card card-${index + 1} icon-${action.icon}`} href={action.href} target={action.href.startsWith('http') ? '_blank' : undefined} rel={action.href.startsWith('http') ? 'noopener' : undefined}>
+      <span class="contact-icon"><Icon name={action.icon} size={30} /></span>
+      <span class="contact-label">{action.label}</span>
+      <strong class={action.value.includes('@') ? '' : 'numeric'}>{action.value}</strong>
+      <small>{action.note}</small>
+      <b aria-hidden="true">↗</b>
+    </a>
+  ))}
+</section>
+
+<section class="location-section">
+  <div class="container location-grid">
+    <div class="location-copy">
+      <span class="section-kicker">{content.visitKicker}</span>
+      <h2>{content.visitTitle}</h2>
+      <p>{content.address}</p>
+      <div class="landlines">
+        <strong>{content.landlineLabel}</strong>
+        <div class="landline-links">
+          {content.landlines.map((line, index) => (
+            <>
+              {index > 0 && <span aria-hidden="true">·</span>}
+              <a class="numeric" href={line.href}>{line.label}</a>
+            </>
+          ))}
+        </div>
+      </div>
+      <a class="btn btn-outline" href={directionsUrl} target="_blank" rel="noopener">{content.directions}<span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="map-wrap">
+      <iframe src={mapEmbed} title={content.mapTitle} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+    </div>
+  </div>
+</section>
+
+<section class="container contact-cta">
+  <div><span class="section-kicker">{isArabic ? 'معهد صرح المعرفة' : 'ELC'}</span><h2>{content.ready}</h2><p>{content.readyText}</p></div>
+  <a class="btn btn-primary" href={`/${locale}/register`}>{content.register}</a>
+</section>
+
+<style>
+  .contact-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding-block: clamp(3.5rem, 7vw, 6rem); }
+  .contact-card { --contact-accent: var(--color-primary); --contact-accent-deep: #8d1026; --contact-soft: var(--color-blue-soft); position: relative; isolation: isolate; display: flex; min-height: 18rem; flex-direction: column; padding: 1.55rem; overflow: hidden; border: 1px solid var(--color-border); border-radius: 1.6rem; color: var(--color-navy); background: linear-gradient(145deg, #fff 55%, var(--contact-soft)); box-shadow: 0 15px 38px rgb(49 43 40 / .09); transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease), border-color var(--motion-base) var(--ease); }
+  .contact-card::before { content: ''; position: absolute; z-index: -1; width: 11rem; height: 11rem; inset-inline-start: -5.5rem; top: -6rem; border-radius: 50%; background: var(--contact-soft); opacity: .85; transition: transform .55s var(--ease); }
+  .contact-card::after { content: ''; position: absolute; z-index: -1; inset: 0; background-image: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--contact-accent) 18%, transparent) 1px, transparent 0); background-size: 18px 18px; mask-image: linear-gradient(145deg, transparent 42%, black); opacity: .42; }
+  .contact-card:hover { border-color: color-mix(in srgb, var(--contact-accent) 28%, var(--color-border)); color: var(--color-navy); text-decoration: none; transform: translateY(-7px); box-shadow: 0 25px 58px rgb(49 43 40 / .16); }
+  .contact-card:hover::before { transform: scale(1.22); }
+  .contact-card[href^="tel:"] strong { text-decoration: underline; text-decoration-color: rgb(182 23 51 / .28); text-underline-offset: .22em; }
+  .contact-card[href^="tel:"]:hover strong { text-decoration-color: currentColor; }
+  .contact-icon { position: relative; display: grid; width: 4.5rem; height: 4.5rem; place-items: center; margin-bottom: auto; border: 1px solid rgb(255 255 255 / .68); border-radius: 1.35rem; color: #fff; background: linear-gradient(145deg, var(--contact-accent), var(--contact-accent-deep)); box-shadow: 0 15px 30px color-mix(in srgb, var(--contact-accent) 28%, transparent), inset 0 1px 0 rgb(255 255 255 / .28); transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease); }
+  .contact-icon::after { content: ''; position: absolute; inset: -.42rem; border: 1px solid var(--contact-accent); border-radius: 1.65rem; opacity: .18; transition: transform var(--motion-base) var(--ease), opacity var(--motion-base) var(--ease); }
+  .contact-card:hover .contact-icon { transform: rotate(-6deg) scale(1.06); box-shadow: 0 20px 38px color-mix(in srgb, var(--contact-accent) 35%, transparent), inset 0 1px 0 rgb(255 255 255 / .3); }
+  .contact-card:hover .contact-icon::after { opacity: .38; transform: scale(1.08); }
+  .icon-whatsapp { --contact-accent: #159447; --contact-accent-deep: #087b37; --contact-soft: #e5f6eb; }
+  .icon-mail { --contact-accent: #d66f1f; --contact-accent-deep: #9b4b10; --contact-soft: #fff0dc; }
+  .contact-label { margin-top: 2.75rem; color: var(--contact-accent-deep); font-size: .75rem; font-weight: 850; text-transform: uppercase; letter-spacing: .065em; }
+  :global(:lang(ar)) .contact-label { letter-spacing: 0; }
+  .contact-card strong { margin-top: .3rem; font-size: clamp(1.1rem, 2vw, 1.45rem); }
+  .contact-card small { margin-top: .35rem; color: var(--color-ink-muted); }
+  .contact-card b { position: absolute; display: grid; width: 2.25rem; height: 2.25rem; place-items: center; inset-inline-end: 1.4rem; top: 1.4rem; border: 1px solid color-mix(in srgb, var(--contact-accent) 18%, transparent); border-radius: 50%; color: var(--contact-accent); background: rgb(255 255 255 / .76); box-shadow: 0 8px 20px rgb(49 43 40 / .08); transition: transform var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); }
+  .contact-card:hover b { color: #fff; background: var(--contact-accent); transform: translate(2px, -2px); }
+  :global(:dir(rtl)) .contact-card:hover b { transform: translate(-2px, -2px) scaleX(-1); }
+  .location-section { padding-block: clamp(4.5rem, 8vw, 7rem); background: var(--color-navy); color: #fff; }
+  .location-grid { display: grid; grid-template-columns: minmax(18rem, .65fr) minmax(0, 1.35fr); align-items: center; gap: clamp(3rem, 7vw, 7rem); }
+  .section-kicker { color: var(--color-primary); font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  :global(:lang(ar)) .section-kicker { letter-spacing: 0; }
+  .location-copy .section-kicker { color: #f7b75f; }
+  .landlines { display: flex; flex-direction: column; gap: .25rem; margin: 1rem 0 1.5rem; }
+  .landlines strong { color: #fff; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }
+  .landline-links { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; }
+  .landline-links > span { color: #777980; }
+  .landlines a { color: #f7b75f; font-weight: 750; }
+  .landlines a:hover { color: #fff; text-decoration-thickness: 2px; text-underline-offset: .2em; }
+  :global(:lang(ar)) .landlines strong { letter-spacing: 0; }
+  .location-copy h2, .contact-cta h2 { margin: .7rem 0 1rem; font-size: clamp(2.2rem, 4vw, 4rem); line-height: 1.08; letter-spacing: -.045em; }
+  :global(:lang(ar)) .location-copy h2, :global(:lang(ar)) .contact-cta h2 { line-height: 1.35; letter-spacing: -.025em; }
+  .location-copy p { margin: 0 0 1.5rem; color: #d0ccc7; line-height: 1.8; }
+  .location-copy .btn { color: #fff; border-color: #5a5c61; }
+  .map-wrap { min-height: 30rem; overflow: hidden; border: 1px solid #4d4f54; border-radius: 2rem; background: #36383d; box-shadow: 0 25px 65px rgb(0 0 0 / .24); }
+  .map-wrap iframe { display: block; width: 100%; height: 30rem; border: 0; filter: saturate(.75) contrast(.95); }
+  .contact-cta { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 3rem; padding-block: clamp(4.5rem, 8vw, 7rem); }
+  .contact-cta h2 { color: var(--color-navy); }
+  .contact-cta p { max-width: 56ch; margin: 0; color: var(--color-ink-muted); line-height: 1.75; }
+  @media (max-width: 800px) {
+    .contact-actions { grid-template-columns: 1fr; }
+    .contact-card { min-height: 14rem; }
+    .location-grid, .contact-cta { grid-template-columns: 1fr; }
+    .contact-cta .btn { justify-self: start; }
+  }
+  @media (max-width: 520px) {
+    .map-wrap, .map-wrap iframe { min-height: 24rem; height: 24rem; }
+    .contact-cta .btn { width: 100%; justify-content: center; }
+  }
+</style>

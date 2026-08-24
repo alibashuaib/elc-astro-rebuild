@@ -11,8 +11,8 @@ const { faqs, title } = Astro.props;
 {faqs.length > 0 && (
   <section class="faq">
     <h2>{title}</h2>
-    {faqs.map((faq) => (
-      <details class="faq-item">
+    {faqs.map((faq, index) => (
+      <details class="faq-item" name="course-faq" open={index === 0}>
         <summary>{faq.question}</summary>
         <p>{faq.answer}</p>
       </details>
@@ -21,11 +21,17 @@ const { faqs, title } = Astro.props;
 )}
 
 <style>
-  .faq { margin-top: var(--space-6); }
+  .faq { margin-top: var(--space-6); padding: clamp(1.15rem, 3vw, 2rem); border: 1px solid var(--color-border); border-radius: 1.6rem; background: #fff; box-shadow: var(--shadow-sm); }
+  .faq h2 { margin: 0 0 .5rem; color: var(--color-navy); }
   .faq-item {
-    border-bottom: 1px solid var(--color-border);
-    padding-block: var(--space-3);
+    margin-top: .65rem;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: .95rem;
+    background: var(--color-surface-soft);
+    transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease);
   }
+  .faq-item[open] { border-color: rgb(182 23 51 / .24); background: rgb(182 23 51 / .045); }
   .faq-item summary {
     cursor: pointer;
     font-weight: 600;

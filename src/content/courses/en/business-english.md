@@ -1,26 +1,27 @@
 ---
 title: Business English
-summary: Professional communication for the workplace — emails, meetings, presentations, negotiation.
+summary: Tailored workplace English built around real professional scenarios, from email and reports to meetings and presentations.
 category: business
-level: B2
-price: 1800
-currency: SAR
-durationWeeks: 6
-hoursPerWeek: 5
 imageAlt: Professionals in a business English workshop at ELC
 faqs:
-  - question: What happens if I miss a class?
-    answer: Placeholder answer — replace with the real make-up-class policy.
-  - question: Is there a certificate at the end?
-    answer: Placeholder answer — replace with the real certification details.
+  - question: How is the program designed?
+    answer: It begins with a needs assessment, then uses a practical curriculum shaped around the participants’ roles, goals, and workplace language requirements.
+  - question: What will participants practice?
+    answer: Training uses real-world business scenarios to develop professional vocabulary, email and report writing, meetings, presentations, and workplace communication.
+  - question: Is progress reported?
+    answer: The published program includes a final report summarizing participant progress, strengths, and areas for further development.
 draft: false
 ---
 
-Full curriculum breakdown, schedule, and enrollment details go here — placeholder
-content until real copy is written (plan doc §8, open item).
+Business English helps individuals and teams communicate more professionally in the workplace. Programs are tailored through a needs assessment and use practical scenarios, expert instruction, and real-world resources.
 
-## Curriculum
+## Program approach
 
-- Weeks 1–2: Business writing (emails, reports)
-- Weeks 3–4: Meetings and presentations
-- Weeks 5–6: Negotiation and client communication
+- Needs assessment and business-language placement
+- A practical curriculum aligned with participant and organization goals
+- Email, report, meeting, and presentation skills
+- Professional vocabulary and real workplace communication
+- Hands-on delivery with expert instructors
+- A final progress report with strengths and development priorities
+
+Contact ELC for a tailored proposal, schedule, and pricing.

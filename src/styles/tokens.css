@@ -1,52 +1,52 @@
-/*
-  Design tokens — ELC Astro Rebuild, 2026 pass.
-  Direction: "chalkboard & paper" — ink-toned zones alternating with crisp paper
-  zones, echoing the classroom itself, not a generic dark-mode-with-accent look.
-  Brand colors (crimson/gold) come from the existing logo — kept, but restaged.
-  Kept in plain CSS custom properties — no framework, minimal bytes shipped.
-*/
-
+/* ELC 2026 — education-first system built from the official logo palette. */
 :root {
-  /* Brand colors, pulled from the existing logo */
-  --color-crimson: #a31e2e;       /* primary / CTA — solid backgrounds (white text on top) */
-  --color-crimson-ink: #7c1723;   /* hover/active state, darker for contrast */
-  --color-crimson-text: #a31e2e;  /* crimson used AS text/links — same as --color-crimson in light mode, diverges in dark mode (see below) */
-  --color-amber: #c97a1a;         /* sparing accent only — fails AA on white, never use for text on light bg */
-  --color-amber-text: #8f5610;    /* darkened amber, passes AA on --color-bg for small text if ever needed */
+  --color-primary: #b61733;
+  --color-primary-deep: #8c1027;
+  --color-crimson: #b61733;
+  --color-crimson-ink: #841026;
+  --color-crimson-text: #a4132d;
+  --color-coral: #f29420;
+  --color-coral-soft: #fff1df;
+  --color-mint: #a6a8ab;
+  --color-mint-ink: #5b5e62;
+  --color-mint-soft: #eff0f1;
+  --color-yellow: #f6ad43;
+  --color-yellow-ink: #895411;
+  --color-yellow-soft: #fff3dc;
+  --color-blue-soft: #fae9ed;
 
-  --color-bg: #fbf6ef;            /* warm off-white, not stark white */
+  --color-bg: #f8f7f5;
   --color-bg-raised: #ffffff;
-  --color-ink: #2b2420;           /* warm charcoal, not pure black */
-  --color-ink-muted: #6b6259;     /* warm slate gray, secondary text */
-  --color-border: #e7ddcf;
+  --color-surface-soft: #f1efec;
+  --color-navy: #292b2f;
+  --color-ink: #37393d;
+  --color-ink-muted: #6c6f74;
+  --color-border: #e4dfda;
+  --color-border-strong: #cec8c1;
 
-  /* Fixed "chalkboard" zone tokens — do NOT invert with prefers-color-scheme.
-     Used only for deliberately dark editorial bands (hero, stats strip), which
-     read the same whether the visitor's OS is in light or dark mode. */
-  --zone-ink-bg: #17120d;
-  --zone-ink-bg-raised: #221a13;
-  --zone-ink-text: #f7f2e9;
-  --zone-ink-muted: #b8ab98;
-  --zone-ink-border: #3a2f24;
-  --zone-ink-signal: #e35866;     /* crimson, lightened for AA text-on-ink (matches dark-mode logic below) */
-  --zone-ink-ember: #7c1723;
+  /* Legacy aliases retained for components outside the redesigned homepage. */
+  --color-amber: var(--color-yellow);
+  --color-amber-text: var(--color-yellow-ink);
+  --zone-ink-bg: var(--color-navy);
+  --zone-ink-bg-raised: #36383d;
+  --zone-ink-text: #ffffff;
+  --zone-ink-muted: #d0ccc7;
+  --zone-ink-border: #4c4e53;
+  --zone-ink-signal: #f4b15b;
+  --zone-ink-ember: var(--color-coral);
 
-  /* Type */
-  --font-display: 'Cairo', 'IBM Plex Sans Arabic', system-ui, sans-serif;
-  --font-body: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace; /* prices/durations, forced LTR */
-  /* English-only editorial accent (eyebrows, pull-quotes) — no Arabic coverage,
-     so it never appears in the Arabic type system, only as a Latin flourish. */
-  --font-editorial: 'Newsreader', Georgia, serif;
+  --font-display: 'Manrope', 'Alexandria', system-ui, sans-serif;
+  --font-body: 'Manrope', 'Alexandria', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-editorial: 'Manrope', 'Alexandria', system-ui, sans-serif;
 
   --fs-sm: clamp(0.875rem, 0.83rem + 0.2vw, 0.95rem);
   --fs-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --fs-lg: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --fs-lg: clamp(1.2rem, 1.08rem + 0.55vw, 1.48rem);
   --fs-xl: clamp(1.75rem, 1.5rem + 1.2vw, 2.5rem);
   --fs-2xl: clamp(2.5rem, 1.8rem + 3.5vw, 4.75rem);
   --fs-3xl: clamp(3rem, 2rem + 5vw, 6.5rem);
 
-  /* Space scale */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 1rem;
@@ -56,33 +56,20 @@
   --space-7: 6rem;
   --space-8: 8.5rem;
 
-  --radius: 0.5rem;
-  --max-width: 72rem;
+  --radius: 0.85rem;
+  --max-width: 76rem;
+  --shadow-sm: 0 10px 30px rgb(49 43 40 / 0.07);
+  --shadow-md: 0 22px 55px rgb(49 43 40 / 0.13);
 
   --motion-fast: 150ms;
   --motion-base: 250ms;
   --motion-slow: 600ms;
-  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Dark mode variant (the site-wide OS preference — distinct from the fixed
-   --zone-ink-* tokens above, which never change) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #1c1815;
-    --color-bg-raised: #262019;
-    --color-ink: #f2ece2;
-    --color-ink-muted: #a89e91;
-    --color-border: #3a3229;
-    /* Tuned separately from light mode: --color-crimson stays dark enough for white
-       button text (5.87:1 vs white); --color-crimson-text is lightened so it's legible
-       as standalone text/links on the dark background (4.85:1 vs --color-bg-raised).
-       A single value can't satisfy both AA thresholds against this background. */
-    --color-crimson: #b83243;
-    --color-crimson-ink: #cc4456;
-    --color-crimson-text: #e8606d;
-    --color-amber-text: #e0a24a;
-  }
+:lang(ar) {
+  --font-display: 'Alexandria', 'Manrope', system-ui, sans-serif;
+  --font-body: 'Alexandria', 'Manrope', system-ui, sans-serif;
 }
 
 @media (prefers-reduced-motion: reduce) {

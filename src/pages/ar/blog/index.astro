@@ -2,8 +2,8 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../../layouts/Layout.astro';
 import PageHero from '../../../components/PageHero.astro';
+import NewsExperience from '../../../components/NewsExperience.astro';
 import { breadcrumbSchema } from '../../../lib/schema';
-import { localizePath } from '../../../i18n/ui';
 
 const posts = (await getCollection('blog', (e) => e.id.startsWith('ar/') && !e.data.draft))
   .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
@@ -17,32 +17,11 @@ const breadcrumbs = breadcrumbSchema([
 <Layout
   locale="ar"
   path="/blog"
-  title="الأخبار — ELC"
-  description="مقالات ونصائح وتحديثات من ELC."
+  title="الأخبار — معهد صرح المعرفة"
+  description="مقالات ونصائح وتحديثات من معهد صرح المعرفة."
   jsonLd={breadcrumbs}
 >
-  <PageHero title="الأخبار" subtitle="مقالات ونصائح وتحديثات من ELC." />
+  <PageHero kicker="معهد صرح المعرفة" title="الأخبار" subtitle="مقالات ونصائح وتحديثات من معهد صرح المعرفة." />
 
-  <section class="container prose-page">
-    <ul class="post-list">
-      {posts.map((post) => (
-        <li>
-          <a href={localizePath('ar', `/blog/${post.id.replace('ar/', '')}`)}>
-            <h2>{post.data.title}</h2>
-          </a>
-          <p>{post.data.summary}</p>
-          <time datetime={post.data.publishDate.toISOString()} class="numeric">
-            {post.data.publishDate.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </time>
-        </li>
-      ))}
-    </ul>
-  </section>
+  <NewsExperience locale="ar" posts={posts} />
 </Layout>
-
-<style>
-  .prose-page { padding-block: var(--space-6); max-width: 42rem; }
-  .post-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--space-5); }
-  .post-list h2 { font-size: var(--fs-lg); margin-bottom: var(--space-1); }
-  .post-list time { font-size: var(--fs-sm); color: var(--color-ink-muted); }
-</style>

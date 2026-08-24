@@ -54,33 +54,14 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     {ogImage && <meta property="og:image" content={new URL(ogImage, site).toString()} />}
     <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Preconnect + actually load the type system (was silently missing — preconnect
-         alone loads nothing, every page was falling back to system fonts). One request,
-         only the weights actually used, font-display=swap so text never blocks on font load.
-         Loaded non-render-blocking (preload + swap-media trick): the stylesheet fetches
-         in parallel with everything else and only applies once ready, so first paint
-         never waits on it — text renders immediately in the system-font fallback and
-         swaps to Cairo/IBM Plex when the font file arrives. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preload the locale's critical local font so branded text is ready for first paint. -->
     <link
       rel="preload"
-      as="style"
-      href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&family=IBM+Plex+Mono:wght@500&family=Newsreader:ital,wght@1,500&display=swap"
+      href={locale === 'ar' ? '/fonts/alexandria-arabic.woff2' : '/fonts/manrope-latin.woff2'}
+      as="font"
+      type="font/woff2"
+      crossorigin
     />
-    <link
-      id="font-stylesheet"
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&family=IBM+Plex+Mono:wght@500&family=Newsreader:ital,wght@1,500&display=swap"
-      media="print"
-    />
-    <script src="/scripts/font-swap.js" defer></script>
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;600&family=IBM+Plex+Mono:wght@500&family=Newsreader:ital,wght@1,500&display=swap"
-      />
-    </noscript>
 
     {ldEntries.map((entry) => (
       <script type="application/ld+json" set:html={JSON.stringify(entry)} />

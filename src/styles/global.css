@@ -1,11 +1,54 @@
 @import './tokens.css';
 
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/manrope-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Alexandria';
+  src: url('/fonts/alexandria-arabic.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: block;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1;
+}
+
+@font-face {
+  font-family: 'Alexandria';
+  src: url('/fonts/alexandria-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: block;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/ibm-plex-mono-500-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('/fonts/ibm-plex-mono-700-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 
 html {
   background: var(--color-bg);
-  color-scheme: light dark;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -21,7 +64,7 @@ h1, h2, h3, h4 {
   font-family: var(--font-display);
   font-weight: 700;
   line-height: 1.05;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.025em;
   margin: 0 0 var(--space-3);
 }
 
@@ -42,11 +85,7 @@ h3 { font-size: var(--fs-lg); }
 /* English-only editorial accent — small-caps-ish serif italic label, used for
    eyebrows and pull-quotes. Never applied to Arabic text (Newsreader has no
    Arabic glyphs); the Arabic system uses its own eyebrow treatment instead. */
-.editorial-mark {
-  font-family: var(--font-editorial);
-  font-style: italic;
-  font-weight: 500;
-}
+.editorial-mark { font-family: var(--font-editorial); font-weight: 700; }
 
 /* The "fluency line" — the site's signature motif (see HeroGraphic), reduced to
    a plain gradient rule and reused as a section divider. One recurring idea,
@@ -127,21 +166,28 @@ img, svg { max-width: 100%; height: auto; display: block; }
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius);
+  justify-content: center;
+  min-height: 3.1rem;
+  padding: .75rem 1.25rem;
+  border-radius: 999px;
   font-family: var(--font-display);
   font-weight: 600;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background-color var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+  transition: background-color var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease), transform var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
 }
 
 .btn-primary {
-  background: var(--color-crimson);
+  background: var(--color-primary);
   color: #fff;
+  box-shadow: 0 10px 24px rgb(182 23 51 / .22);
 }
+
+/* Author-level display rules (grid/flex) must never override semantic hidden states. */
+[hidden] { display: none !important; }
 .btn-primary:hover {
-  background: var(--color-crimson-ink);
+  background: var(--color-primary-deep);
+  transform: translateY(-2px);
   text-decoration: none;
 }
 
@@ -151,8 +197,21 @@ img, svg { max-width: 100%; height: auto; display: block; }
   color: var(--color-ink);
 }
 .btn-outline:hover {
-  border-color: var(--color-crimson);
+  border-color: var(--color-primary);
   text-decoration: none;
+}
+
+.btn-soft {
+  color: var(--color-navy);
+  background: #fff;
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+.btn-soft:hover {
+  color: var(--color-primary);
+  border-color: #e8bcc5;
+  text-decoration: none;
+  transform: translateY(-2px);
 }
 
 /* Skip link for keyboard/screen reader users */
@@ -178,6 +237,6 @@ img, svg { max-width: 100%; height: auto; display: block; }
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-crimson);
+  outline: 3px solid var(--color-primary);
   outline-offset: 2px;
 }

@@ -1,41 +1,45 @@
 ---
-// Shared ink-zone header band for interior pages — gives every page the same
-// visual weight the homepage hero has, instead of a plain white h1. Keeps the
-// site's signature texture (GhostScript) and fluency-line motif consistent
-// across the whole site rather than living only on the homepage.
-import GhostScript from './GhostScript.astro';
+// Shared education-first hero for interior pages.
 
 interface Props {
   title: string;
   subtitle?: string;
+  kicker?: string;
 }
-const { title, subtitle } = Astro.props;
+const { title, subtitle, kicker = 'ELC' } = Astro.props;
 ---
 
-<header class="page-hero zone-ink">
-  <GhostScript />
+<header class="page-hero">
+  <span class="hero-orb" aria-hidden="true"></span>
   <div class="container page-hero-inner">
+    <span class="page-kicker"><i></i>{kicker}</span>
     <h1>{title}</h1>
     {subtitle && <p class="subtitle">{subtitle}</p>}
   </div>
 </header>
-<hr class="fluency-rule" />
 
 <style>
   .page-hero {
     position: relative;
     overflow: hidden;
-    padding-block: var(--space-6);
+    padding-block: clamp(4rem, 8vw, 7rem);
+    background: linear-gradient(140deg, #f7f5f2 0%, #fff7ed 100%);
   }
+  .page-hero::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 1px 1px, rgb(65 82 143 / .1) 1px, transparent 0); background-size: 28px 28px; mask-image: linear-gradient(90deg, black, transparent 75%); }
+  .hero-orb { position: absolute; width: 20rem; height: 20rem; inset-inline-end: -5rem; top: -9rem; border-radius: 50%; background: rgb(182 23 51 / .11); }
   .page-hero-inner {
     position: relative;
     z-index: 1;
   }
-  .page-hero h1 { margin-bottom: var(--space-2); }
+  .page-kicker { display: inline-flex; align-items: center; gap: .45rem; margin-bottom: 1rem; color: var(--color-primary); font-size: .75rem; font-weight: 800; letter-spacing: .12em; }
+  .page-kicker i { width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-coral); }
+  .page-hero h1 { max-width: 15ch; margin-bottom: var(--space-3); color: var(--color-navy); font-size: clamp(3rem, 6vw, 5.8rem); letter-spacing: -.055em; }
+  :global(:lang(ar)) .page-hero h1 { line-height: 1.25; letter-spacing: -.025em; }
   .subtitle {
     font-size: var(--fs-lg);
-    color: var(--zone-ink-muted);
+    color: var(--color-ink-muted);
     max-width: 48ch;
     margin: 0;
+    line-height: 1.7;
   }
 </style>
