@@ -1,0 +1,90 @@
+---
+import { useTranslations, localizePath, type Locale } from '../i18n/ui';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const gtmId = import.meta.env.PUBLIC_GTM_ID as string | undefined;
+---
+
+{gtmId && (
+  <noscript>
+    <iframe
+      src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+      height="0"
+      width="0"
+      style="display:none;visibility:hidden"
+      title="gtm"
+    ></iframe>
+  </noscript>
+)}
+
+{gtmId && (
+  <div class="consent-banner" data-consent-banner hidden>
+    <p>
+      {t('consent.message')}
+      {' '}
+      <a href={localizePath(locale, '/legal/privacy')}>{t('consent.link')}</a>
+    </p>
+    <div class="consent-actions">
+      <button type="button" class="btn btn-outline" data-consent-reject>{t('consent.reject')}</button>
+      <button type="button" class="btn btn-primary" data-consent-accept>{t('consent.accept')}</button>
+    </div>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var banner = document.querySelector('[data-consent-banner]');
+      if (!banner) return;
+      var stored;
+      try { stored = localStorage.getItem('elc-consent'); } catch (e) {}
+      if (!stored) banner.hidden = false;
+
+      function setConsent(granted) {
+        try { localStorage.setItem('elc-consent', granted ? 'granted' : 'denied'); } catch (e) {}
+        if (window.gtag) {
+          window.gtag('consent', 'update', {
+            ad_storage: granted ? 'granted' : 'denied',
+            ad_user_data: granted ? 'granted' : 'denied',
+            ad_personalization: granted ? 'granted' : 'denied',
+            analytics_storage: granted ? 'granted' : 'denied',
+          });
+        }
+        banner.hidden = true;
+      }
+
+      banner.querySelector('[data-consent-accept]')?.addEventListener('click', function () { setConsent(true); });
+      banner.querySelector('[data-consent-reject]')?.addEventListener('click', function () { setConsent(false); });
+    })();
+  </script>
+)}
+
+<style>
+  .consent-banner {
+    position: fixed;
+    inset-inline: var(--space-3);
+    bottom: var(--space-3);
+    z-index: 60;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    max-width: 62rem;
+    margin-inline: auto;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: 1.1rem;
+    background: var(--color-bg-raised);
+    box-shadow: var(--shadow-md);
+  }
+  .consent-banner p { margin: 0; max-width: 46rem; color: var(--color-ink-muted); font-size: .85rem; line-height: 1.6; }
+  .consent-banner p a { color: var(--color-crimson-text); text-decoration: underline; text-decoration-color: var(--color-border); }
+  .consent-banner p a:hover { text-decoration-color: currentColor; }
+  .consent-actions { display: flex; flex-shrink: 0; gap: .6rem; }
+  .consent-actions .btn { padding: .55rem 1.1rem; font-size: .85rem; }
+  @media (max-width: 560px) {
+    .consent-banner { flex-direction: column; align-items: stretch; }
+    .consent-actions { justify-content: flex-end; }
+  }
+</style>

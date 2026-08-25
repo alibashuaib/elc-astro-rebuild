@@ -65,6 +65,10 @@ export const ui = {
     'legal.privacy': 'Privacy Policy',
     'footer.terms': 'Terms',
     'footer.privacy': 'Privacy',
+    'consent.message': 'We use essential cookies to run this site. With your consent, we also use analytics and advertising cookies to understand how visitors use it and measure how they find us — nothing beyond what’s necessary is turned on until you choose Accept.',
+    'consent.accept': 'Accept',
+    'consent.reject': 'Reject',
+    'consent.link': 'Privacy Notice',
   },
   ar: {
     'nav.courses': 'الدورات',
@@ -114,6 +118,10 @@ export const ui = {
     'legal.privacy': 'سياسة الخصوصية',
     'footer.terms': 'الشروط',
     'footer.privacy': 'الخصوصية',
+    'consent.message': 'نستخدم ملفات تعريف ارتباط أساسية لتشغيل هذا الموقع. بموافقتك، نستخدم أيضاً ملفات تعريف ارتباط للتحليلات والإعلانات لفهم كيفية استخدام الزوار للموقع وقياس كيفية وصولهم إلينا — لا يتم تفعيل أي شيء غير ضروري حتى توافق.',
+    'consent.accept': 'موافق',
+    'consent.reject': 'رفض',
+    'consent.link': 'إشعار الخصوصية',
   },
 } as const;
 

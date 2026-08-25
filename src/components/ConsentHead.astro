@@ -1,0 +1,49 @@
+---
+// Google Consent Mode v2 — must run before GTM's own script so GTM (and
+// anything it fires, e.g. GA4, Ads conversion pings with hashed params) starts
+// in a denied state and only unlocks after the visitor actually accepts.
+// GTM container ID isn't set yet (PUBLIC_GTM_ID) — this whole block is inert
+// until it is; nothing loads or fires in the meantime.
+const gtmId = import.meta.env.PUBLIC_GTM_ID as string | undefined;
+---
+
+{gtmId && (
+  <Fragment>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      // Deny everything by default — this is what makes the banner meaningful
+      // rather than cosmetic. 'wait_for_update' briefly holds the first tag
+      // fire so a same-tick consent read below can still apply in time.
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500,
+      });
+      // Returning visitor who already chose "Accept" — restore that instantly,
+      // still before GTM loads, so they're not re-prompted every page.
+      try {
+        if (localStorage.getItem('elc-consent') === 'granted') {
+          gtag('consent', 'update', {
+            ad_storage: 'granted',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted',
+            analytics_storage: 'granted',
+          });
+        }
+      } catch (e) {}
+    </script>
+    <script is:inline define:vars={{ gtmId }}>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0], j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', gtmId);
+    </script>
+  </Fragment>
+)}
