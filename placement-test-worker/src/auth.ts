@@ -22,13 +22,22 @@ export async function issueSessionCookie(env: Env, adminId: string): Promise<str
   return `${COOKIE_NAME}=${value}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${ttl}`;
 }
 
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
 export async function verifyAdminSession(req: Request, env: Env): Promise<boolean> {
   const cookieHeader = req.headers.get('cookie') ?? '';
-  const match = cookieHeader.match(new RegExp(`${COOKIE_NAME}=([^;]+)`));
+  const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`));
   if (!match) return false;
   const [adminId, expiresStr, sig] = match[1].split('.');
   if (!adminId || !expiresStr || !sig) return false;
   if (Date.now() > parseInt(expiresStr, 10)) return false;
   const expectedSig = await sign(`${adminId}.${expiresStr}`, env.ADMIN_COOKIE_SECRET);
-  return expectedSig === sig;
+  return constantTimeEqual(expectedSig, sig);
 }

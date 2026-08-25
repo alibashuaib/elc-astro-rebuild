@@ -38,6 +38,18 @@ describe('admin routes', () => {
     expect(await verifyAdminSession(req2, env as any)).toBe(true);
   });
 
+  it('ignores a cookie whose name merely ends with the session cookie name', async () => {
+    const res = await handleAdminLogin(new Request('http://x', { method: 'POST', body: JSON.stringify({ username: 'staff', password: 'correct-horse' }) }), env as any);
+    const cookieValue = res.headers.get('set-cookie')!.split(';')[0];
+    const spoofedHeader = `foo=bar; xelc_admin_session=malicious; ${cookieValue}`;
+    const req2 = new Request('http://x', { headers: { cookie: spoofedHeader } });
+    expect(await verifyAdminSession(req2, env as any)).toBe(true);
+
+    const onlySpoofedHeader = `foo=bar; xelc_admin_session=malicious`;
+    const req3 = new Request('http://x', { headers: { cookie: onlySpoofedHeader } });
+    expect(await verifyAdminSession(req3, env as any)).toBe(false);
+  });
+
   it('creates and lists slots', async () => {
     await handleAdminCreateSlot(new Request('http://x', { method: 'POST', body: JSON.stringify({ startsAt: '2099-01-01T10:00:00Z', capacity: 4 }) }), env as any);
     const res = await handleAdminListSlots(new Request('http://x'), env as any);
