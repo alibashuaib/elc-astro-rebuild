@@ -40,13 +40,15 @@ export function organizationSchema(
       latitude: 21.4971147,
       longitude: 39.2156796,
     },
-    // Real, from the live site's footer/social links.
+    // Real, from the live site's footer/social links plus YouTube/LinkedIn
+    // confirmed live and active during a later audit pass.
     sameAs: [
       'https://www.facebook.com/ELCJeddah',
       'https://twitter.com/elcjeddah',
       'https://www.instagram.com/elcjeddah',
       'https://www.snapchat.com/add/elcjeddah',
-      // TODO: add YouTube, LinkedIn — currently missing per audit
+      'https://www.youtube.com/c/ELCInst',
+      'https://www.linkedin.com/company/elcjeddah',
     ],
     ...(aggregateRating && {
       aggregateRating: {

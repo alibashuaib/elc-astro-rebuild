@@ -10,12 +10,16 @@ const copyright = locale === 'ar'
   ? `© ${year} معهد صرح المعرفة. جميع الحقوق محفوظة.`
   : `© ${year} ELC. All rights reserved.`;
 
-// Real contact/social details, pulled from the live elc.com.sa.
+// Real contact/social details, pulled from the live elc.com.sa. YouTube and
+// LinkedIn confirmed live/active in a later audit pass (both were missing
+// from the original footer + schema.ts sameAs).
 const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/ELCJeddah', icon: 'facebook' },
   { label: 'X (Twitter)', href: 'https://twitter.com/elcjeddah', icon: 'x' },
   { label: 'Instagram', href: 'https://www.instagram.com/elcjeddah', icon: 'instagram' },
   { label: 'Snapchat', href: 'https://www.snapchat.com/add/elcjeddah', icon: 'snapchat' },
+  { label: 'YouTube', href: 'https://www.youtube.com/c/ELCInst', icon: 'youtube' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/elcjeddah', icon: 'linkedin' },
 ];
 ---
 
@@ -44,6 +48,12 @@ const socialLinks = [
           )}
           {s.icon === 'snapchat' && (
             <svg class="snapchat-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C9 3 7 5.2 7 8.2v3c0 1.2-.8 2.1-2 2.5.8.9 1.8 1.4 3 1.6.2 1.7 1.1 2.3 2.5 1.6.9-.4 1.9-.4 3 0 1.4.7 2.3.1 2.5-1.6 1.2-.2 2.2-.7 3-1.6-1.2-.4-2-1.3-2-2.5v-3C17 5.2 15 3 12 3Z" /></svg>
+          )}
+          {s.icon === 'youtube' && (
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a2.999 2.999 0 0 0-2.112-2.12C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.386.521a2.999 2.999 0 0 0-2.112 2.12C0 8.07 0 12 0 12s0 3.93.502 5.814a2.999 2.999 0 0 0 2.112 2.12c1.881.521 9.386.521 9.386.521s7.505 0 9.386-.521a2.999 2.999 0 0 0 2.112-2.12C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.75 15.568V8.432L15.818 12 9.75 15.568Z" /></svg>
+          )}
+          {s.icon === 'linkedin' && (
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14ZM8.27 18.5V10.13H5.5v8.37h2.77Zm-1.39-9.94a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68ZM18.5 18.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79Z" /></svg>
           )}
           <span class="sr-only">{s.label}</span>
         </a>
