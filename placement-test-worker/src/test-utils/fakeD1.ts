@@ -25,27 +25,34 @@ export function createFakeD1(migrationFiles: string[]): D1Database {
 
   function wrapStatement(sql: string) {
     const stmt = db.prepare(sql);
+
+    function methodsFor(bound: ReturnType<typeof stmt.bind>) {
+      return {
+        async run() {
+          const isSelect = /^\s*select/i.test(sql);
+          if (isSelect) {
+            const results = bound.all();
+            return { results, meta: { changes: 0, last_row_id: 0 } };
+          }
+          const info = bound.run();
+          return { meta: { changes: info.changes, last_row_id: Number(info.lastInsertRowid) } };
+        },
+        async first<T = unknown>(): Promise<T | null> {
+          return (bound.get() as T) ?? null;
+        },
+        async all<T = unknown>(): Promise<{ results: T[] }> {
+          return { results: bound.all() as T[] };
+        },
+      };
+    }
+
     return {
       bind(...args: unknown[]) {
-        const bound = stmt.bind(...(args as any[]));
-        return {
-          async run() {
-            const isSelect = /^\s*select/i.test(sql);
-            if (isSelect) {
-              const results = bound.all();
-              return { results, meta: { changes: 0, last_row_id: 0 } };
-            }
-            const info = bound.run();
-            return { meta: { changes: info.changes, last_row_id: Number(info.lastInsertRowid) } };
-          },
-          async first<T = unknown>(): Promise<T | null> {
-            return (bound.get() as T) ?? null;
-          },
-          async all<T = unknown>(): Promise<{ results: T[] }> {
-            return { results: bound.all() as T[] };
-          },
-        };
+        return methodsFor(stmt.bind(...(args as any[])));
       },
+      // Real D1 prepared statements also support run()/first()/all() directly
+      // when there are no bound parameters (no .bind() call needed).
+      ...methodsFor(stmt),
     };
   }
 

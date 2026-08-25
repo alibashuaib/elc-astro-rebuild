@@ -23,6 +23,7 @@ export interface QuestionRow {
   prompt: string;
   options: string; // JSON string
   correct_index: number;
+  active: number;
 }
 
 export interface SessionRow {
