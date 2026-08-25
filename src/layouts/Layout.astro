@@ -16,9 +16,11 @@ interface Props {
   /** optional pre-serialized JSON-LD object(s) for this page */
   jsonLd?: object | object[];
   ogImage?: string;
+  /** suppress search-engine indexing (e.g. internal/staff-only pages) */
+  noindex?: boolean;
 }
 
-const { locale, path, title, description, jsonLd, ogImage } = Astro.props;
+const { locale, path, title, description, jsonLd, ogImage, noindex } = Astro.props;
 const t = useTranslations(locale);
 const dir = localeDir[locale];
 
@@ -59,6 +61,7 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonicalUrl} />
 
     <!-- Bidirectional hreflang, mapped to the equivalent page, not just the homepage -->
