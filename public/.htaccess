@@ -35,12 +35,16 @@
   # style-src below.
   #
   # googletagmanager.com covers GTM's script + the consent banner's noscript
-  # iframe; google-analytics.com/analytics.google.com covers whatever GTM
-  # container gets built (GA4 and/or Ads conversion pings with hashed
-  # parameters) — nothing on any of these origins loads or fires until
-  # PUBLIC_GTM_ID is set AND the visitor accepts (Consent Mode v2, denied by
-  # default — see ConsentHead.astro).
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com; connect-src 'self' https://api.github.com https://*.workers.dev https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://www.googletagmanager.com; base-uri 'self'; form-action 'self'; object-src 'none'"
+  # iframe. The rest cover the ad-platform tags planned to run *through* that
+  # GTM container — Google Ads/GA4 (hashed-parameter conversions),
+  # Meta/Facebook Pixel, Snap Pixel, TikTok Pixel — nothing on any of these
+  # origins loads or fires until PUBLIC_GTM_ID is set AND the visitor accepts
+  # (Consent Mode v2, denied by default — see ConsentHead.astro). Consent
+  # Mode's auto-blocking only covers Google's own tags though — each
+  # Meta/Snap/TikTok tag in GTM needs its own "Consent Settings" pointing at
+  # the same analytics_storage/ad_storage signal, set per-tag in the GTM UI,
+  # not something this file can enforce.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://www.googletagmanager.com https://connect.facebook.net https://sc-static.net https://analytics.tiktok.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com; connect-src 'self' https://api.github.com https://*.workers.dev https://www.google-analytics.com https://analytics.google.com https://connect.facebook.net https://www.facebook.com https://tr.snapchat.com https://analytics.tiktok.com; frame-src 'self' https://www.google.com https://www.googletagmanager.com; base-uri 'self'; form-action 'self'; object-src 'none'"
 </IfModule>
 
 # Directory listing off.
