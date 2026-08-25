@@ -32,9 +32,9 @@ architecturally cleaner — a `SameSite=Lax`/`Strict` cookie would work, and the
 1. `npm install`
 2. `npx wrangler d1 create placement-test` — copy the printed `database_id`
    into `wrangler.toml`.
-3. `npm run db:migrate:remote` — creates tables and loads the 72 placeholder
-   questions. Do **not** run `0003_seed_admin.sql` (it isn't a real
-   migration); instead bootstrap the admin account directly:
+3. `npm run db:migrate:remote` — creates tables and loads the real 63-question
+   bank (see "Question bank" below). Do **not** run `0003_seed_admin.sql`
+   (it isn't a real migration); instead bootstrap the admin account directly:
    ```
    node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 10))" 'your-real-password'
    npx wrangler d1 execute placement-test --remote --command "INSERT INTO admin_users (id, username, password_hash) VALUES ('admin-1','staff','<PASTE_HASH>')"
@@ -47,17 +47,35 @@ architecturally cleaner — a `SameSite=Lax`/`Strict` cookie would work, and the
 7. In `src/index.ts`, add the deployed site's real origin to
    `ALLOWED_ORIGINS` if it differs from `https://elc.com.sa`.
 
-## Replacing the placeholder question bank
+## Question bank
 
-The seed migration (`migrations/0002_seed_questions.sql`) inserts 72
-clearly-labeled placeholder items. To replace them with real content:
+`migrations/0002_seed_questions.sql` inserts 72 clearly-labeled placeholder
+items (kept for migration history). `migrations/0003_real_questions.sql`
+runs after it and deletes those placeholders, replacing them with the real
+63-question bank sourced from ELC's paper placement tests ("Adult Placement
+Test" and "Kids Placement Test"):
 
-```
-npx wrangler d1 execute placement-test --remote --command "DELETE FROM questions"
-```
+- **Adults (50 questions):** all real content — 40 grammar/situational items
+  plus 10 reading-comprehension items (two short articles, 5 questions each).
+- **Kids (13 questions):** only the parts of the paper test that fit this
+  engine's 4-option multiple-choice format — 8 grammar/vocabulary items plus
+  5 true/false reading-comprehension items. The paper test's handwriting
+  section (write the capital/lowercase letters, fill in missing numbers) and
+  its picture-matching/fill-in-the-blank-with-images section have no digital
+  equivalent in this schema or the `TestRunner.astro` UI, and were
+  intentionally left out — that part of the kids test still needs to be
+  administered on paper, or the schema/UI extended to support those item
+  types (new question types, not just more rows).
 
-then insert the real bank either via the admin page's question form
-(Task 10) or a new SQL file run the same way as the seed migration.
+**CEFR levels are an approximation.** Neither paper test tags its questions
+with a level — 0003 assigns A1–C2 by each question's position in the source
+document (paper placement tests are conventionally ordered easiest-to-hardest),
+split into roughly even buckets. Review the level assignments in
+`0003_real_questions.sql` before relying on them pedagogically; adjust with
+`UPDATE questions SET level = ... WHERE id = ...` or a follow-up migration.
+
+To add more questions later, either use the admin page's question form
+(Task 10) or write a new SQL migration file the same way as 0003.
 
 ## Local development
 
