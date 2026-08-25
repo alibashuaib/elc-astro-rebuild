@@ -142,6 +142,7 @@ const basePath = `/${locale}`;
           <span class="purpose-icon" aria-hidden="true"><Icon name="star" size={25} /></span>
         </div>
         <h3>{content.valuesKicker}</h3>
+        <p>{content.valuesLead}</p>
         <ul class="purpose-values">
           {content.values.map((value) => (
             <li><Icon name={value.icon} size={18} /><b>{value.title}</b></li>
@@ -223,7 +224,7 @@ const basePath = `/${locale}`;
   :global(:lang(ar)) .story-copy h2, :global(:lang(ar)) .section-heading h2, :global(:lang(ar)) .closing-section h2 { line-height: 1.35; letter-spacing: -.025em; }
   .story-copy h2 { margin: .75rem 0 1.2rem; }
   .story-copy p { margin: 0; color: var(--color-ink-muted); font-size: 1.05rem; line-height: 1.85; }
-  .purpose-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(14rem, .7fr) minmax(0, 1fr); align-items: stretch; gap: 1rem; }
+  .purpose-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(15rem, 1fr) minmax(0, 1.05fr); align-items: stretch; gap: 1rem; }
   .purpose-card { position: relative; display: flex; min-height: 23rem; flex-direction: column; padding: clamp(1.5rem, 2.5vw, 2rem); overflow: hidden; border-radius: 1.75rem; transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease); }
   .purpose-card:hover { transform: translateY(-5px); box-shadow: 0 24px 55px rgb(39 32 31 / .16); }
   .purpose-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: auto; }
@@ -243,6 +244,7 @@ const basePath = `/${locale}`;
   .vision-card { color: var(--color-navy); background: var(--color-coral-soft); }
   .vision-card p { color: #76532e; }
   .values-card { color: #fff; background: var(--color-navy); }
+  .values-card p { margin-bottom: 1.25rem; color: #c7cbd6; }
   .purpose-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; padding: 0; margin: 0; list-style: none; }
   .purpose-values li { display: flex; min-width: 0; align-items: center; gap: .55rem; padding: .65rem .7rem; border: 1px solid #4d5060; border-radius: .85rem; color: #f3f1ee; background: rgb(255 255 255 / .06); }
   .purpose-values :global(svg) { flex: 0 0 auto; color: #f7b75f; }
