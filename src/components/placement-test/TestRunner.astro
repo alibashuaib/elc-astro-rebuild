@@ -1,0 +1,96 @@
+---
+import type { useTranslations } from '../../i18n/ui';
+
+export interface Props {
+  t: ReturnType<typeof useTranslations>;
+}
+const { t } = Astro.props;
+---
+
+<section
+  id="placement-test-runner"
+  class="card"
+  hidden
+  data-question-label={t('placementTest.questionOf')}
+>
+  <p id="pt-progress" class="pt-progress"></p>
+  <p id="pt-prompt" class="pt-prompt"></p>
+  <div id="pt-options" class="pt-options"></div>
+</section>
+
+<script>
+  import { startSession, submitAnswer } from '../../lib/placementApi';
+  import type { QuestionPayload } from '../../lib/placementApi';
+
+  const runner = document.getElementById('placement-test-runner') as HTMLElement;
+  const progressEl = document.getElementById('pt-progress') as HTMLElement;
+  const promptEl = document.getElementById('pt-prompt') as HTMLElement;
+  const optionsEl = document.getElementById('pt-options') as HTMLElement;
+  const questionLabel = runner.dataset.questionLabel ?? '';
+  let sessionId = '';
+  let questionNum = 0;
+
+  function renderQuestion(step: QuestionPayload) {
+    questionNum++;
+    progressEl.textContent = `${questionLabel} ${questionNum}`;
+    promptEl.textContent = step.prompt;
+    optionsEl.innerHTML = '';
+    step.options.forEach((opt: string, idx: number) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-outline';
+      btn.textContent = opt;
+      btn.addEventListener('click', async () => {
+        const next = await submitAnswer(sessionId, step.questionId, idx);
+        if (next.done) {
+          document.dispatchEvent(
+            new CustomEvent('placement:done', { detail: { level: next.level, sessionId } })
+          );
+          runner.hidden = true;
+        } else {
+          renderQuestion(next);
+        }
+      });
+      optionsEl.appendChild(btn);
+    });
+  }
+
+  document.addEventListener('placement:register', async (event: Event) => {
+    const detail = (event as CustomEvent).detail;
+    const step = await startSession(detail);
+    sessionId = step.sessionId;
+    runner.hidden = false;
+    renderQuestion(step);
+  });
+</script>
+
+<style>
+  .card {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--color-border);
+    border-radius: 1.5rem;
+    background: var(--color-bg-raised);
+    box-shadow: var(--shadow-sm);
+  }
+  .pt-progress {
+    margin: 0;
+    color: var(--color-ink-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .pt-prompt {
+    margin: 0;
+    color: var(--color-navy);
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+  .pt-options {
+    display: grid;
+    gap: 0.65rem;
+  }
+</style>

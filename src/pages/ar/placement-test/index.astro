@@ -1,0 +1,49 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
+import RegistrationForm from '../../../components/placement-test/RegistrationForm.astro';
+import TestRunner from '../../../components/placement-test/TestRunner.astro';
+import ResultBooking from '../../../components/placement-test/ResultBooking.astro';
+import { useTranslations } from '../../../i18n/ui';
+import { breadcrumbSchema } from '../../../lib/schema';
+
+const t = useTranslations('ar');
+
+// TODO: confirm the real center WhatsApp number before launch — placeholder only.
+const WHATSAPP_NUMBER = '966500000000';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
+  { name: 'اختبار تحديد المستوى', url: 'https://elc.com.sa/ar/placement-test/' },
+]);
+---
+
+<Layout
+  locale="ar"
+  path="/placement-test"
+  title={`${t('placementTest.heading')} — معهد صرح المعرفة`}
+  description="أجرِ اختبار تحديد المستوى المجاني والتكيفي من معهد صرح المعرفة عبر الإنترنت، واحصل على مستواك التقديري فوراً، ثم احجز موعد الاختبار الشفوي."
+  jsonLd={breadcrumbs}
+>
+  <PageHero
+    kicker="معهد صرح المعرفة"
+    title={t('placementTest.heading')}
+    subtitle={t('placementTest.subtitle')}
+  />
+
+  <section class="container placement-test-wrap">
+    <RegistrationForm locale="ar" t={t} />
+    <TestRunner t={t} />
+    <ResultBooking t={t} whatsappNumber={WHATSAPP_NUMBER} />
+  </section>
+</Layout>
+
+<style>
+  .placement-test-wrap {
+    display: grid;
+    gap: 2rem;
+    max-width: 40rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 5vw, 4rem);
+  }
+</style>
