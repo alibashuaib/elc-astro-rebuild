@@ -10,6 +10,8 @@
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "latest",
     "@cloudflare/workers-types": "latest",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.3.0",
     "better-sqlite3": "^13.0.3",
     "typescript": "latest",
     "vitest": "latest",
