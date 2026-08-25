@@ -1,0 +1,92 @@
+---
+import type { Locale, useTranslations } from '../../i18n/ui';
+
+export interface Props {
+  locale: Locale;
+  t: ReturnType<typeof useTranslations>;
+}
+const { locale, t } = Astro.props;
+---
+
+<form id="placement-registration" class="card" data-locale={locale}>
+  <label>
+    {t('placementTest.formName')}
+    <input required name="name" type="text" autocomplete="name" />
+  </label>
+  <label>
+    {t('placementTest.formPhone')}
+    <input class="numeric" required name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+  </label>
+  <label>
+    {t('placementTest.formDob')}
+    <input required name="dob" type="date" />
+  </label>
+  <label id="guardian-field" hidden>
+    {t('placementTest.formGuardian')}
+    <input name="guardianName" type="text" autocomplete="name" />
+  </label>
+  <button type="submit" class="btn btn-primary">{t('placementTest.formSubmit')}</button>
+</form>
+
+<script>
+  const form = document.getElementById('placement-registration') as HTMLFormElement;
+  const dobInput = form.querySelector<HTMLInputElement>('input[name="dob"]')!;
+  const guardianField = document.getElementById('guardian-field') as HTMLElement;
+
+  function isMinor(dobValue: string): boolean {
+    const age = (Date.now() - new Date(dobValue).getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+    return age < 16;
+  }
+
+  dobInput.addEventListener('change', () => {
+    guardianField.hidden = !isMinor(dobInput.value);
+    const guardianInput = guardianField.querySelector<HTMLInputElement>('input')!;
+    guardianInput.required = !guardianField.hidden;
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(form).entries());
+    document.dispatchEvent(
+      new CustomEvent('placement:register', { detail: { ...data, locale: form.dataset.locale } })
+    );
+  });
+</script>
+
+<style>
+  .card {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--color-border);
+    border-radius: 1.5rem;
+    background: var(--color-bg-raised);
+    box-shadow: var(--shadow-sm);
+  }
+  .card label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    color: var(--color-navy);
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+  .card input {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-surface-soft);
+    font: inherit;
+  }
+  .card input:focus {
+    outline: 3px solid rgb(182 23 51 / 0.12);
+    border-color: var(--color-primary);
+  }
+  .card .btn {
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+</style>

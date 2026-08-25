@@ -1,0 +1,304 @@
+---
+// src/components/placement-test/AdminPanel.astro
+// Staff-only tool — plain hardcoded English strings (no i18n needed, see task report).
+---
+
+<section id="admin-login" class="card">
+  <h2>Admin login</h2>
+  <label>
+    Username
+    <input id="admin-username" type="text" autocomplete="username" />
+  </label>
+  <label>
+    Password
+    <input id="admin-password" type="password" autocomplete="current-password" />
+  </label>
+  <button id="admin-login-btn" type="button" class="btn btn-primary">Log in</button>
+</section>
+
+<section id="admin-dashboard" class="dashboard" hidden>
+  <div class="card">
+    <h2>Slots</h2>
+    <form id="slot-form" class="slot-form">
+      <label>
+        Starts at
+        <input id="slot-starts-at" type="datetime-local" required />
+      </label>
+      <label>
+        Capacity
+        <input id="slot-capacity" type="number" min="1" value="4" required />
+      </label>
+      <button type="submit" class="btn btn-primary">Add slot</button>
+    </form>
+    <ul id="slot-list" class="admin-list"></ul>
+  </div>
+
+  <div class="card">
+    <h2>Upcoming bookings</h2>
+    <ul id="booking-list" class="admin-list"></ul>
+  </div>
+
+  <div class="card">
+    <h2>Question bank</h2>
+    <form id="question-form" class="question-form">
+      <label>
+        Track
+        <select id="question-track" required>
+          <option value="kids">Kids</option>
+          <option value="adults">Adults</option>
+        </select>
+      </label>
+      <label>
+        Level
+        <select id="question-level" required>
+          <option value="A1">A1</option>
+          <option value="A2">A2</option>
+          <option value="B1">B1</option>
+          <option value="B2">B2</option>
+          <option value="C1">C1</option>
+          <option value="C2">C2</option>
+        </select>
+      </label>
+      <label>
+        Prompt
+        <input id="question-prompt" type="text" required />
+      </label>
+      <label>
+        Option 1
+        <input id="question-option-0" type="text" required />
+      </label>
+      <label>
+        Option 2
+        <input id="question-option-1" type="text" required />
+      </label>
+      <label>
+        Option 3
+        <input id="question-option-2" type="text" required />
+      </label>
+      <label>
+        Option 4
+        <input id="question-option-3" type="text" required />
+      </label>
+      <label>
+        Correct option
+        <select id="question-correct-index" required>
+          <option value="0">Option 1</option>
+          <option value="1">Option 2</option>
+          <option value="2">Option 3</option>
+          <option value="3">Option 4</option>
+        </select>
+      </label>
+      <button type="submit" class="btn btn-primary">Add question</button>
+    </form>
+    <ul id="question-list" class="admin-list"></ul>
+  </div>
+</section>
+
+<script>
+  const BASE = import.meta.env.PUBLIC_PLACEMENT_API_URL as string;
+
+  async function api(path: string, init?: RequestInit) {
+    const res = await fetch(`${BASE}${path}`, {
+      ...init,
+      credentials: 'include',
+      headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
+    });
+    if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
+    return res.status === 204 ? null : res.json();
+  }
+
+  document.getElementById('admin-login-btn')!.addEventListener('click', async () => {
+    const username = (document.getElementById('admin-username') as HTMLInputElement).value;
+    const password = (document.getElementById('admin-password') as HTMLInputElement).value;
+    try {
+      await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+      document.getElementById('admin-login')!.setAttribute('hidden', '');
+      document.getElementById('admin-dashboard')!.removeAttribute('hidden');
+      await loadAll();
+    } catch {
+      alert('Login failed');
+    }
+  });
+
+  async function loadAll() {
+    const [{ slots }, { bookings }, { questions }] = await Promise.all([
+      api('/api/admin/slots'),
+      api('/api/admin/bookings'),
+      api('/api/admin/questions'),
+    ]);
+
+    const slotList = document.getElementById('slot-list')!;
+    slotList.innerHTML = '';
+    slots.forEach((s: any) => {
+      const li = document.createElement('li');
+      li.textContent = `${new Date(s.starts_at).toLocaleString()} — ${s.booked_count}/${s.capacity} `;
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'btn btn-outline';
+      del.textContent = 'Delete';
+      del.addEventListener('click', async () => {
+        const res = await fetch(`${BASE}/api/admin/slots/${s.id}`, { method: 'DELETE', credentials: 'include' });
+        if (res.status === 409) {
+          alert('This slot has confirmed bookings and cannot be deleted.');
+          return;
+        }
+        if (!res.ok) {
+          alert('Delete failed.');
+          return;
+        }
+        loadAll();
+      });
+      li.appendChild(del);
+      slotList.appendChild(li);
+    });
+
+    const bookingList = document.getElementById('booking-list')!;
+    bookingList.innerHTML = '';
+    bookings.forEach((b: any) => {
+      const li = document.createElement('li');
+      li.textContent = `${b.student_name} (${b.phone}) — level ${b.estimated_level} — ${new Date(b.starts_at).toLocaleString()}`;
+      bookingList.appendChild(li);
+    });
+
+    const questionList = document.getElementById('question-list')!;
+    questionList.innerHTML = '';
+    questions.forEach((q: any) => {
+      const li = document.createElement('li');
+      li.textContent = `[${q.track}/${q.level}] ${q.prompt} ${q.active ? '' : '(inactive)'} `;
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'btn btn-outline';
+      toggle.textContent = q.active ? 'Deactivate' : 'Activate';
+      toggle.addEventListener('click', async () => {
+        await api(`/api/admin/questions/${q.id}`, { method: 'PATCH', body: JSON.stringify({ active: !q.active }) });
+        loadAll();
+      });
+      li.appendChild(toggle);
+      questionList.appendChild(li);
+    });
+  }
+
+  document.getElementById('slot-form')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const startsAt = (document.getElementById('slot-starts-at') as HTMLInputElement).value;
+    const capacity = Number((document.getElementById('slot-capacity') as HTMLInputElement).value);
+    await api('/api/admin/slots', {
+      method: 'POST',
+      body: JSON.stringify({ startsAt: new Date(startsAt).toISOString(), capacity }),
+    });
+    await loadAll();
+  });
+
+  document.getElementById('question-form')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const track = (document.getElementById('question-track') as HTMLSelectElement).value;
+    const level = (document.getElementById('question-level') as HTMLSelectElement).value;
+    const prompt = (document.getElementById('question-prompt') as HTMLInputElement).value;
+    const options = [0, 1, 2, 3].map(
+      (i) => (document.getElementById(`question-option-${i}`) as HTMLInputElement).value
+    );
+    const correctIndex = Number((document.getElementById('question-correct-index') as HTMLSelectElement).value);
+    await api('/api/admin/questions', {
+      method: 'POST',
+      body: JSON.stringify({ track, level, prompt, options, correctIndex }),
+    });
+    (document.getElementById('question-form') as HTMLFormElement).reset();
+    await loadAll();
+  });
+</script>
+
+<style>
+  .card {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--color-border);
+    border-radius: 1.5rem;
+    background: var(--color-bg-raised);
+    box-shadow: var(--shadow-sm);
+  }
+  .card h2 {
+    margin: 0;
+    color: var(--color-navy);
+    font-size: 1.1rem;
+  }
+  .card label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    color: var(--color-navy);
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+  .card input {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-surface-soft);
+    font: inherit;
+  }
+  .card input:focus {
+    outline: 3px solid rgb(182 23 51 / 0.12);
+    border-color: var(--color-primary);
+  }
+  .card .btn {
+    justify-content: center;
+  }
+
+  .dashboard {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .slot-form {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: end;
+  }
+
+  .question-form {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: end;
+    margin-bottom: 1rem;
+  }
+  .question-form select {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-surface-soft);
+    font: inherit;
+  }
+  .question-form button {
+    grid-column: 1 / -1;
+  }
+
+  .admin-list {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .admin-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    background: var(--color-surface-soft);
+    color: var(--color-ink);
+    font-size: 0.9rem;
+  }
+</style>

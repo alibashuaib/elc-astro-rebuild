@@ -1,0 +1,45 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
+import RegistrationForm from '../../../components/placement-test/RegistrationForm.astro';
+import TestRunner from '../../../components/placement-test/TestRunner.astro';
+import ResultBooking from '../../../components/placement-test/ResultBooking.astro';
+import { useTranslations } from '../../../i18n/ui';
+import { breadcrumbSchema } from '../../../lib/schema';
+
+const t = useTranslations('en');
+
+// Real center WhatsApp number, same as WhatsAppButton.astro's live wa.me link.
+const WHATSAPP_NUMBER = '966546656000';
+
+const breadcrumbs = breadcrumbSchema([
+  { name: 'Home', url: 'https://elc.com.sa/en/' },
+  { name: 'Placement Test', url: 'https://elc.com.sa/en/placement-test/' },
+]);
+---
+
+<Layout
+  locale="en"
+  path="/placement-test"
+  title={`${t('placementTest.heading')} — ELC English Courses in Jeddah`}
+  description="Take ELC's free adaptive English placement test online, get your estimated level instantly, and book your oral test slot."
+  jsonLd={breadcrumbs}
+>
+  <PageHero title={t('placementTest.heading')} subtitle={t('placementTest.subtitle')} />
+
+  <section class="container placement-test-wrap">
+    <RegistrationForm locale="en" t={t} />
+    <TestRunner t={t} />
+    <ResultBooking t={t} locale="en" whatsappNumber={WHATSAPP_NUMBER} />
+  </section>
+</Layout>
+
+<style>
+  .placement-test-wrap {
+    display: grid;
+    gap: 2rem;
+    max-width: 40rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 5vw, 4rem);
+  }
+</style>

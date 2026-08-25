@@ -5,7 +5,12 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://elc.com.sa',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      // Staff-only, noindex pages shouldn't be advertised in the sitemap either.
+      filter: (page) => !page.includes('/placement-test/admin'),
+    }),
+  ],
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'ar'],

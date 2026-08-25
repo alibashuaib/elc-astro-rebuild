@@ -1,0 +1,29 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PageHero from '../../../components/PageHero.astro';
+import AdminPanel from '../../../components/placement-test/AdminPanel.astro';
+---
+
+<Layout
+  locale="en"
+  path="/placement-test/admin"
+  title="Placement Test Admin — ELC"
+  description="Internal staff tool for managing placement test slots, bookings, and the question bank."
+  noindex={true}
+>
+  <PageHero title="Placement Test Admin" subtitle="Manage slots, bookings, and the question bank." />
+
+  <section class="container placement-admin-wrap">
+    <AdminPanel />
+  </section>
+</Layout>
+
+<style>
+  .placement-admin-wrap {
+    display: grid;
+    gap: 2rem;
+    max-width: 48rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 5vw, 4rem);
+  }
+</style>

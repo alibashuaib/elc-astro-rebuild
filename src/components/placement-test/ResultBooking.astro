@@ -1,0 +1,113 @@
+---
+import type { useTranslations, Locale } from '../../i18n/ui';
+
+export interface Props {
+  t: ReturnType<typeof useTranslations>;
+  locale: Locale;
+  whatsappNumber: string;
+}
+const { t, locale, whatsappNumber } = Astro.props;
+---
+
+<section
+  id="placement-result"
+  class="card"
+  hidden
+  data-whatsapp-number={whatsappNumber}
+  data-locale={locale}
+  data-message-template={t('placementTest.whatsappMessage')}
+>
+  <h2>{t('placementTest.resultHeading')}: <span id="pt-level"></span></h2>
+  <h3>{t('placementTest.bookingHeading')}</h3>
+  <ul id="pt-slots" class="pt-slots"></ul>
+  <a id="pt-whatsapp" class="btn btn-primary" hidden target="_blank" rel="noopener">
+    {t('placementTest.whatsappConfirm')}
+  </a>
+</section>
+
+<script>
+  import { listSlots, createBooking } from '../../lib/placementApi';
+
+  const section = document.getElementById('placement-result') as HTMLElement;
+  const levelEl = document.getElementById('pt-level') as HTMLElement;
+  const slotsEl = document.getElementById('pt-slots') as HTMLElement;
+  const waLink = document.getElementById('pt-whatsapp') as HTMLAnchorElement;
+  const whatsappNumber = section.dataset.whatsappNumber ?? '';
+  // Locale-aware WhatsApp message template (see i18n/ui.ts `placementTest.whatsappMessage`),
+  // with {name}/{level}/{time} placeholders filled in per booking below.
+  const messageTemplate = section.dataset.messageTemplate ?? '';
+  const locale = section.dataset.locale ?? 'en';
+  let studentName = '';
+
+  document.addEventListener('placement:register', (event: Event) => {
+    studentName = (event as CustomEvent).detail.name;
+  });
+
+  async function renderSlots(detail: { sessionId: string; level: string }) {
+    const { slots } = await listSlots();
+    slotsEl.innerHTML = '';
+    slots.forEach((slot) => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-outline';
+      btn.textContent = new Date(slot.starts_at).toLocaleString();
+      btn.addEventListener('click', async () => {
+        const result = await createBooking(detail.sessionId, slot.id);
+        if ('error' in result) {
+          alert('That slot just filled up — please pick another.');
+          // The design spec requires re-fetching the slot list so the student picks
+          // from an up-to-date set rather than clicking the now-stale, already-full slot again.
+          await renderSlots(detail);
+          return;
+        }
+        const message = messageTemplate
+          .replace('{name}', studentName)
+          .replace('{level}', detail.level)
+          .replace('{time}', new Date(slot.starts_at).toLocaleString(locale));
+        const text = encodeURIComponent(message);
+        waLink.href = `https://wa.me/${whatsappNumber}?text=${text}`;
+        waLink.hidden = false;
+      });
+      li.appendChild(btn);
+      slotsEl.appendChild(li);
+    });
+  }
+
+  document.addEventListener('placement:done', async (event: Event) => {
+    const detail = (event as CustomEvent).detail;
+    section.hidden = false;
+    levelEl.textContent = detail.level;
+    await renderSlots(detail);
+  });
+</script>
+
+<style>
+  .card {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--color-border);
+    border-radius: 1.5rem;
+    background: var(--color-bg-raised);
+    box-shadow: var(--shadow-sm);
+  }
+  .card h2,
+  .card h3 {
+    margin: 0;
+    color: var(--color-navy);
+  }
+  .pt-slots {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pt-slots button {
+    width: 100%;
+  }
+  #pt-whatsapp {
+    justify-content: center;
+  }
+</style>
