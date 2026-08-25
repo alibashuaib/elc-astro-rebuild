@@ -12,10 +12,12 @@ const { t } = Astro.props;
   class="card"
   hidden
   data-question-label={t('placementTest.questionOf')}
+  data-answer-error={t('placementTest.answerError')}
 >
   <p id="pt-progress" class="pt-progress"></p>
   <p id="pt-prompt" class="pt-prompt"></p>
   <div id="pt-options" class="pt-options"></div>
+  <p id="pt-error" class="pt-error" hidden></p>
 </section>
 
 <script>
@@ -26,7 +28,9 @@ const { t } = Astro.props;
   const progressEl = document.getElementById('pt-progress') as HTMLElement;
   const promptEl = document.getElementById('pt-prompt') as HTMLElement;
   const optionsEl = document.getElementById('pt-options') as HTMLElement;
+  const errorEl = document.getElementById('pt-error') as HTMLElement;
   const questionLabel = runner.dataset.questionLabel ?? '';
+  const answerErrorText = runner.dataset.answerError ?? '';
   let sessionId = '';
   let questionNum = 0;
 
@@ -35,20 +39,32 @@ const { t } = Astro.props;
     progressEl.textContent = `${questionLabel} ${questionNum}`;
     promptEl.textContent = step.prompt;
     optionsEl.innerHTML = '';
+    errorEl.hidden = true;
     step.options.forEach((opt: string, idx: number) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-outline';
       btn.textContent = opt;
       btn.addEventListener('click', async () => {
-        const next = await submitAnswer(sessionId, step.questionId, idx);
-        if (next.done) {
-          document.dispatchEvent(
-            new CustomEvent('placement:done', { detail: { level: next.level, sessionId } })
-          );
-          runner.hidden = true;
-        } else {
-          renderQuestion(next);
+        const buttons = Array.from(optionsEl.querySelectorAll('button'));
+        buttons.forEach((b) => (b.disabled = true));
+        errorEl.hidden = true;
+        try {
+          const next = await submitAnswer(sessionId, step.questionId, idx);
+          if (next.done) {
+            document.dispatchEvent(
+              new CustomEvent('placement:done', { detail: { level: next.level, sessionId } })
+            );
+            runner.hidden = true;
+          } else {
+            renderQuestion(next);
+          }
+        } catch {
+          // Network/API failure mid-test: re-enable the buttons and show an inline error
+          // instead of leaving a frozen, unresponsive question card.
+          errorEl.textContent = answerErrorText;
+          errorEl.hidden = false;
+          buttons.forEach((b) => (b.disabled = false));
         }
       });
       optionsEl.appendChild(btn);
@@ -60,6 +76,13 @@ const { t } = Astro.props;
     const step = await startSession(detail);
     sessionId = step.sessionId;
     runner.hidden = false;
+    if (step.done) {
+      document.dispatchEvent(
+        new CustomEvent('placement:done', { detail: { level: step.level, sessionId } })
+      );
+      runner.hidden = true;
+      return;
+    }
     renderQuestion(step);
   });
 </script>
@@ -92,5 +115,11 @@ const { t } = Astro.props;
   .pt-options {
     display: grid;
     gap: 0.65rem;
+  }
+  .pt-error {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    font-weight: 700;
   }
 </style>

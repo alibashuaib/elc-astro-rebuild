@@ -85,6 +85,8 @@ export const ui = {
     'placementTest.bookingHeading': 'Choose a time for your oral test',
     'placementTest.bookingConfirm': 'Confirm booking',
     'placementTest.whatsappConfirm': 'Send confirmation on WhatsApp',
+    'placementTest.whatsappMessage': "Hi, I'm {name}. My estimated level is {level} and I booked an oral test slot for {time}.",
+    'placementTest.answerError': 'Something went wrong — please try again.',
   },
   ar: {
     'nav.courses': 'الدورات',
@@ -154,6 +156,8 @@ export const ui = {
     'placementTest.bookingHeading': 'اختر موعداً للاختبار الشفوي',
     'placementTest.bookingConfirm': 'تأكيد الحجز',
     'placementTest.whatsappConfirm': 'إرسال التأكيد عبر واتساب',
+    'placementTest.whatsappMessage': 'مرحباً، أنا {name}. مستواي التقديري هو {level} وقد حجزت موعد الاختبار الشفوي في {time}.',
+    'placementTest.answerError': 'حدث خطأ ما — يرجى المحاولة مرة أخرى.',
   },
 } as const;
 

@@ -76,9 +76,14 @@ export async function insertResponse(
 }
 
 export async function listOpenSlots(env: Env): Promise<Array<{ id: string; starts_at: string; remaining: number }>> {
+  // `starts_at` is stored as ISO-8601 with a 'T' separator and 'Z' suffix (see createSlot /
+  // AdminPanel.astro's `new Date(startsAt).toISOString()`). datetime('now') instead produces a
+  // space-separated, millisecond-less string ('2026-09-01 10:00:00'), and comparing the two
+  // formats as strings is unreliable near date/time boundaries. strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+  // formats "now" the same way as the stored values, so the string comparison is apples-to-apples.
   const { results } = await env.DB.prepare(
     `SELECT id, starts_at, (capacity - booked_count) AS remaining FROM slots
-     WHERE starts_at > datetime('now') AND booked_count < capacity ORDER BY starts_at ASC`
+     WHERE starts_at > strftime('%Y-%m-%dT%H:%M:%fZ', 'now') AND booked_count < capacity ORDER BY starts_at ASC`
   ).all<{ id: string; starts_at: string; remaining: number }>();
   return results ?? [];
 }
@@ -112,8 +117,18 @@ export async function createSlot(env: Env, startsAt: string, capacity: number): 
   return id;
 }
 
-export async function deleteSlot(env: Env, id: string): Promise<void> {
+/**
+ * Deletes a slot, but refuses (returns false) if it still has confirmed bookings —
+ * otherwise `listBookingsWithDetails`'s JOIN would silently drop those bookings from the
+ * admin's booking list with no warning and no cancellation record. Returns true on success.
+ */
+export async function deleteSlot(env: Env, id: string): Promise<boolean> {
+  const booked = await env.DB.prepare(
+    `SELECT COUNT(*) AS count FROM bookings WHERE slot_id = ? AND status = 'confirmed'`
+  ).bind(id).first<{ count: number }>();
+  if (booked && booked.count > 0) return false;
   await env.DB.prepare(`DELETE FROM slots WHERE id = ?`).bind(id).run();
+  return true;
 }
 
 export async function listBookingsWithDetails(env: Env): Promise<Array<{

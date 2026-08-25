@@ -52,9 +52,20 @@ export function listSlots() {
   return request<{ slots: Array<{ id: string; starts_at: string; remaining: number }> }>('/api/slots');
 }
 
-export function createBooking(sessionId: string, slotId: string) {
-  return request<{ bookingId: string } | { error: string }>('/api/bookings', {
+export async function createBooking(
+  sessionId: string,
+  slotId: string
+): Promise<{ bookingId: string } | { error: string }> {
+  const res = await fetch(`${BASE}/api/bookings`, {
     method: 'POST',
+    credentials: 'include',
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ sessionId, slotId }),
   });
+  if (res.status === 409) {
+    const body = await res.json();
+    return { error: body.error };
+  }
+  if (!res.ok) throw new Error(`placement API /api/bookings failed: ${res.status}`);
+  return res.json();
 }

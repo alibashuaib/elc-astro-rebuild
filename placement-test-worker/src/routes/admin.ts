@@ -32,7 +32,8 @@ export async function handleAdminCreateSlot(req: Request, env: Env): Promise<Res
 }
 
 export async function handleAdminDeleteSlot(_req: Request, env: Env, slotId: string): Promise<Response> {
-  await deleteSlot(env, slotId);
+  const deleted = await deleteSlot(env, slotId);
+  if (!deleted) return json({ error: 'slot_has_bookings' }, 409);
   return json({ ok: true });
 }
 

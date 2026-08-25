@@ -40,6 +40,56 @@
 
   <div class="card">
     <h2>Question bank</h2>
+    <form id="question-form" class="question-form">
+      <label>
+        Track
+        <select id="question-track" required>
+          <option value="kids">Kids</option>
+          <option value="adults">Adults</option>
+        </select>
+      </label>
+      <label>
+        Level
+        <select id="question-level" required>
+          <option value="A1">A1</option>
+          <option value="A2">A2</option>
+          <option value="B1">B1</option>
+          <option value="B2">B2</option>
+          <option value="C1">C1</option>
+          <option value="C2">C2</option>
+        </select>
+      </label>
+      <label>
+        Prompt
+        <input id="question-prompt" type="text" required />
+      </label>
+      <label>
+        Option 1
+        <input id="question-option-0" type="text" required />
+      </label>
+      <label>
+        Option 2
+        <input id="question-option-1" type="text" required />
+      </label>
+      <label>
+        Option 3
+        <input id="question-option-2" type="text" required />
+      </label>
+      <label>
+        Option 4
+        <input id="question-option-3" type="text" required />
+      </label>
+      <label>
+        Correct option
+        <select id="question-correct-index" required>
+          <option value="0">Option 1</option>
+          <option value="1">Option 2</option>
+          <option value="2">Option 3</option>
+          <option value="3">Option 4</option>
+        </select>
+      </label>
+      <button type="submit" class="btn btn-primary">Add question</button>
+    </form>
     <ul id="question-list" class="admin-list"></ul>
   </div>
 </section>
@@ -87,7 +137,15 @@
       del.className = 'btn btn-outline';
       del.textContent = 'Delete';
       del.addEventListener('click', async () => {
-        await api(`/api/admin/slots/${s.id}`, { method: 'DELETE' });
+        const res = await fetch(`${BASE}/api/admin/slots/${s.id}`, { method: 'DELETE', credentials: 'include' });
+        if (res.status === 409) {
+          alert('This slot has confirmed bookings and cannot be deleted.');
+          return;
+        }
+        if (!res.ok) {
+          alert('Delete failed.');
+          return;
+        }
         loadAll();
       });
       li.appendChild(del);
@@ -128,6 +186,23 @@
       method: 'POST',
       body: JSON.stringify({ startsAt: new Date(startsAt).toISOString(), capacity }),
     });
+    await loadAll();
+  });
+
+  document.getElementById('question-form')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const track = (document.getElementById('question-track') as HTMLSelectElement).value;
+    const level = (document.getElementById('question-level') as HTMLSelectElement).value;
+    const prompt = (document.getElementById('question-prompt') as HTMLInputElement).value;
+    const options = [0, 1, 2, 3].map(
+      (i) => (document.getElementById(`question-option-${i}`) as HTMLInputElement).value
+    );
+    const correctIndex = Number((document.getElementById('question-correct-index') as HTMLSelectElement).value);
+    await api('/api/admin/questions', {
+      method: 'POST',
+      body: JSON.stringify({ track, level, prompt, options, correctIndex }),
+    });
+    (document.getElementById('question-form') as HTMLFormElement).reset();
     await loadAll();
   });
 </script>
@@ -183,6 +258,27 @@
     gap: 1rem;
     grid-template-columns: 1fr 1fr auto;
     align-items: end;
+  }
+
+  .question-form {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: end;
+    margin-bottom: 1rem;
+  }
+  .question-form select {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-surface-soft);
+    font: inherit;
+  }
+  .question-form button {
+    grid-column: 1 / -1;
   }
 
   .admin-list {

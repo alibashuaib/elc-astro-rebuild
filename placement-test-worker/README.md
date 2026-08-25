@@ -18,6 +18,15 @@ the real schema — but we recommend that whoever deploys this for real **also d
 one manual pass with `wrangler dev` in a normal (non-sandboxed) environment
 before going live** to confirm real D1 and `workerd` behavior matches the shim's.
 
+**Recommendation (future improvement, not required for launch):** the admin
+session cookie currently has to use `SameSite=None; Secure` because the Worker
+is deployed on the default `*.workers.dev` subdomain, a different origin than
+`elc.com.sa`. Routing this Worker at `elc.com.sa/api/*` via a Cloudflare
+[custom route](https://developers.cloudflare.com/workers/configuration/routing/routes/)
+instead would make the admin panel same-site with its API, which is
+architecturally cleaner — a `SameSite=Lax`/`Strict` cookie would work, and the
+`ALLOWED_ORIGINS` CORS allowlist in `src/index.ts` would no longer be needed.
+
 ## First-time deploy
 
 1. `npm install`

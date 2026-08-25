@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
-import { handleCreateBooking } from './booking';
+import { handleCreateBooking, handleListSlots } from './booking';
 import { createSlot, insertStudent, insertSession } from '../db';
 import path from 'node:path';
 
@@ -42,5 +42,20 @@ describe('booking routes', () => {
     ]);
     const statuses = [resA.status, resB.status].sort();
     expect(statuses).toEqual([200, 409]);
+  });
+
+  // Fix 6 regression coverage: starts_at is stored ISO-8601 with a 'T' separator
+  // (`new Date(...).toISOString()`, e.g. AdminPanel.astro's slot form), and listOpenSlots
+  // must compare against "now" formatted the same way, not datetime('now')'s space-separated
+  // format — otherwise the string comparison at date/time boundaries is unreliable.
+  it('excludes a slot a few seconds in the past and includes one a few seconds in the future', async () => {
+    const past = new Date(Date.now() - 5_000).toISOString();
+    const future = new Date(Date.now() + 5_000).toISOString();
+    await createSlot(env as any, past, 4);
+    const futureId = await createSlot(env as any, future, 4);
+
+    const res = await handleListSlots(new Request('http://x'), env as any);
+    const data = (await res.json()) as any;
+    expect(data.slots.map((s: any) => s.id)).toEqual([futureId]);
   });
 });

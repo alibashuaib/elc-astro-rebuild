@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
 import bcrypt from 'bcryptjs';
-import { handleAdminLogin, handleAdminCreateSlot, handleAdminListSlots } from './admin';
+import { handleAdminLogin, handleAdminCreateSlot, handleAdminListSlots, handleAdminDeleteSlot } from './admin';
 import { verifyAdminSession } from '../auth';
+import { createSlot, insertStudent, insertSession, bookSlotAtomic } from '../db';
 import path from 'node:path';
 
 function makeEnv() {
@@ -56,5 +57,28 @@ describe('admin routes', () => {
     const data = await res.json() as any;
     expect(data.slots).toHaveLength(1);
     expect(data.slots[0].capacity).toBe(4);
+  });
+
+  it('deletes a slot with no bookings', async () => {
+    const slotId = await createSlot(env as any, '2099-01-01T10:00:00Z', 4);
+    const res = await handleAdminDeleteSlot(new Request('http://x', { method: 'DELETE' }), env as any, slotId);
+    expect(res.status).toBe(200);
+    const list = await (await handleAdminListSlots(new Request('http://x'), env as any)).json() as any;
+    expect(list.slots).toHaveLength(0);
+  });
+
+  it('refuses to delete a slot with a confirmed booking', async () => {
+    const slotId = await createSlot(env as any, '2099-01-01T10:00:00Z', 4);
+    const studentId = await insertStudent(env as any, { name: 'A', phone: '1', dob: '2000-01-01', locale: 'en' });
+    const sessionId = await insertSession(env as any, studentId, 'adults');
+    await bookSlotAtomic(env as any, slotId, sessionId);
+
+    const res = await handleAdminDeleteSlot(new Request('http://x', { method: 'DELETE' }), env as any, slotId);
+    expect(res.status).toBe(409);
+    const data = await res.json() as any;
+    expect(data.error).toBe('slot_has_bookings');
+
+    const list = await (await handleAdminListSlots(new Request('http://x'), env as any)).json() as any;
+    expect(list.slots).toHaveLength(1);
   });
 });

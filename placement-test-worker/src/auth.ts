@@ -19,7 +19,11 @@ export async function issueSessionCookie(env: Env, adminId: string): Promise<str
   const payload = `${adminId}.${expires}`;
   const sig = await sign(payload, env.ADMIN_COOKIE_SECRET);
   const value = `${payload}.${sig}`;
-  return `${COOKIE_NAME}=${value}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${ttl}`;
+  // SameSite=None (with Secure) is required, not just permitted: the admin panel is served from
+  // elc.com.sa while this Worker runs on a different origin (*.workers.dev), so its cross-site
+  // fetch() calls to /api/admin/* would never attach a SameSite=Strict or =Lax cookie — login
+  // would appear to succeed while every subsequent admin call silently 401s.
+  return `${COOKIE_NAME}=${value}; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=${ttl}`;
 }
 
 function constantTimeEqual(a: string, b: string): boolean {

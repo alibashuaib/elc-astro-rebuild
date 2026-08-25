@@ -9,8 +9,8 @@ import { breadcrumbSchema } from '../../../lib/schema';
 
 const t = useTranslations('en');
 
-// TODO: confirm the real center WhatsApp number before launch — placeholder only.
-const WHATSAPP_NUMBER = '966500000000';
+// Real center WhatsApp number, same as WhatsAppButton.astro's live wa.me link.
+const WHATSAPP_NUMBER = '966546656000';
 
 const breadcrumbs = breadcrumbSchema([
   { name: 'Home', url: 'https://elc.com.sa/en/' },
@@ -30,7 +30,7 @@ const breadcrumbs = breadcrumbSchema([
   <section class="container placement-test-wrap">
     <RegistrationForm locale="en" t={t} />
     <TestRunner t={t} />
-    <ResultBooking t={t} whatsappNumber={WHATSAPP_NUMBER} />
+    <ResultBooking t={t} locale="en" whatsappNumber={WHATSAPP_NUMBER} />
   </section>
 </Layout>
 
