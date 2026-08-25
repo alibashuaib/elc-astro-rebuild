@@ -31,7 +31,10 @@ build (`npm run build && npm run preview`) and confirmed again in CI.
   is link-only (call/WhatsApp/email), no form. Keeps the site fully static.
 - `src/styles/tokens.css` — design tokens (color/type/space), light+dark mode.
 - `public/admin/` — Decap CMS scaffold for non-technical staff editing.
-- `public/.htaccess` — security headers for Hostinger's Apache.
+- `public/.htaccess` — security headers for Hostinger's Apache, plus
+  `ErrorDocument 404 /404.html` pointing at the page below.
+- `src/pages/404.astro` — one bilingual (not per-locale) branded 404 page,
+  since Apache can't route the error page by the broken URL's language.
 - `cms-oauth-worker/` — Cloudflare Worker OAuth proxy Decap needs to log in via GitHub.
 
 ## Commands
@@ -50,15 +53,16 @@ Copy `.env.example` to `.env` to test the Google Reviews integration locally.
 These are tracked inline as `TODO` comments at the relevant file, plus the source
 plan doc's own "What's Not Yet Decided" section:
 
-- **Google Business Profile reviews** — `GOOGLE_PLACES_API_KEY` + `GOOGLE_PLACE_ID`
-  still aren't set (not locally, not as repo secrets), so the homepage
-  testimonials section currently renders nothing. Needs a Places API (New) key and
-  this business's real Place ID (the GBP listing is "Knowledge Edifice Institute
-  (ELC)" / معهد صرح المعرفة, 4.6★, 409 reviews, Al Fayha, Jeddah — confirmed live on
-  Google Maps). A `GOOGLE_MAPS_API_KEY` repo secret is now set (pulled from the
-  live site's Rank Math config, used there only for its Maps *embed* widget) —
-  worth checking in Google Cloud Console whether Places API (New) is enabled on
-  that same key/project before requesting a separate one.
+- **Google reviews: aggregate live, individual quotes still blocked.**
+  `GOOGLE_PLACES_API_KEY` + `GOOGLE_PLACE_ID` are set as repo secrets (the real
+  GBP listing: "Knowledge Edifice Institute (ELC)" / معهد صرح المعرفة, Al Fayha,
+  Jeddah), so the homepage's rating badge (4.6★, 409 reviews) renders and
+  updates on the weekly schedule. Individual review *text* doesn't come back
+  from the API — confirmed with a wildcard field mask, Google only returns it
+  under the "Enterprise + Atmosphere" Places API SKU, which needs its own
+  billing-account authorization beyond just enabling the API. Once that's on,
+  the quote cards in `Testimonials.astro` will start rendering automatically —
+  no code change needed.
 - **Decap CMS OAuth** — `cms-oauth-worker/` is written but not deployed; needs your
   Cloudflare login (`npx wrangler login`) plus a GitHub OAuth App, then
   `public/admin/config.yml`'s `base_url` updated to the deployed Worker URL.

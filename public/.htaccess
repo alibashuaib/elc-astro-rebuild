@@ -39,3 +39,8 @@ Options -Indexes
 # Standard Astro `format: "directory"` output — Apache serves /foo/index.html for /foo/ already;
 # this just makes /foo (no trailing slash) resolve the same way.
 DirectorySlash On
+
+# Branded, bilingual 404 (src/pages/404.astro) instead of Apache's bare default
+# error page. A single page, not per-locale — ErrorDocument can't route by the
+# broken URL's language, so it shows both EN and AR with a link to each home.
+ErrorDocument 404 /404.html
