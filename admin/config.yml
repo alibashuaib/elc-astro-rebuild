@@ -1,0 +1,85 @@
+# Decap CMS config — git-backed visual editor for non-technical staff.
+#
+# TODO before this works in production:
+#   Deploy cms-oauth-worker/ (see its README) and replace `base_url` below with
+#   the deployed Worker's URL.
+
+backend:
+  name: github
+  repo: alibashuaib/elc-astro-rebuild
+  branch: main
+  base_url: https://TODO-deploy-cms-oauth-worker.workers.dev
+  auth_endpoint: auth
+
+# Draft/staging preview before anything goes live — important for price/schedule changes.
+publish_mode: editorial_workflow
+
+media_folder: 'src/assets/uploads'
+public_folder: '/uploads'
+
+# Every content field required in both languages before publish (plan §7 guardrail):
+# Decap's multiple_folders i18n structure enforces exactly the src/content/<type>/<locale>/ layout
+# already used by the Astro content collections, and blocks publish until both locales are filled.
+i18n:
+  structure: multiple_folders
+  locales: [en, ar]
+  default_locale: en
+
+collections:
+  - name: courses
+    label: Courses
+    folder: src/content/courses
+    i18n: true
+    create: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: Title, widget: string, i18n: true }
+      - { name: summary, label: Summary, widget: text, i18n: true }
+      - name: category
+        label: Category
+        widget: select
+        options: [kids, adults, women, business, exam-prep]
+      - name: level
+        label: Level
+        widget: select
+        options: [A1, A2, B1, B2, C1, C2]
+      - { name: price, label: Price, widget: number, value_type: float }
+      - { name: currency, label: Currency, widget: string, default: SAR }
+      - { name: durationWeeks, label: Duration (weeks), widget: number, value_type: int }
+      - { name: hoursPerWeek, label: Hours per week, widget: number, value_type: int }
+      - { name: hoursPerMonth, label: Hours per month, widget: string, required: false }
+      - { name: image, label: Image, widget: image, required: false }
+      - { name: imageAlt, label: Image alt text, widget: string, required: true, i18n: true }
+      - name: faqs
+        label: FAQs
+        widget: list
+        i18n: true
+        required: false
+        fields:
+          - { name: question, label: Question, widget: string }
+          - { name: answer, label: Answer, widget: text }
+      - { name: draft, label: Draft, widget: boolean, default: true }
+      - { name: body, label: Body, widget: markdown, i18n: true }
+
+  - name: blog
+    label: News / Blog
+    folder: src/content/blog
+    i18n: true
+    create: true
+    slug: '{{slug}}'
+    extension: md
+    format: frontmatter
+    fields:
+      - { name: title, label: Title, widget: string, i18n: true }
+      - { name: summary, label: Summary, widget: text, i18n: true }
+      - { name: publishDate, label: Publish Date, widget: datetime }
+      - { name: image, label: Image, widget: image, required: false }
+      - { name: imageAlt, label: Image alt text, widget: string, required: true, i18n: true }
+      - { name: draft, label: Draft, widget: boolean, default: true }
+      - { name: body, label: Body, widget: markdown, i18n: true }
+
+# No "testimonials" collection: reviews shown on the site are pulled live from the
+# Google Business Profile at build time (src/lib/googleReviews.ts) — staff manage
+# them by replying to/curating reviews on Google, not through this CMS.

@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Explicitly open to AI crawlers — GEO requirement from the rebuild plan
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://elc.com.sa/sitemap-index.xml
