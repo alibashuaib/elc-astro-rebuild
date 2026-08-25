@@ -1,0 +1,21 @@
+{
+  "name": "placement-test-worker",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "db:migrate:local": "wrangler d1 execute placement-test --local --file=migrations/0001_init.sql && wrangler d1 execute placement-test --local --file=migrations/0002_seed_questions.sql",
+    "db:migrate:remote": "wrangler d1 execute placement-test --remote --file=migrations/0001_init.sql && wrangler d1 execute placement-test --remote --file=migrations/0002_seed_questions.sql"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "latest",
+    "@cloudflare/workers-types": "latest",
+    "better-sqlite3": "^13.0.3",
+    "typescript": "latest",
+    "vitest": "latest",
+    "wrangler": "latest"
+  },
+  "dependencies": {
+    "bcryptjs": "latest"
+  }
+}
