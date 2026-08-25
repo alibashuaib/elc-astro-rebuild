@@ -33,18 +33,36 @@ const formattedPrice = price?.toLocaleString('en-US');
         <strong class="contact-price">{t('courses.contactDetails')}</strong>
       )}
     </div>
+    {/* Price already covers the "no data yet" case with its own contact
+        message above — showing two more placeholder-dash boxes here on
+        top of that would be redundant and (with the schedule-item's fixed
+        min-height) clip the "Varies" label rather than help the visitor. */}
+    {price !== undefined && (durationWeeks !== undefined || hoursPerMonth) && (
     <div class="schedule-grid">
+      {durationWeeks !== undefined ? (
       <div class="schedule-item weeks-fact">
         <span class="fact-label"><i><Icon name="calendar" size={14} /></i>{t('courses.weeksPerLevel')}</span>
-        <strong class:list={['metric-shape', 'numeric', { variable: durationWeeks === undefined }]}>{durationWeeks ?? '—'}</strong>
-        {durationWeeks === undefined && <small>{t('courses.varies')}</small>}
+        <strong class="metric-shape numeric">{durationWeeks}</strong>
       </div>
+      ) : (
+      <div class="schedule-item weeks-fact is-variable">
+        <span class="fact-label"><i><Icon name="calendar" size={14} /></i>{t('courses.weeksPerLevel')}</span>
+        <p>{t('courses.varies')}</p>
+      </div>
+      )}
+      {hoursPerMonth ? (
       <div class="schedule-item hours-fact">
         <span class="fact-label"><i><Icon name="clock" size={14} /></i>{t('courses.monthlyHours')}</span>
-        <strong class:list={['metric-shape', 'numeric', { variable: !hoursPerMonth }]}>{hoursPerMonth ?? '—'}</strong>
-        {!hoursPerMonth && <small>{t('courses.varies')}</small>}
+        <strong class="metric-shape numeric">{hoursPerMonth}</strong>
       </div>
+      ) : (
+      <div class="schedule-item hours-fact is-variable">
+        <span class="fact-label"><i><Icon name="clock" size={14} /></i>{t('courses.monthlyHours')}</span>
+        <p>{t('courses.varies')}</p>
+      </div>
+      )}
     </div>
+    )}
   </div>
   <a href={localizePath(locale, `/courses/${slug}`)} class="btn btn-outline">{t('courses.viewCourse')}</a>
 </article>
@@ -106,6 +124,6 @@ const formattedPrice = price?.toLocaleString('en-US');
   .hours-fact { --fact-color: #9b5d0d; --fact-soft: var(--color-yellow-soft); border-color: rgb(155 93 13 / .14); }
   .metric-shape { position: relative; z-index: 1; display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border: 1px solid color-mix(in srgb, var(--fact-color) 18%, transparent); border-radius: .85rem .85rem .85rem .28rem; color: var(--fact-color); background: var(--fact-soft); box-shadow: 0 7px 16px rgb(49 43 40 / .08); font-size: 1.35rem; font-weight: 850; line-height: 1; transform: rotate(-2deg); }
   :global(:dir(rtl)) .metric-shape { border-radius: .85rem .85rem .28rem .85rem; transform: rotate(2deg); }
-  .schedule-item strong.variable { color: var(--color-border-strong); background: var(--color-surface-soft); transform: none; }
-  .schedule-item small { position: absolute; inset-inline-end: .65rem; bottom: .62rem; color: var(--color-ink-muted); font-size: .58rem; font-weight: 700; }
+  .schedule-item.is-variable { justify-items: start; align-content: start; gap: .4rem; }
+  .schedule-item.is-variable p { position: relative; z-index: 1; margin: 0; color: var(--color-ink-muted); font-size: .72rem; font-weight: 650; line-height: 1.35; }
 </style>
