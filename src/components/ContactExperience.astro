@@ -148,9 +148,9 @@ const directionsUrl = 'https://www.google.com/maps/search/?api=1&query=21.497114
   .contact-card b { position: absolute; display: grid; width: 2.25rem; height: 2.25rem; place-items: center; inset-inline-end: 1.4rem; top: 1.4rem; border: 1px solid color-mix(in srgb, var(--contact-accent) 18%, transparent); border-radius: 50%; color: var(--contact-accent); background: rgb(255 255 255 / .76); box-shadow: 0 8px 20px rgb(49 43 40 / .08); transition: transform var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); }
   .contact-card:hover b { color: #fff; background: var(--contact-accent); transform: translate(2px, -2px); }
   :global(:dir(rtl)) .contact-card:hover b { transform: translate(-2px, -2px) scaleX(-1); }
-  .location-section { padding-block: clamp(4.5rem, 8vw, 7rem); background: var(--color-navy); color: #fff; }
+  .location-section { padding-block: clamp(4.5rem, 8vw, 7rem); background: var(--zone-ink-bg); color: #fff; }
   .location-grid { display: grid; grid-template-columns: minmax(18rem, .65fr) minmax(0, 1.35fr); align-items: center; gap: clamp(3rem, 7vw, 7rem); }
-  .section-kicker { color: var(--color-primary); font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .section-kicker { color: var(--color-primary-text); font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
   :global(:lang(ar)) .section-kicker { letter-spacing: 0; }
   .location-copy .section-kicker { color: #f7b75f; }
   .landlines { display: flex; flex-direction: column; gap: .25rem; margin: 1rem 0 1.5rem; }

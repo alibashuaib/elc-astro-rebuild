@@ -41,6 +41,16 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Before first paint: apply a stored explicit theme choice. System-
+         preference dark mode needs no JS (pure CSS in tokens.css) — this only
+         matters for a visitor who picked a theme against their OS default,
+         so their next page load doesn't flash the other one first. -->
+    <script is:inline>
+      try {
+        var t = localStorage.getItem('elc-theme');
+        if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
     <!-- As early as possible: Consent Mode default (denied) + GTM, so nothing
          GTM fires ever starts in a granted state before the visitor chooses. -->
     <ConsentHead />

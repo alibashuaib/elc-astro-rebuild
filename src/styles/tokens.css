@@ -5,6 +5,11 @@
   --color-crimson: #b61733;
   --color-crimson-ink: #841026;
   --color-crimson-text: #a4132d;
+  /* Text-safe variant of --color-primary: identical in light mode, brightened
+     for dark mode so brand-red text (kickers, prices, stat numbers) meets
+     4.5:1 on dark surfaces. Buttons/badges keep using --color-primary itself
+     since their white-on-red contrast is already fine and doesn't need this. */
+  --color-primary-text: var(--color-primary);
   --color-coral: #f29420;
   --color-coral-soft: #fff1df;
   --color-mint: #a6a8ab;
@@ -23,11 +28,17 @@
   --color-ink-muted: #6c6f74;
   --color-border: #e4dfda;
   --color-border-strong: #cec8c1;
+  --color-header-bg: rgb(255 255 255 / .9);
 
   /* Legacy aliases retained for components outside the redesigned homepage. */
   --color-amber: var(--color-yellow);
   --color-amber-text: var(--color-yellow-ink);
-  --zone-ink-bg: var(--color-navy);
+  /* Fixed literal, not var(--color-navy) — this needs to stay the same dark
+     shade in both themes for the "always-dark editorial zone" sections that
+     use it (location/values/why/courses/featured-story). --color-navy itself
+     flips to a light color in dark mode (it's also used as heading text), so
+     aliasing this to it would turn those sections light-on-light. */
+  --zone-ink-bg: #292b2f;
   --zone-ink-bg-raised: #36383d;
   --zone-ink-text: #ffffff;
   --zone-ink-muted: #d0ccc7;
@@ -78,4 +89,51 @@
     --motion-base: 0ms;
     --motion-slow: 0ms;
   }
+}
+
+/* Dark mode — scoped intentionally: only the base surface/text/border tokens
+   that most components already reference via var(--color-*). Decorative
+   accents (course-card watermarks, badge gradients, stat-card top bars, the
+   map placeholder, testimonial "soft" tints, etc.) were tuned for light
+   backgrounds using hardcoded hex values scattered across component files —
+   fixing every one of those is out of scope for this pass. They'll still
+   render in dark mode, just not perfectly re-tuned for it.
+   --color-primary/coral/etc. (brand colors) are deliberately unchanged so
+   buttons/badges keep their familiar white-on-red look — but that same red
+   used as *text* on a dark surface fails contrast, so --color-primary-text
+   and --color-crimson-text get their own brightened dark-mode values below.
+   Two guards, matching the toggle in Header.astro:
+   - prefers-color-scheme: dark, unless the visitor explicitly chose light
+   - [data-theme="dark"]: explicit choice, overrides system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #18181a;
+    --color-bg-raised: #232327;
+    --color-surface-soft: #29292e;
+    --color-navy: #f3f2f0;
+    --color-ink: #e4e2df;
+    --color-ink-muted: #a3a6ab;
+    --color-border: #3a3b40;
+    --color-border-strong: #4d4f56;
+    --shadow-sm: 0 10px 30px rgb(0 0 0 / 0.35);
+    --shadow-md: 0 22px 55px rgb(0 0 0 / 0.45);
+    --color-header-bg: rgb(24 24 26 / .85);
+    --color-primary-text: #f56478;
+    --color-crimson-text: #f56478;
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #18181a;
+  --color-bg-raised: #232327;
+  --color-surface-soft: #29292e;
+  --color-navy: #f3f2f0;
+  --color-ink: #e4e2df;
+  --color-ink-muted: #a3a6ab;
+  --color-border: #3a3b40;
+  --color-border-strong: #4d4f56;
+  --shadow-sm: 0 10px 30px rgb(0 0 0 / 0.35);
+  --shadow-md: 0 22px 55px rgb(0 0 0 / 0.45);
+  --color-header-bg: rgb(24 24 26 / .85);
+  --color-primary-text: #f56478;
+  --color-crimson-text: #f56478;
 }

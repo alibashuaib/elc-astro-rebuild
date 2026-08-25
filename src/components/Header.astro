@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import logoFull from '../assets/logo-elc-full.png';
+import SearchOverlay from './SearchOverlay.astro';
 import { useTranslations, localizePath, alternateLocale, type Locale } from '../i18n/ui';
 
 interface Props {
@@ -40,6 +41,11 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
         {t('nav.lms')}
       </a>
       <a href={localizePath(locale, '/register')} class="btn btn-primary">{t('nav.register')}</a>
+      <SearchOverlay locale={locale} />
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label={t('theme.toggle')}>
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M12 2v2.5M12 19.5V22M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2 12h2.5M19.5 12H22M4.2 19.8 6 18M18 6l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+      </button>
       <a
         href={localizePath(otherLocale, currentPath)}
         class="lang-switch"
@@ -76,7 +82,7 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgb(255 255 255 / .9);
+    background: var(--color-header-bg);
     border-bottom: 1px solid rgb(228 223 218 / .85);
     box-shadow: 0 8px 35px rgb(49 43 40 / .05);
     backdrop-filter: blur(18px);
@@ -128,12 +134,35 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     height: 2.65rem;
     border-radius: 999px;
     padding: .45rem;
-    background: #fff;
+    background: var(--color-bg-raised);
     box-shadow: 0 7px 18px rgb(49 43 40 / .08);
     transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
   }
   .lang-switch:hover { border-color: rgb(182 23 51 / .34); text-decoration: none; transform: translateY(-2px); box-shadow: 0 10px 24px rgb(49 43 40 / .13); }
   .flag-icon { display: block; width: 1.6rem; height: auto; overflow: hidden; border-radius: .14rem; box-shadow: 0 0 0 1px rgb(25 39 69 / .12); }
+  .theme-toggle {
+    display: grid;
+    place-items: center;
+    width: 2.65rem;
+    height: 2.65rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0;
+    color: var(--color-ink-muted);
+    background: var(--color-bg-raised);
+    box-shadow: 0 7px 18px rgb(49 43 40 / .08);
+    cursor: pointer;
+    transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+  }
+  .theme-toggle:hover { color: var(--color-primary); border-color: rgb(182 23 51 / .34); transform: translateY(-2px); }
+  .theme-toggle svg { width: 1.15rem; height: 1.15rem; }
+  .theme-toggle .icon-moon { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+  :root[data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .icon-sun { display: none; }
+    :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: block; }
+  }
   .nav-toggle {
     display: none;
     flex-direction: column;
@@ -160,7 +189,7 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
       /* Solid, not translucent: this panel overlays page content directly (no
          blur fallback if backdrop-filter isn't supported/rendered), so partial
          opacity here lets text underneath show through. */
-      background: #fff;
+      background: var(--color-bg-raised);
       border-bottom: 1px solid var(--color-border);
       display: none;
     }
@@ -181,3 +210,15 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
 </style>
 
 <script src="/scripts/mobile-nav.js" defer></script>
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const root = document.documentElement;
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const current = root.getAttribute('data-theme') ?? (systemDark ? 'dark' : 'light');
+      const next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('elc-theme', next); } catch (e) {}
+    });
+  });
+</script>
