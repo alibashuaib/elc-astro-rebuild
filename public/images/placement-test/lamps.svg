@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Two lamps">
+  <circle cx="120" cy="120" r="112" fill="#FFF4CC"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#F0B429" stroke-width="6"/>
+  <g>
+    <path d="M52 78 L92 78 L84 116 L60 116 Z" fill="#FFD24C" stroke="#D69A00" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="70" y="116" width="4" height="46" fill="#7A4A15"/>
+    <rect x="54" y="160" width="40" height="10" rx="4" fill="#7A4A15"/>
+  </g>
+  <g>
+    <path d="M148 78 L188 78 L180 116 L156 116 Z" fill="#FFD24C" stroke="#D69A00" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="166" y="116" width="4" height="46" fill="#7A4A15"/>
+    <rect x="150" y="160" width="40" height="10" rx="4" fill="#7A4A15"/>
+  </g>
+</svg>

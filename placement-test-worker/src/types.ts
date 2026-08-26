@@ -28,6 +28,7 @@ export interface QuestionRow {
   options: string; // JSON string; '[]' for type: 'text'
   correct_index: number; // unused placeholder (0) for type: 'text'
   expected_answer: string | null; // set for type: 'text', null for type: 'mcq'
+  case_sensitive: number; // 1 only for items that explicitly test capital/small letters; 0 grades case-insensitively
   image_url: string | null; // optional picture shown above the prompt (e.g. picture-matching items)
   passage_id: string | null; // set for reading-comprehension items; joins to passages.id for the article text
   sequence: number; // fixed order within track, matching the source document

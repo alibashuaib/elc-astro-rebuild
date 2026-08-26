@@ -67,6 +67,17 @@ export async function pickNextQuestion(
   return row ?? null;
 }
 
+// Total size of a track's active question bank -- used by the frontend to
+// render "question N of total" progress, since the walk-through is a fixed
+// sequential pass over this same set (see pickNextQuestion) rather than an
+// adaptive test with a variable question count.
+export async function countActiveQuestions(env: Env, track: Track): Promise<number> {
+  const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM questions WHERE track = ? AND active = 1`)
+    .bind(track)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
+}
+
 export async function getPassage(env: Env, id: string): Promise<PassageRow | null> {
   const row = await env.DB.prepare(`SELECT * FROM passages WHERE id = ?`).bind(id).first<PassageRow>();
   return row ?? null;
@@ -76,16 +87,18 @@ export async function insertResponse(
   env: Env,
   sessionId: string,
   questionId: string,
-  // For type: 'text' questions there's no option index -- pass null and the row
-  // stores the documented -1 sentinel in selected_index (kept NOT NULL for
-  // backward compatibility) with the typed answer in answer_text instead.
+  // For type: 'text' questions and skipped questions there's no option index --
+  // pass null and the row stores the documented -1 sentinel in selected_index
+  // (kept NOT NULL for backward compatibility) with the typed answer in
+  // answer_text instead (null for a skip too).
   selectedIndex: number | null,
   correct: boolean,
-  answerText: string | null = null
+  answerText: string | null = null,
+  skipped: boolean = false
 ): Promise<void> {
   await env.DB.prepare(
-    `INSERT INTO responses (id, session_id, question_id, selected_index, correct, answer_text) VALUES (?, ?, ?, ?, ?, ?)`
-  ).bind(newId(), sessionId, questionId, selectedIndex ?? -1, correct ? 1 : 0, answerText).run();
+    `INSERT INTO responses (id, session_id, question_id, selected_index, correct, answer_text, skipped) VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).bind(newId(), sessionId, questionId, selectedIndex ?? -1, correct ? 1 : 0, answerText, skipped ? 1 : 0).run();
 }
 
 export async function listOpenSlots(env: Env): Promise<Array<{ id: string; starts_at: string; remaining: number }>> {
@@ -173,8 +186,8 @@ export async function insertQuestion(env: Env, q: Omit<QuestionRow, 'id' | 'sequ
     .bind(q.track)
     .first<{ next: number }>();
   await env.DB.prepare(
-    `INSERT INTO questions (id, track, level, type, prompt, options, correct_index, expected_answer, passage_id, sequence) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(id, q.track, q.level, q.type, q.prompt, q.options, q.correct_index, q.expected_answer, q.passage_id, next?.next ?? 1).run();
+    `INSERT INTO questions (id, track, level, type, prompt, options, correct_index, expected_answer, case_sensitive, passage_id, sequence) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(id, q.track, q.level, q.type, q.prompt, q.options, q.correct_index, q.expected_answer, q.case_sensitive, q.passage_id, next?.next ?? 1).run();
   return id;
 }
 

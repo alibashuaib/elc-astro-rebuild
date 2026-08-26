@@ -1,16 +1,20 @@
 import type { Env, StudentInput } from '../types';
-import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage } from '../db';
+import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
 }
 
-// Case-sensitive on purpose: some text-type items test capitalization itself
-// (e.g. "write the capital letter"), so folding case would make those
-// ungradeable. Only whitespace is normalized.
-function normalizeAnswer(s: string): string {
-  return s.trim().replace(/\s+/g, ' ');
+// Case-sensitive only for the handful of items that explicitly test
+// capitalization itself (e.g. "write the capital letter") -- see
+// migrations/0012_case_insensitive_grading.sql and questions.case_sensitive.
+// Every other text-type answer is graded case-insensitively so a student
+// isn't marked wrong for harmless casing (e.g. typing "tv" instead of "TV").
+// Whitespace is always normalized regardless.
+function normalizeAnswer(s: string, caseSensitive: boolean): string {
+  const trimmed = s.trim().replace(/\s+/g, ' ');
+  return caseSensitive ? trimmed : trimmed.toLowerCase();
 }
 
 // Questions are served in fixed order (see migrations/0006_fixed_sequential_order.sql
@@ -28,6 +32,7 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     return { done: true, level, levelName };
   }
   const passage = q.passage_id ? await getPassage(env, q.passage_id) : null;
+  const total = await countActiveQuestions(env, track as 'kids' | 'adults');
   return {
     done: false,
     questionId: q.id,
@@ -36,6 +41,10 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     options: q.type === 'mcq' ? JSON.parse(q.options) : undefined,
     imageUrl: q.image_url ?? undefined,
     passage: passage ? { id: passage.id, title: passage.title, body: passage.body } : undefined,
+    // Fixed sequential walk-through over this same active bank (see pickNextQuestion),
+    // so "excludeIds so far + this one" is exactly this question's 1-based position in it.
+    questionNumber: excludeIds.length + 1,
+    total,
   };
 }
 
@@ -57,22 +66,32 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   if (!session || session.status !== 'in_progress') {
     return json({ error: 'session not found or already completed' }, 404);
   }
-  const body = await req.json<{ questionId: string; selectedIndex?: number; answerText?: string }>();
+  const body = await req.json<{ questionId: string; selectedIndex?: number; answerText?: string; skip?: boolean }>();
   const q = await env.DB
-    .prepare(`SELECT type, correct_index, expected_answer FROM questions WHERE id = ?`)
+    .prepare(`SELECT type, correct_index, expected_answer, case_sensitive FROM questions WHERE id = ?`)
     .bind(body.questionId)
-    .first<{ type: 'mcq' | 'text'; correct_index: number; expected_answer: string | null }>();
+    .first<{ type: 'mcq' | 'text'; correct_index: number; expected_answer: string | null; case_sensitive: number }>();
   if (!q) return json({ error: 'unknown question' }, 400);
 
+  const skipped = body.skip === true;
   let correct: boolean;
-  if (q.type === 'text') {
+  if (skipped) {
+    // A student who doesn't understand the question can skip it instead of
+    // guessing. Scored the same as a wrong answer -- the level estimate has
+    // no third "unknown" outcome to give it -- but recorded distinctly (see
+    // migrations/0011_skip_question.sql) so admin reporting can tell
+    // "answered wrong" apart from "never attempted".
+    correct = false;
+  } else if (q.type === 'text') {
     if (typeof body.answerText !== 'string') return json({ error: 'answerText is required for this question' }, 400);
-    correct = q.expected_answer !== null && normalizeAnswer(body.answerText) === normalizeAnswer(q.expected_answer);
+    correct =
+      q.expected_answer !== null &&
+      normalizeAnswer(body.answerText, !!q.case_sensitive) === normalizeAnswer(q.expected_answer, !!q.case_sensitive);
   } else {
     if (typeof body.selectedIndex !== 'number') return json({ error: 'selectedIndex is required for this question' }, 400);
     correct = q.correct_index === body.selectedIndex;
   }
-  await insertResponse(env, sessionId, body.questionId, body.selectedIndex ?? null, correct, body.answerText ?? null);
+  await insertResponse(env, sessionId, body.questionId, body.selectedIndex ?? null, correct, body.answerText ?? null, skipped);
 
   const priorState = {
     currentLevelIndex: session.current_level_index,
@@ -81,6 +100,11 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     questionsAsked: session.questions_asked,
   };
   const nextState = applyAnswer(priorState, correct);
+
+  // `correct` is omitted from a skipped answer's response -- there's nothing to
+  // give feedback on, and the frontend uses its absence to skip showing the
+  // correct/incorrect banner (see TestRunner.astro's showFeedback).
+  const feedback = skipped ? {} : { correct };
 
   if (isDone(nextState)) {
     const level = finalLevel(nextState, session.track);
@@ -92,7 +116,7 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
       questions_asked: nextState.questionsAsked,
     });
     await completeSession(env, sessionId, level);
-    return json({ done: true, level, levelName });
+    return json({ done: true, level, levelName, ...feedback });
   }
 
   await updateSessionScoring(env, sessionId, {
@@ -107,5 +131,5 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   ).results?.map((r) => r.question_id) ?? [];
 
   const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, askedIds);
-  return json(next);
+  return json({ ...next, ...feedback });
 }

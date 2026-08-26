@@ -57,6 +57,7 @@ export async function handleAdminCreateQuestion(req: Request, env: Env): Promise
     options: JSON.stringify(body.options),
     correct_index: body.correctIndex,
     expected_answer: null,
+    case_sensitive: 0,
     image_url: null,
     passage_id: null,
     active: 1,

@@ -15,8 +15,14 @@ const { t } = Astro.props;
   data-answer-error={t('placementTest.answerError')}
   data-answer-submit={t('placementTest.answerSubmit')}
   data-reading-passage={t('placementTest.readingPassage')}
+  data-correct={t('placementTest.correct')}
+  data-incorrect={t('placementTest.incorrect')}
+  data-skip={t('placementTest.skip')}
 >
   <p id="pt-progress" class="pt-progress"></p>
+  <div id="pt-progress-track" class="pt-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div id="pt-progress-fill" class="pt-progress-fill"></div>
+  </div>
   <details id="pt-passage" class="pt-passage" hidden>
     <summary id="pt-passage-title" class="pt-passage-title"></summary>
     <p id="pt-passage-body" class="pt-passage-body"></p>
@@ -24,6 +30,8 @@ const { t } = Astro.props;
   <img id="pt-image" class="pt-image" alt="" hidden />
   <p id="pt-prompt" class="pt-prompt"></p>
   <div id="pt-options" class="pt-options"></div>
+  <button type="button" id="pt-skip" class="pt-skip-btn"></button>
+  <p id="pt-feedback" class="pt-feedback" hidden></p>
   <p id="pt-error" class="pt-error" hidden></p>
 </section>
 
@@ -33,48 +41,94 @@ const { t } = Astro.props;
 
   const runner = document.getElementById('placement-test-runner') as HTMLElement;
   const progressEl = document.getElementById('pt-progress') as HTMLElement;
+  const progressTrackEl = document.getElementById('pt-progress-track') as HTMLElement;
+  const progressFillEl = document.getElementById('pt-progress-fill') as HTMLElement;
   const passageEl = document.getElementById('pt-passage') as HTMLDetailsElement;
   const passageTitleEl = document.getElementById('pt-passage-title') as HTMLElement;
   const passageBodyEl = document.getElementById('pt-passage-body') as HTMLElement;
   const imageEl = document.getElementById('pt-image') as HTMLImageElement;
   const promptEl = document.getElementById('pt-prompt') as HTMLElement;
   const optionsEl = document.getElementById('pt-options') as HTMLElement;
+  const feedbackEl = document.getElementById('pt-feedback') as HTMLElement;
   const errorEl = document.getElementById('pt-error') as HTMLElement;
+  const skipBtn = document.getElementById('pt-skip') as HTMLButtonElement;
   const questionLabel = runner.dataset.questionLabel ?? '';
   const answerErrorText = runner.dataset.answerError ?? '';
   const answerSubmitText = runner.dataset.answerSubmit ?? 'Submit';
   const readingPassageLabel = runner.dataset.readingPassage ?? 'Reading passage';
+  const correctText = runner.dataset.correct ?? 'Correct!';
+  const incorrectText = runner.dataset.incorrect ?? 'Incorrect';
+  skipBtn.textContent = runner.dataset.skip ?? "I don't understand — skip";
+  // How long the correct/incorrect feedback stays on screen before the next
+  // question loads -- long enough to register, short enough not to feel like
+  // a stall between questions.
+  const FEEDBACK_DELAY_MS = 1100;
   let sessionId = '';
-  let questionNum = 0;
   let lastPassageId = '';
+
+  function setProgress(questionNumber: number, total: number) {
+    progressEl.textContent = total > 0 ? `${questionLabel} ${questionNumber} / ${total}` : `${questionLabel} ${questionNumber}`;
+    const pct = total > 0 ? Math.min(100, Math.round((questionNumber / total) * 100)) : 0;
+    progressFillEl.style.width = `${pct}%`;
+    progressTrackEl.setAttribute('aria-valuenow', String(pct));
+  }
+
+  function showFeedback(correct: boolean | undefined, selectedEl: HTMLElement | null) {
+    if (correct === undefined) {
+      feedbackEl.hidden = true;
+      return;
+    }
+    feedbackEl.hidden = false;
+    feedbackEl.textContent = correct ? correctText : incorrectText;
+    feedbackEl.className = `pt-feedback ${correct ? 'pt-feedback-correct' : 'pt-feedback-incorrect'}`;
+    selectedEl?.classList.add(correct ? 'pt-selected-correct' : 'pt-selected-incorrect');
+  }
 
   async function handleSubmit(
     step: QuestionPayload,
-    answer: { selectedIndex: number } | { answerText: string },
-    disabledEls: Array<HTMLButtonElement | HTMLInputElement>
+    answer: { selectedIndex: number } | { answerText: string } | { skip: true },
+    disabledEls: Array<HTMLButtonElement | HTMLInputElement>,
+    selectedEl: HTMLElement | null
   ) {
     disabledEls.forEach((el) => (el.disabled = true));
+    skipBtn.disabled = true;
     errorEl.hidden = true;
     try {
       const next = await submitAnswer(sessionId, step.questionId, answer);
-      if (next.done) {
-        document.dispatchEvent(new CustomEvent('placement:done', { detail: { level: next.level, levelName: next.levelName, sessionId } }));
-        runner.hidden = true;
-      } else {
-        renderQuestion(next);
-      }
+      showFeedback(next.correct, selectedEl);
+      window.setTimeout(
+        () => {
+          if (next.done) {
+            progressFillEl.style.width = '100%';
+            document.dispatchEvent(new CustomEvent('placement:done', { detail: { level: next.level, levelName: next.levelName, sessionId } }));
+            runner.hidden = true;
+          } else {
+            renderQuestion(next);
+          }
+        },
+        next.correct === undefined ? 0 : FEEDBACK_DELAY_MS
+      );
     } catch {
       // Network/API failure mid-test: re-enable the inputs and show an inline error
       // instead of leaving a frozen, unresponsive question card.
       errorEl.textContent = answerErrorText;
       errorEl.hidden = false;
       disabledEls.forEach((el) => (el.disabled = false));
+      skipBtn.disabled = false;
     }
   }
 
   function renderQuestion(step: QuestionPayload) {
-    questionNum++;
-    progressEl.textContent = `${questionLabel} ${questionNum}`;
+    setProgress(step.questionNumber, step.total);
+    feedbackEl.hidden = true;
+    skipBtn.disabled = false;
+    // Re-bound each render (rather than once) so the closure always skips
+    // *this* question's id and disables *this* question's currently-rendered
+    // inputs, whatever type they are.
+    skipBtn.onclick = () => {
+      const inputEls = Array.from(optionsEl.querySelectorAll('button, input')) as Array<HTMLButtonElement | HTMLInputElement>;
+      handleSubmit(step, { skip: true }, inputEls, null);
+    };
 
     if (step.passage) {
       passageEl.hidden = false;
@@ -116,7 +170,7 @@ const { t } = Astro.props;
       submitBtn.textContent = answerSubmitText;
       submitBtn.addEventListener('click', () => {
         if (!input.value.trim()) return;
-        handleSubmit(step, { answerText: input.value }, [input, submitBtn]);
+        handleSubmit(step, { answerText: input.value }, [input, submitBtn], input);
       });
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') submitBtn.click();
@@ -150,7 +204,7 @@ const { t } = Astro.props;
       btn.textContent = opt;
       btn.addEventListener('click', () => {
         const buttons = Array.from(optionsEl.querySelectorAll('button')) as HTMLButtonElement[];
-        handleSubmit(step, { selectedIndex: idx }, buttons);
+        handleSubmit(step, { selectedIndex: idx }, buttons, btn);
       });
       optionsEl.appendChild(btn);
     });
@@ -170,7 +224,7 @@ const { t } = Astro.props;
     btn.appendChild(label);
     btn.addEventListener('click', () => {
       const buttons = Array.from(optionsEl.querySelectorAll('button')) as HTMLButtonElement[];
-      handleSubmit(step, { selectedIndex: idx }, buttons);
+      handleSubmit(step, { selectedIndex: idx }, buttons, btn);
     });
     return btn;
   }
@@ -208,6 +262,61 @@ const { t } = Astro.props;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
+  }
+  .pt-progress-track {
+    height: 0.4rem;
+    border-radius: 999px;
+    background: var(--color-surface-soft);
+    overflow: hidden;
+  }
+  .pt-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: var(--color-primary);
+    transition: width var(--motion-fast) var(--ease);
+  }
+  .pt-skip-btn {
+    justify-self: start;
+    padding: 0.35rem 0;
+    border: none;
+    background: none;
+    color: var(--color-ink-muted);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .pt-skip-btn:hover:not(:disabled) {
+    color: var(--color-ink);
+  }
+  .pt-skip-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .pt-feedback {
+    margin: 0;
+    padding: 0.6rem 0.9rem;
+    border-radius: 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .pt-feedback-correct {
+    background: rgb(34 139 87 / 0.12);
+    color: #1a7a49;
+  }
+  .pt-feedback-incorrect {
+    background: rgb(182 23 51 / 0.1);
+    color: var(--color-primary-text);
+  }
+  .pt-selected-correct {
+    border-color: #1a7a49 !important;
+    background: rgb(34 139 87 / 0.14) !important;
+  }
+  .pt-selected-incorrect {
+    border-color: var(--color-primary) !important;
+    background: rgb(182 23 51 / 0.1) !important;
   }
   .pt-passage {
     border: 1px solid var(--color-border);

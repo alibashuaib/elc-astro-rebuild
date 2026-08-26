@@ -92,6 +92,9 @@ export const ui = {
     'placementTest.answerError': 'Something went wrong — please try again.',
     'placementTest.answerSubmit': 'Submit',
     'placementTest.readingPassage': 'Reading passage',
+    'placementTest.correct': 'Correct!',
+    'placementTest.incorrect': 'Incorrect',
+    'placementTest.skip': "I don't understand — skip",
   },
   ar: {
     'nav.courses': 'الدورات',
@@ -168,6 +171,9 @@ export const ui = {
     'placementTest.answerError': 'حدث خطأ ما — يرجى المحاولة مرة أخرى.',
     'placementTest.answerSubmit': 'إرسال',
     'placementTest.readingPassage': 'نص القراءة',
+    'placementTest.correct': 'إجابة صحيحة!',
+    'placementTest.incorrect': 'إجابة خاطئة',
+    'placementTest.skip': 'لا أفهم — تخطي',
   },
 } as const;
 
