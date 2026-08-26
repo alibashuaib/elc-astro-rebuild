@@ -4,11 +4,20 @@ function newId(): string {
   return crypto.randomUUID();
 }
 
+// Kids track is age 12 and under; 13+ is adults. Computed as an exact
+// calendar-year age (not ms-elapsed / 365.25 days) -- that average-year
+// approximation put a student turning 12 exactly today on the wrong side of
+// the cutoff, since "now" is always some hours past midnight while `dob`
+// parses to midnight, nudging the approximate age fractionally past 12.
 export function computeTrack(dob: string): Track {
   const birth = new Date(dob);
-  const ageMs = Date.now() - birth.getTime();
-  const age = ageMs / (1000 * 60 * 60 * 24 * 365.25);
-  return age < 16 ? 'kids' : 'adults';
+  const today = new Date();
+  let age = today.getUTCFullYear() - birth.getUTCFullYear();
+  const hadBirthdayThisYear =
+    today.getUTCMonth() > birth.getUTCMonth() ||
+    (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() >= birth.getUTCDate());
+  if (!hadBirthdayThisYear) age--;
+  return age <= 12 ? 'kids' : 'adults';
 }
 
 export async function insertStudent(env: Env, input: StudentInput): Promise<string> {
