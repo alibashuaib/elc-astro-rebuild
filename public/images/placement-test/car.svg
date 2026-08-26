@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A car">
+  <circle cx="120" cy="120" r="112" fill="#CDEBFF"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#4D96FF" stroke-width="6"/>
+  <g>
+    <path d="M46 150 L58 108 C62 96 74 88 87 88 L153 88 C166 88 178 96 182 108 L194 150 Z" fill="#FF6B6B" stroke="#B3261E" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M76 116 L88 96 L152 96 L164 116 Z" fill="#CDEBFF" stroke="#B3261E" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="40" y="146" width="160" height="26" rx="10" fill="#FF6B6B" stroke="#B3261E" stroke-width="6"/>
+    <circle cx="78" cy="176" r="20" fill="#3A2E2A" stroke="#1F1B1A" stroke-width="4"/>
+    <circle cx="78" cy="176" r="8" fill="#D9D9D9"/>
+    <circle cx="164" cy="176" r="20" fill="#3A2E2A" stroke="#1F1B1A" stroke-width="4"/>
+    <circle cx="164" cy="176" r="8" fill="#D9D9D9"/>
+    <circle cx="182" cy="132" r="7" fill="#FFF6E0" stroke="#B3261E" stroke-width="3"/>
+  </g>
+</svg>

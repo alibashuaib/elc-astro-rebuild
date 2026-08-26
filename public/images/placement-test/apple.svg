@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="An apple">
+  <circle cx="120" cy="120" r="112" fill="#FFE1E1"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#FF6B6B" stroke-width="6"/>
+  <path d="M120 92 C96 68 54 74 46 112 C38 154 74 190 106 190 C112 190 128 190 134 190 C166 190 202 154 194 112 C186 74 144 68 120 92 Z"
+        fill="#FF5A5F" stroke="#B3261E" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M120 92 C120 78 122 66 118 54" fill="none" stroke="#7A4B23" stroke-width="7" stroke-linecap="round"/>
+  <path d="M118 60 C132 46 152 46 160 58 C146 66 130 66 118 60 Z" fill="#4CAF50" stroke="#2E7D32" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="92" cy="118" rx="16" ry="24" fill="#FFFFFF" opacity="0.35"/>
+</svg>

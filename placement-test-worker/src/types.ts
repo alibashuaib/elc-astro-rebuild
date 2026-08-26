@@ -14,16 +14,31 @@ export interface StudentInput {
   dob: string; // ISO date
   guardianName?: string;
   locale: 'en' | 'ar';
+  track?: Track; // explicit choice from the registration form; falls back to age-based computeTrack(dob) if omitted/invalid
 }
+
+export type QuestionType = 'mcq' | 'text';
 
 export interface QuestionRow {
   id: string;
   track: Track;
-  level: CefrLevel;
+  level: CefrLevel; // descriptive metadata only -- doesn't drive question selection, see db.ts/pickNextQuestion
+  type: QuestionType;
   prompt: string;
-  options: string; // JSON string
-  correct_index: number;
+  options: string; // JSON string; '[]' for type: 'text'
+  correct_index: number; // unused placeholder (0) for type: 'text'
+  expected_answer: string | null; // set for type: 'text', null for type: 'mcq'
+  case_sensitive: number; // 1 only for items that explicitly test capital/small letters; 0 grades case-insensitively
+  image_url: string | null; // optional picture shown above the prompt (e.g. picture-matching items)
+  passage_id: string | null; // set for reading-comprehension items; joins to passages.id for the article text
+  sequence: number; // fixed order within track, matching the source document
   active: number;
+}
+
+export interface PassageRow {
+  id: string;
+  title: string;
+  body: string;
 }
 
 export interface SessionRow {

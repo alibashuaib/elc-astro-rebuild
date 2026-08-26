@@ -6,6 +6,7 @@ export interface StartSessionInput {
   dob: string;
   guardianName?: string;
   locale: 'en' | 'ar';
+  track?: 'kids' | 'adults';
 }
 
 export interface QuestionPayload {
@@ -13,13 +14,21 @@ export interface QuestionPayload {
   sessionId?: string;
   track?: 'kids' | 'adults';
   questionId: string;
+  type: 'mcq' | 'text';
   prompt: string;
-  options: string[];
+  options?: string[]; // present for type: 'mcq' only
+  imageUrl?: string; // optional picture shown above the prompt (e.g. picture-matching items)
+  passage?: { id: string; title: string; body: string }; // present for reading-comprehension items
+  questionNumber: number; // 1-based position in the track's fixed sequential walk-through
+  total: number; // size of the track's active question bank, for progress display
+  correct?: boolean; // whether the *previous* answer (the one this response is replying to) was correct; absent for the first question
 }
 
 export interface DonePayload {
   done: true;
   level: string;
+  levelName: string; // stage name for `level`, e.g. "Elementary" for kids A2 -- see scoring.ts/STAGE_NAMES_BY_TRACK
+  correct?: boolean; // whether the final answer was correct; absent if the session ended without answering (bank pre-exhausted)
 }
 
 export type SessionStep = (QuestionPayload | DonePayload) & { sessionId?: string; track?: string };
@@ -41,10 +50,14 @@ export function startSession(input: StartSessionInput) {
   });
 }
 
-export function submitAnswer(sessionId: string, questionId: string, selectedIndex: number) {
+export function submitAnswer(
+  sessionId: string,
+  questionId: string,
+  answer: { selectedIndex: number } | { answerText: string } | { skip: true }
+) {
   return request<SessionStep>(`/api/session/${sessionId}/answer`, {
     method: 'POST',
-    body: JSON.stringify({ questionId, selectedIndex }),
+    body: JSON.stringify({ questionId, ...answer }),
   });
 }
 

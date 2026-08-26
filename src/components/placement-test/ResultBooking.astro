@@ -17,8 +17,19 @@ const { t, locale, whatsappNumber } = Astro.props;
   data-locale={locale}
   data-message-template={t('placementTest.whatsappMessage')}
 >
-  <h2>{t('placementTest.resultHeading')}: <span id="pt-level"></span></h2>
-  <h3>{t('placementTest.bookingHeading')}</h3>
+  <header class="result-heading">
+    <span class="result-check" aria-hidden="true">✓</span>
+    <div>
+      <p class="result-eyebrow">{t('placementTest.stageResult')}</p>
+      <h2>{t('placementTest.resultHeading')}</h2>
+      <p>{t('placementTest.resultIntro')}</p>
+    </div>
+  </header>
+  <div id="pt-level" class="pt-level"></div>
+  <div class="booking-heading">
+    <span aria-hidden="true">02</span>
+    <h3>{t('placementTest.bookingHeading')}</h3>
+  </div>
   <ul id="pt-slots" class="pt-slots"></ul>
   <a id="pt-whatsapp" class="btn btn-primary" hidden target="_blank" rel="noopener">
     {t('placementTest.whatsappConfirm')}
@@ -43,7 +54,7 @@ const { t, locale, whatsappNumber } = Astro.props;
     studentName = (event as CustomEvent).detail.name;
   });
 
-  async function renderSlots(detail: { sessionId: string; level: string }) {
+  async function renderSlots(detail: { sessionId: string; level: string; levelName?: string }) {
     const { slots } = await listSlots();
     slotsEl.innerHTML = '';
     slots.forEach((slot) => {
@@ -51,7 +62,13 @@ const { t, locale, whatsappNumber } = Astro.props;
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-outline';
-      btn.textContent = new Date(slot.starts_at).toLocaleString();
+      btn.textContent = new Intl.DateTimeFormat(locale, {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+      }).format(new Date(slot.starts_at));
       btn.addEventListener('click', async () => {
         const result = await createBooking(detail.sessionId, slot.id);
         if ('error' in result) {
@@ -61,9 +78,10 @@ const { t, locale, whatsappNumber } = Astro.props;
           await renderSlots(detail);
           return;
         }
+        const levelDisplay = detail.levelName ? `${detail.level} (${detail.levelName})` : detail.level;
         const message = messageTemplate
           .replace('{name}', studentName)
-          .replace('{level}', detail.level)
+          .replace('{level}', levelDisplay)
           .replace('{time}', new Date(slot.starts_at).toLocaleString(locale));
         const text = encodeURIComponent(message);
         waLink.href = `https://wa.me/${whatsappNumber}?text=${text}`;
@@ -77,26 +95,87 @@ const { t, locale, whatsappNumber } = Astro.props;
   document.addEventListener('placement:done', async (event: Event) => {
     const detail = (event as CustomEvent).detail;
     section.hidden = false;
-    levelEl.textContent = detail.level;
+    levelEl.textContent = detail.levelName ? `${detail.level} · ${detail.levelName}` : detail.level;
     await renderSlots(detail);
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 </script>
 
 <style>
   .card {
     display: grid;
-    gap: 1rem;
-    padding: clamp(1.25rem, 3vw, 2rem);
+    gap: 1.5rem;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
     border: 1px solid var(--color-border);
-    border-radius: 1.5rem;
+    border-radius: 1.75rem;
     background: var(--color-bg-raised);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
+    scroll-margin-top: 6rem;
   }
   .card h2,
   .card h3 {
     margin: 0;
     color: var(--color-navy);
   }
+  .result-heading {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: start;
+  }
+  .result-check {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border-radius: 50%;
+    color: #fff;
+    background: #1a7a49;
+    box-shadow: 0 8px 20px rgb(26 122 73 / 0.2);
+    font-size: 1.2rem;
+    font-weight: 900;
+  }
+  .result-eyebrow {
+    margin: 0 0 0.25rem;
+    color: #1a7a49;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .result-heading h2 { margin-bottom: 0.4rem; }
+  .result-heading p:last-child {
+    margin: 0;
+    color: var(--color-ink-muted);
+    font-size: 0.92rem;
+  }
+  .pt-level {
+    display: grid;
+    min-height: 7rem;
+    place-items: center;
+    padding: 1.25rem;
+    border: 1px solid rgb(182 23 51 / 0.18);
+    border-radius: 1.25rem;
+    color: var(--color-primary-text);
+    background: linear-gradient(135deg, rgb(182 23 51 / 0.1), var(--color-bg-raised));
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 6vw, 3rem);
+    font-weight: 800;
+    text-align: center;
+  }
+  .booking-heading {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    padding-top: 0.25rem;
+  }
+  .booking-heading span {
+    color: var(--color-primary-text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .booking-heading h3 { margin: 0; }
   .pt-slots {
     display: grid;
     gap: 0.65rem;
@@ -106,8 +185,12 @@ const { t, locale, whatsappNumber } = Astro.props;
   }
   .pt-slots button {
     width: 100%;
+    min-height: 3.5rem;
+    border-radius: 1rem;
+    background: var(--color-bg-raised);
   }
   #pt-whatsapp {
     justify-content: center;
+    min-height: 3.5rem;
   }
 </style>

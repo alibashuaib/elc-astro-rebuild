@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A TV">
+  <circle cx="120" cy="120" r="112" fill="#E4E7EC"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#5B6472" stroke-width="6"/>
+  <g>
+    <rect x="44" y="70" width="152" height="98" rx="12" fill="#3A2E2A" stroke="#1F1B1A" stroke-width="6"/>
+    <rect x="58" y="84" width="124" height="70" rx="6" fill="#6FD3FF" stroke="#1D4ED8" stroke-width="4"/>
+    <path d="M110 168 L130 168 L138 190 L102 190 Z" fill="#3A2E2A" stroke="#1F1B1A" stroke-width="6" stroke-linejoin="round"/>
+    <rect x="86" y="190" width="68" height="10" rx="5" fill="#1F1B1A"/>
+  </g>
+</svg>

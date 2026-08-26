@@ -32,7 +32,7 @@ architecturally cleaner — a `SameSite=Lax`/`Strict` cookie would work, and the
 1. `npm install`
 2. `npx wrangler d1 create placement-test` — copy the printed `database_id`
    into `wrangler.toml`.
-3. `npm run db:migrate:remote` — creates tables and loads the real 63-question
+3. `npm run db:migrate:remote` — creates tables and loads the real 89-question
    bank (see "Question bank" below). Do **not** run `0003_seed_admin.sql`
    (it isn't a real migration); instead bootstrap the admin account directly:
    ```
@@ -50,32 +50,75 @@ architecturally cleaner — a `SameSite=Lax`/`Strict` cookie would work, and the
 ## Question bank
 
 `migrations/0002_seed_questions.sql` inserts 72 clearly-labeled placeholder
-items (kept for migration history). `migrations/0003_real_questions.sql`
-runs after it and deletes those placeholders, replacing them with the real
-63-question bank sourced from ELC's paper placement tests ("Adult Placement
-Test" and "Kids Placement Test"):
+items (kept for migration history). Three migrations layer real content and
+schema on top of it:
 
-- **Adults (50 questions):** all real content — 40 grammar/situational items
-  plus 10 reading-comprehension items (two short articles, 5 questions each).
-- **Kids (13 questions):** only the parts of the paper test that fit this
-  engine's 4-option multiple-choice format — 8 grammar/vocabulary items plus
-  5 true/false reading-comprehension items. The paper test's handwriting
-  section (write the capital/lowercase letters, fill in missing numbers) and
-  its picture-matching/fill-in-the-blank-with-images section have no digital
-  equivalent in this schema or the `TestRunner.astro` UI, and were
-  intentionally left out — that part of the kids test still needs to be
-  administered on paper, or the schema/UI extended to support those item
-  types (new question types, not just more rows).
+- **`0003_real_questions.sql`** deletes the placeholders and inserts 50 real
+  adult questions (40 grammar/situational + 10 reading-comprehension, from
+  two short articles) plus an initial 13 kids questions (8 grammar/vocab MCQ
+  + 5 true/false reading items) — everything from the paper tests that fit a
+  plain 4-option multiple-choice format.
+- **`0004_add_text_question_type.sql`** adds a `type` ('mcq' | 'text') and
+  `expected_answer` column to `questions`, so the engine can also serve
+  free-text-answer items (handwriting, fill-in-the-blank, counting) — see
+  `src/routes/session.ts`'s `handleAnswer` for the grading branch (exact
+  match after whitespace normalization; deliberately **case-sensitive**,
+  since some items test capitalization itself) and `TestRunner.astro` for the
+  text-input UI. `responses.answer_text` stores what was typed;
+  `responses.selected_index` stores the documented `-1` sentinel for those
+  rows since it's still `NOT NULL` for mcq-row backward compatibility.
+- **`0005_kids_text_and_vocab_questions.sql`** replaces the kids bank (adults
+  untouched) with 39 questions: the original 13 plus 6 capital-letter + 6
+  lowercase-letter handwriting items, 4 missing-number counting items, 5
+  room-vocabulary fill-in-the-blank items, and 5 vocab sentence-completion
+  items (previously missed in 0003) — all `type: 'text'`. The vocab items are
+  `text`, not `mcq`: the source is one shared 5-word bank (climbing, flying,
+  playing, riding, throwing) across all 5 sentences, not a 4-option MCQ per
+  sentence — forcing it into 4 options would mean inventing a distractor
+  that isn't in the source, so the full word bank is shown in the prompt and
+  the student types the word instead.
 
-**CEFR levels are an approximation.** Neither paper test tags its questions
-with a level — 0003 assigns A1–C2 by each question's position in the source
-document (paper placement tests are conventionally ordered easiest-to-hardest),
-split into roughly even buckets. Review the level assignments in
-`0003_real_questions.sql` before relying on them pedagogically; adjust with
+**Still out of scope:** the kids paper test's picture-matching section
+(match Book/Pen/Car/Tree/Apple to pictures) has no digital equivalent
+without the source images, which weren't brought into this schema/UI. That
+part of the kids test still needs to be administered on paper, or the
+schema extended with image asset support.
+
+- **`0006_fixed_sequential_order.sql`** adds a `sequence` column and switches
+  the engine from adaptive CEFR-level-jumping to a fixed, sequential
+  walk-through per track, matching the exact question order in the source
+  paper tests. `src/db.ts`'s `pickNextQuestion` now serves `ORDER BY
+  sequence ASC` per track, ignoring `level` entirely for selection --
+  `level` is kept only as descriptive metadata (and still drives the
+  session's own CEFR-style scoring/estimated-level output in `scoring.ts`,
+  which is otherwise unchanged).
+- **`0007_elc_level_ladders.sql`** relabels `questions.level` (and
+  `scoring.ts`'s `LEVELS_BY_TRACK`) from the generic 6-tier CEFR scale
+  (A1-C2) to ELC's own level ladders, sourced from the "Adults Structure"
+  and "General English for Kids" curricular-structure diagrams -- neither
+  track actually spans A1-C2 in ELC's real curriculum:
+  - **adults:** A0, A1, A2, B1, B2, C1 (no C2)
+  - **kids:** -A1, A1, A1+, A2, A2+, B1 (only reaches B1, with an extra
+    sub-level between A1 and A2, matching Super Minds 1-6 / Cambridge YLE)
+
+  Same bucket assignment/order as 0003/0005 (position-based, see below) --
+  only the label per bucket changes, not which questions are in which
+  bucket. This required rebuilding the `questions` table (SQLite can't
+  ALTER an existing CHECK constraint), with the relabel done inline in the
+  rebuild's `INSERT ... SELECT` rather than as a separate pass, since
+  neither the old nor the new CHECK constraint allows both label sets at
+  once.
+
+**CEFR/ELC levels are an approximation.** Neither paper test tags its
+questions with a level — 0003 and 0005 assign levels by each question's
+position in the source document (paper placement tests are conventionally
+ordered easiest-to-hardest), split into roughly even buckets, then 0007
+relabels those buckets to ELC's real level names. Review the level
+assignments before relying on them pedagogically; adjust with
 `UPDATE questions SET level = ... WHERE id = ...` or a follow-up migration.
 
 To add more questions later, either use the admin page's question form
-(Task 10) or write a new SQL migration file the same way as 0003.
+(mcq only for now) or write a new SQL migration file the same way as 0003/0005.
 
 ## Local development
 

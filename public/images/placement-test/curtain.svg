@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A curtain">
+  <circle cx="120" cy="120" r="112" fill="#F1E4FF"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#9B6BFF" stroke-width="6"/>
+  <g>
+    <rect x="56" y="56" width="128" height="10" rx="5" fill="#6B4FA0" stroke="#4B2E85" stroke-width="4"/>
+    <path d="M62 66 C58 110 66 150 60 190 L84 190 C80 150 88 110 84 66 Z" fill="#B98CFF" stroke="#7A4FCC" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M92 66 C88 112 96 148 90 190 L114 190 C110 148 118 112 114 66 Z" fill="#C7A2FF" stroke="#7A4FCC" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M126 66 C122 112 130 148 124 190 L148 190 C144 148 152 112 148 66 Z" fill="#C7A2FF" stroke="#7A4FCC" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M156 66 C152 110 160 150 154 190 L178 190 C174 150 182 110 178 66 Z" fill="#B98CFF" stroke="#7A4FCC" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+</svg>

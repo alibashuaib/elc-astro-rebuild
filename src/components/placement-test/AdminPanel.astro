@@ -50,14 +50,7 @@
       </label>
       <label>
         Level
-        <select id="question-level" required>
-          <option value="A1">A1</option>
-          <option value="A2">A2</option>
-          <option value="B1">B1</option>
-          <option value="B2">B2</option>
-          <option value="C1">C1</option>
-          <option value="C2">C2</option>
-        </select>
+        <select id="question-level" required></select>
       </label>
       <label>
         Prompt
@@ -188,6 +181,23 @@
     });
     await loadAll();
   });
+
+  // ELC's own level ladders (see scoring.ts/LEVELS_BY_TRACK in placement-test-worker
+  // and the "Adults Structure" / "General English for Kids" curricular-structure
+  // diagrams) -- not the generic CEFR A1-C2 scale. Adults top out at C1 (no C2);
+  // kids only reach B1, with an extra sub-level between A1 and A2.
+  const LEVELS_BY_TRACK: Record<string, string[]> = {
+    adults: ['A0', 'A1', 'A2', 'B1', 'B2', 'C1'],
+    kids: ['-A1', 'A1', 'A1+', 'A2', 'A2+', 'B1'],
+  };
+  const trackSelect = document.getElementById('question-track') as HTMLSelectElement;
+  const levelSelect = document.getElementById('question-level') as HTMLSelectElement;
+  function refreshLevelOptions() {
+    const levels = LEVELS_BY_TRACK[trackSelect.value] ?? [];
+    levelSelect.innerHTML = levels.map((l) => `<option value="${l}">${l}</option>`).join('');
+  }
+  trackSelect.addEventListener('change', refreshLevelOptions);
+  refreshLevelOptions();
 
   document.getElementById('question-form')!.addEventListener('submit', async (e) => {
     e.preventDefault();

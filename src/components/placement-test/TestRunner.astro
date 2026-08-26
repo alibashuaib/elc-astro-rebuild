@@ -13,11 +13,35 @@ const { t } = Astro.props;
   hidden
   data-question-label={t('placementTest.questionOf')}
   data-answer-error={t('placementTest.answerError')}
+  data-answer-submit={t('placementTest.answerSubmit')}
+  data-answer-placeholder={t('placementTest.answerPlaceholder')}
+  data-reading-passage={t('placementTest.readingPassage')}
+  data-correct={t('placementTest.correct')}
+  data-incorrect={t('placementTest.incorrect')}
+  data-skip={t('placementTest.skip')}
 >
+  <header class="runner-heading">
+    <div>
+      <p class="runner-eyebrow">{t('placementTest.stageQuestions')}</p>
+      <h2>{t('placementTest.runnerHeading')}</h2>
+      <p class="runner-intro">{t('placementTest.runnerIntro')}</p>
+    </div>
+    <span id="pt-progress-percent" class="pt-progress-percent numeric">0%</span>
+  </header>
   <p id="pt-progress" class="pt-progress"></p>
+  <div id="pt-progress-track" class="pt-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div id="pt-progress-fill" class="pt-progress-fill"></div>
+  </div>
+  <details id="pt-passage" class="pt-passage" hidden>
+    <summary id="pt-passage-title" class="pt-passage-title"></summary>
+    <p id="pt-passage-body" class="pt-passage-body"></p>
+  </details>
+  <img id="pt-image" class="pt-image" alt="" hidden />
   <p id="pt-prompt" class="pt-prompt"></p>
   <div id="pt-options" class="pt-options"></div>
-  <p id="pt-error" class="pt-error" hidden></p>
+  <button type="button" id="pt-skip" class="pt-skip-btn"></button>
+  <p id="pt-feedback" class="pt-feedback" role="status" aria-live="polite" hidden></p>
+  <p id="pt-error" class="pt-error" role="alert" hidden></p>
 </section>
 
 <script>
@@ -26,76 +50,324 @@ const { t } = Astro.props;
 
   const runner = document.getElementById('placement-test-runner') as HTMLElement;
   const progressEl = document.getElementById('pt-progress') as HTMLElement;
+  const progressTrackEl = document.getElementById('pt-progress-track') as HTMLElement;
+  const progressFillEl = document.getElementById('pt-progress-fill') as HTMLElement;
+  const progressPercentEl = document.getElementById('pt-progress-percent') as HTMLElement;
+  const passageEl = document.getElementById('pt-passage') as HTMLDetailsElement;
+  const passageTitleEl = document.getElementById('pt-passage-title') as HTMLElement;
+  const passageBodyEl = document.getElementById('pt-passage-body') as HTMLElement;
+  const imageEl = document.getElementById('pt-image') as HTMLImageElement;
   const promptEl = document.getElementById('pt-prompt') as HTMLElement;
   const optionsEl = document.getElementById('pt-options') as HTMLElement;
+  const feedbackEl = document.getElementById('pt-feedback') as HTMLElement;
   const errorEl = document.getElementById('pt-error') as HTMLElement;
+  const skipBtn = document.getElementById('pt-skip') as HTMLButtonElement;
+  // Astro scopes component CSS with a generated data attribute. Controls in
+  // this component are created at runtime, so copy that attribute onto every
+  // generated element or the compiled selectors will not match them.
+  const scopeAttribute = Array.from(runner.attributes).find((attribute) =>
+    attribute.name.startsWith('data-astro-cid-')
+  )?.name;
+  function scopeElements(...elements: HTMLElement[]) {
+    if (!scopeAttribute) return;
+    elements.forEach((element) => element.setAttribute(scopeAttribute, ''));
+  }
   const questionLabel = runner.dataset.questionLabel ?? '';
   const answerErrorText = runner.dataset.answerError ?? '';
+  const answerSubmitText = runner.dataset.answerSubmit ?? 'Submit';
+  const answerPlaceholderText = runner.dataset.answerPlaceholder ?? 'Type your answer here';
+  const readingPassageLabel = runner.dataset.readingPassage ?? 'Reading passage';
+  const correctText = runner.dataset.correct ?? 'Correct!';
+  const incorrectText = runner.dataset.incorrect ?? 'Incorrect';
+  skipBtn.textContent = runner.dataset.skip ?? "I don't understand — skip";
+  // How long the correct/incorrect feedback stays on screen before the next
+  // question loads -- long enough to register, short enough not to feel like
+  // a stall between questions.
+  const FEEDBACK_DELAY_MS = 1100;
   let sessionId = '';
-  let questionNum = 0;
+  let lastPassageId = '';
 
-  function renderQuestion(step: QuestionPayload) {
-    questionNum++;
-    progressEl.textContent = `${questionLabel} ${questionNum}`;
-    promptEl.textContent = step.prompt;
-    optionsEl.innerHTML = '';
+  function setProgress(questionNumber: number, total: number) {
+    progressEl.textContent = total > 0 ? `${questionLabel} ${questionNumber} / ${total}` : `${questionLabel} ${questionNumber}`;
+    const pct = total > 0 ? Math.min(100, Math.round((questionNumber / total) * 100)) : 0;
+    progressFillEl.style.width = `${pct}%`;
+    progressPercentEl.textContent = `${pct}%`;
+    progressTrackEl.setAttribute('aria-valuenow', String(pct));
+  }
+
+  function showFeedback(correct: boolean | undefined, selectedEl: HTMLElement | null) {
+    if (correct === undefined) {
+      feedbackEl.hidden = true;
+      return;
+    }
+    feedbackEl.hidden = false;
+    feedbackEl.textContent = correct ? correctText : incorrectText;
+    feedbackEl.className = `pt-feedback ${correct ? 'pt-feedback-correct' : 'pt-feedback-incorrect'}`;
+    selectedEl?.classList.add(correct ? 'pt-selected-correct' : 'pt-selected-incorrect');
+  }
+
+  async function handleSubmit(
+    step: QuestionPayload,
+    answer: { selectedIndex: number } | { answerText: string } | { skip: true },
+    disabledEls: Array<HTMLButtonElement | HTMLInputElement>,
+    selectedEl: HTMLElement | null
+  ) {
+    disabledEls.forEach((el) => (el.disabled = true));
+    skipBtn.disabled = true;
     errorEl.hidden = true;
-    step.options.forEach((opt: string, idx: number) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn btn-outline';
-      btn.textContent = opt;
-      btn.addEventListener('click', async () => {
-        const buttons = Array.from(optionsEl.querySelectorAll('button'));
-        buttons.forEach((b) => (b.disabled = true));
-        errorEl.hidden = true;
-        try {
-          const next = await submitAnswer(sessionId, step.questionId, idx);
+    try {
+      const next = await submitAnswer(sessionId, step.questionId, answer);
+      showFeedback(next.correct, selectedEl);
+      window.setTimeout(
+        () => {
           if (next.done) {
-            document.dispatchEvent(
-              new CustomEvent('placement:done', { detail: { level: next.level, sessionId } })
-            );
+            progressFillEl.style.width = '100%';
+            document.dispatchEvent(new CustomEvent('placement:done', { detail: { level: next.level, levelName: next.levelName, sessionId } }));
             runner.hidden = true;
           } else {
             renderQuestion(next);
           }
-        } catch {
-          // Network/API failure mid-test: re-enable the buttons and show an inline error
-          // instead of leaving a frozen, unresponsive question card.
-          errorEl.textContent = answerErrorText;
-          errorEl.hidden = false;
-          buttons.forEach((b) => (b.disabled = false));
-        }
+        },
+        next.correct === undefined ? 0 : FEEDBACK_DELAY_MS
+      );
+    } catch {
+      // Network/API failure mid-test: re-enable the inputs and show an inline error
+      // instead of leaving a frozen, unresponsive question card.
+      errorEl.textContent = answerErrorText;
+      errorEl.hidden = false;
+      disabledEls.forEach((el) => (el.disabled = false));
+      skipBtn.disabled = false;
+    }
+  }
+
+  function renderQuestion(step: QuestionPayload) {
+    setProgress(step.questionNumber, step.total);
+    feedbackEl.hidden = true;
+    skipBtn.disabled = false;
+    // Re-bound each render (rather than once) so the closure always skips
+    // *this* question's id and disables *this* question's currently-rendered
+    // inputs, whatever type they are.
+    skipBtn.onclick = () => {
+      const inputEls = Array.from(optionsEl.querySelectorAll('button, input')) as Array<HTMLButtonElement | HTMLInputElement>;
+      handleSubmit(step, { skip: true }, inputEls, null);
+    };
+
+    if (step.passage) {
+      passageEl.hidden = false;
+      passageTitleEl.textContent = `${readingPassageLabel}: ${step.passage.title}`;
+      passageBodyEl.textContent = step.passage.body;
+      // Auto-expand only the first question of a new passage; once the student has
+      // opened or closed it, later questions sharing that same passage leave the
+      // <details> state alone instead of forcing it back open every render.
+      if (step.passage.id !== lastPassageId) {
+        passageEl.open = true;
+        lastPassageId = step.passage.id;
+      }
+    } else {
+      passageEl.hidden = true;
+      lastPassageId = '';
+    }
+
+    if (step.imageUrl) {
+      imageEl.src = step.imageUrl;
+      imageEl.hidden = false;
+    } else {
+      imageEl.hidden = true;
+      imageEl.removeAttribute('src');
+    }
+    promptEl.textContent = step.prompt;
+    optionsEl.innerHTML = '';
+    errorEl.hidden = true;
+
+    if (step.type === 'text') {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'pt-text-input';
+      input.placeholder = answerPlaceholderText;
+      input.setAttribute('aria-label', answerPlaceholderText);
+      input.autocomplete = 'off';
+      input.autocapitalize = 'off';
+      input.spellcheck = false;
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'button';
+      submitBtn.className = 'pt-text-submit';
+      const submitLabel = document.createElement('span');
+      submitLabel.textContent = answerSubmitText;
+      const submitIcon = document.createElement('span');
+      submitIcon.className = 'pt-text-submit-icon';
+      submitIcon.setAttribute('aria-hidden', 'true');
+      submitIcon.textContent = '↗';
+      submitBtn.appendChild(submitLabel);
+      submitBtn.appendChild(submitIcon);
+      submitBtn.addEventListener('click', () => {
+        if (!input.value.trim()) return;
+        handleSubmit(step, { answerText: input.value }, [input, submitBtn], input);
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitBtn.click();
+      });
+      const textAnswer = document.createElement('div');
+      textAnswer.className = 'pt-text-answer';
+      textAnswer.appendChild(input);
+      textAnswer.appendChild(submitBtn);
+      scopeElements(input, submitBtn, submitLabel, submitIcon, textAnswer);
+      optionsEl.appendChild(textAnswer);
+      input.focus();
+      return;
+    }
+
+    const options = step.options ?? [];
+    // True/false reading-comprehension items are still plain 2-option mcq rows
+    // in the DB (grading is identical to any other mcq), but they read better
+    // as a distinct True/False choice than as a vertical 4-option-style list.
+    const isTrueFalse = options.length === 2 && options[0] === 'True' && options[1] === 'False';
+
+    if (isTrueFalse) {
+      optionsEl.classList.add('pt-options-tf');
+      const trueBtn = makeTrueFalseButton('true', 0, step);
+      const falseBtn = makeTrueFalseButton('false', 1, step);
+      optionsEl.appendChild(trueBtn);
+      optionsEl.appendChild(falseBtn);
+      return;
+    }
+    optionsEl.classList.remove('pt-options-tf');
+
+    options.forEach((opt: string, idx: number) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pt-option-btn';
+      const key = document.createElement('span');
+      key.className = 'pt-option-key';
+      key.setAttribute('aria-hidden', 'true');
+      key.textContent = String(idx + 1).padStart(2, '0');
+      const label = document.createElement('span');
+      label.className = 'pt-option-label';
+      label.textContent = opt;
+      btn.appendChild(key);
+      btn.appendChild(label);
+      scopeElements(btn, key, label);
+      btn.addEventListener('click', () => {
+        const buttons = Array.from(optionsEl.querySelectorAll('button')) as HTMLButtonElement[];
+        handleSubmit(step, { selectedIndex: idx }, buttons, btn);
       });
       optionsEl.appendChild(btn);
     });
   }
 
+  function makeTrueFalseButton(kind: 'true' | 'false', idx: number, step: QuestionPayload): HTMLButtonElement {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `pt-tf-btn pt-tf-${kind}`;
+    const icon = document.createElement('span');
+    icon.className = 'pt-tf-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = kind === 'true' ? '✓' : '✕';
+    const label = document.createElement('span');
+    label.textContent = kind === 'true' ? 'True' : 'False';
+    btn.appendChild(icon);
+    btn.appendChild(label);
+    scopeElements(btn, icon, label);
+    btn.addEventListener('click', () => {
+      const buttons = Array.from(optionsEl.querySelectorAll('button')) as HTMLButtonElement[];
+      handleSubmit(step, { selectedIndex: idx }, buttons, btn);
+    });
+    return btn;
+  }
+
   document.addEventListener('placement:register', async (event: Event) => {
     const detail = (event as CustomEvent).detail;
-    const step = await startSession(detail);
+    const registrationError = document.getElementById('placement-registration-error') as HTMLElement | null;
+    if (registrationError) registrationError.hidden = true;
+    let step;
+    try {
+      step = await startSession(detail);
+    } catch {
+      if (registrationError) registrationError.hidden = false;
+      return;
+    }
     sessionId = step.sessionId;
+    const registration = document.getElementById('placement-registration') as HTMLFormElement | null;
+    if (registration) registration.hidden = true;
     runner.hidden = false;
+    document.dispatchEvent(new CustomEvent('placement:started'));
     if (step.done) {
       document.dispatchEvent(
-        new CustomEvent('placement:done', { detail: { level: step.level, sessionId } })
+        new CustomEvent('placement:done', { detail: { level: step.level, levelName: step.levelName, sessionId } })
       );
       runner.hidden = true;
       return;
     }
     renderQuestion(step);
+    runner.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
+
+  // Local-only visual harness for checking dynamically generated question
+  // controls without creating test records. Vite removes this branch from
+  // production builds because import.meta.env.DEV is false there.
+  if (import.meta.env.DEV) {
+    const previewType = new URLSearchParams(window.location.search).get('preview-question');
+    if (previewType === 'mcq' || previewType === 'text') {
+      const registration = document.getElementById('placement-registration') as HTMLFormElement | null;
+      if (registration) registration.hidden = true;
+      runner.hidden = false;
+      document.dispatchEvent(new CustomEvent('placement:started'));
+      renderQuestion({
+        done: false,
+        questionId: 'visual-preview',
+        type: previewType,
+        prompt: previewType === 'mcq' ? 'Choose the answer that completes the sentence.' : 'Write the missing word.',
+        options: previewType === 'mcq' ? ['I work every weekday.', 'I have other plans.', 'I am going to the park.', 'Nothing special.'] : undefined,
+        questionNumber: 3,
+        total: 12,
+      });
+    }
+  }
 </script>
 
 <style>
   .card {
     display: grid;
-    gap: 1rem;
-    padding: clamp(1.25rem, 3vw, 2rem);
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
     border: 1px solid var(--color-border);
-    border-radius: 1.5rem;
+    border-radius: 1.75rem;
     background: var(--color-bg-raised);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
+    scroll-margin-top: 6rem;
+  }
+  .runner-heading {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+    justify-content: space-between;
+  }
+  .runner-eyebrow {
+    margin: 0 0 0.25rem;
+    color: var(--color-primary-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .runner-heading h2 {
+    margin: 0 0 0.45rem;
+    color: var(--color-navy);
+    font-size: clamp(1.45rem, 4vw, 2rem);
+  }
+  .runner-intro {
+    max-width: 37rem;
+    margin: 0;
+    color: var(--color-ink-muted);
+    font-size: 0.9rem;
+  }
+  .pt-progress-percent {
+    flex: 0 0 auto;
+    padding: 0.45rem 0.7rem;
+    border-radius: 999px;
+    color: var(--color-primary-text);
+    background: rgb(182 23 51 / 0.1);
+    font-size: 0.8rem;
+    font-weight: 700;
   }
   .pt-progress {
     margin: 0;
@@ -105,21 +377,365 @@ const { t } = Astro.props;
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
+  .pt-progress-track {
+    height: 0.55rem;
+    border-radius: 999px;
+    background: var(--color-surface-soft);
+    overflow: hidden;
+  }
+  .pt-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: var(--color-primary);
+    transition: width var(--motion-fast) var(--ease);
+  }
+  .pt-skip-btn {
+    justify-self: start;
+    padding: 0.35rem 0;
+    border: none;
+    background: none;
+    color: var(--color-ink-muted);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .pt-skip-btn:hover:not(:disabled) {
+    color: var(--color-ink);
+  }
+  .pt-skip-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .pt-feedback {
+    margin: 0;
+    padding: 0.6rem 0.9rem;
+    border-radius: 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .pt-feedback-correct {
+    background: rgb(34 139 87 / 0.12);
+    color: #1a7a49;
+  }
+  .pt-feedback-incorrect {
+    background: rgb(182 23 51 / 0.1);
+    color: var(--color-primary-text);
+  }
+  .pt-selected-correct {
+    border-color: transparent !important;
+    background: rgb(34 139 87 / 0.1) !important;
+    box-shadow: inset 0 0 0 2px #1a7a49, 0 12px 28px rgb(34 139 87 / 0.14) !important;
+  }
+  .pt-selected-incorrect {
+    border-color: transparent !important;
+    background: rgb(182 23 51 / 0.08) !important;
+    box-shadow: inset 0 0 0 2px var(--color-primary), 0 12px 28px rgb(182 23 51 / 0.12) !important;
+  }
+  .pt-passage {
+    border: 1px solid var(--color-border);
+    border-inline-start: 4px solid var(--color-coral);
+    border-radius: 1rem;
+    background: rgb(246 173 67 / 0.08);
+    padding: 0.85rem 1rem;
+  }
+  .pt-passage-title {
+    cursor: pointer;
+    margin: 0;
+    color: var(--color-navy);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  .pt-passage-body {
+    margin: 0.65rem 0 0;
+    max-height: 14rem;
+    overflow-y: auto;
+    color: var(--color-ink);
+    font-size: 0.9rem;
+    line-height: 1.55;
+    white-space: pre-line;
+  }
+  .pt-image {
+    justify-self: center;
+    width: min(100%, 18rem);
+    height: auto;
+    max-height: 15rem;
+    object-fit: contain;
+    border-radius: 1.25rem;
+    box-shadow: var(--shadow-sm);
+  }
   .pt-prompt {
     margin: 0;
     color: var(--color-navy);
-    font-size: 1.15rem;
+    padding-top: 0.35rem;
+    font-size: clamp(1.15rem, 3vw, 1.4rem);
     font-weight: 700;
     line-height: 1.5;
   }
   .pt-options {
     display: grid;
-    gap: 0.65rem;
+    gap: 0.8rem;
+  }
+  .pt-option-btn {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    min-height: 4.35rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 1.15rem;
+    color: var(--color-ink);
+    background: linear-gradient(135deg, var(--color-bg-raised), rgb(182 23 51 / 0.025));
+    box-shadow: inset 0 0 0 1px var(--color-border), 0 5px 16px rgb(49 43 40 / 0.045);
+    font: inherit;
+    font-weight: 700;
+    text-align: start;
+    cursor: pointer;
+    transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease),
+      background var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
+  }
+  .pt-option-btn::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--color-coral), var(--color-primary));
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform var(--motion-fast) var(--ease);
+  }
+  .pt-option-btn::after {
+    content: '';
+    width: 1.2rem;
+    height: 1.2rem;
+    border: 2px solid var(--color-border-strong);
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 4px var(--color-bg-raised);
+    background: transparent;
+    transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
+      transform var(--motion-fast) var(--ease);
+  }
+  .pt-option-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    background: linear-gradient(135deg, var(--color-bg-raised), rgb(182 23 51 / 0.065));
+    box-shadow: inset 0 0 0 1px rgb(182 23 51 / 0.42), 0 14px 30px rgb(49 43 40 / 0.1);
+  }
+  .pt-option-btn:hover:not(:disabled)::before { transform: scaleY(1); }
+  .pt-option-btn:hover:not(:disabled)::after {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    transform: scale(1.08);
+  }
+  .pt-option-btn:active:not(:disabled) { transform: translateY(0) scale(0.995); }
+  .pt-option-btn:focus-visible {
+    outline: 3px solid rgb(182 23 51 / 0.2);
+    outline-offset: 3px;
+  }
+  .pt-option-btn:disabled { cursor: default; }
+  .pt-option-btn:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect) { opacity: 0.52; }
+  .pt-option-key {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    color: var(--color-ink-muted);
+    background: transparent;
+    box-shadow: none;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 700;
+    direction: ltr;
+    transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
+      box-shadow var(--motion-fast) var(--ease);
+  }
+  .pt-option-label { line-height: 1.45; }
+  .pt-option-btn:hover:not(:disabled) .pt-option-key {
+    color: #fff;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    box-shadow: 0 6px 14px rgb(182 23 51 / 0.2);
+  }
+  .pt-option-btn.pt-selected-correct::before,
+  .pt-option-btn.pt-selected-incorrect::before { transform: scaleY(1); }
+  .pt-option-btn.pt-selected-correct::after {
+    content: '✓';
+    display: grid;
+    place-items: center;
+    border-color: #1a7a49;
+    color: #fff;
+    background: #1a7a49;
+    box-shadow: none;
+    font-size: 0.75rem;
+    font-weight: 900;
+  }
+  .pt-option-btn.pt-selected-incorrect::after {
+    content: '×';
+    display: grid;
+    place-items: center;
+    border-color: var(--color-primary);
+    color: #fff;
+    background: var(--color-primary);
+    box-shadow: none;
+    font-size: 0.9rem;
+    font-weight: 900;
+  }
+  .pt-option-btn.pt-selected-correct .pt-option-key {
+    color: #fff;
+    background: #1a7a49;
+    border-color: #1a7a49;
+    box-shadow: 0 7px 16px rgb(34 139 87 / 0.2);
+  }
+  .pt-option-btn.pt-selected-incorrect .pt-option-key {
+    color: #fff;
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    box-shadow: 0 7px 16px rgb(182 23 51 / 0.2);
   }
   .pt-error {
     margin: 0;
     color: var(--color-primary);
     font-size: 0.9rem;
     font-weight: 700;
+  }
+  .pt-text-input {
+    min-width: 0;
+    width: 100%;
+    min-height: 3.75rem;
+    padding: 0.85rem 1rem;
+    border: 0;
+    border-radius: 0;
+    color: var(--color-ink);
+    background: transparent;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    outline: none;
+  }
+  .pt-text-input::placeholder {
+    color: var(--color-ink-muted);
+    font-weight: 500;
+    opacity: 0.72;
+  }
+  .pt-text-answer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.35rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 1.2rem;
+    background: linear-gradient(135deg, var(--color-bg-raised), rgb(182 23 51 / 0.025));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 8px 24px rgb(49 43 40 / 0.06);
+    transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease),
+      background var(--motion-fast) var(--ease);
+  }
+  .pt-text-answer:focus-within {
+    border-color: var(--color-primary);
+    background: var(--color-bg-raised);
+    box-shadow: 0 0 0 4px rgb(182 23 51 / 0.1), 0 12px 28px rgb(49 43 40 / 0.08);
+  }
+  .pt-text-submit {
+    display: inline-flex;
+    gap: 0.65rem;
+    align-items: center;
+    min-height: 3.25rem;
+    padding-block: 0.65rem;
+    padding-inline: 1.1rem 0.75rem;
+    border: 0;
+    border-radius: 0.95rem;
+    color: #fff;
+    background: var(--color-primary);
+    box-shadow: 0 8px 20px rgb(182 23 51 / 0.2);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 750;
+    cursor: pointer;
+    transition: transform var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
+      box-shadow var(--motion-fast) var(--ease);
+  }
+  .pt-text-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    background: var(--color-primary-deep);
+    box-shadow: 0 11px 24px rgb(182 23 51 / 0.26);
+  }
+  .pt-text-submit:active:not(:disabled) { transform: translateY(0); }
+  .pt-text-submit:disabled { opacity: 0.6; cursor: default; }
+  .pt-text-submit-icon {
+    display: grid;
+    width: 1.75rem;
+    height: 1.75rem;
+    place-items: center;
+    border-radius: 0.6rem;
+    color: var(--color-primary-deep);
+    background: #fff;
+    font-size: 0.9rem;
+    font-weight: 900;
+  }
+  .pt-options-tf {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pt-tf-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 4rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    background: var(--color-bg-raised);
+    color: var(--color-ink);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
+      color var(--motion-fast) var(--ease);
+  }
+  .pt-tf-icon {
+    display: inline-flex;
+    width: 1.6rem;
+    height: 1.6rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .pt-tf-true .pt-tf-icon {
+    background: rgb(34 139 87 / 0.14);
+    color: #1a7a49;
+  }
+  .pt-tf-false .pt-tf-icon {
+    background: rgb(182 23 51 / 0.1);
+    color: var(--color-primary-text);
+  }
+  .pt-tf-btn:hover:not(:disabled) {
+    border-color: var(--color-primary);
+  }
+  .pt-tf-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  @media (max-width: 520px) {
+    .runner-heading { display: grid; }
+    .pt-progress-percent { justify-self: start; }
+    .pt-options-tf { grid-template-columns: 1fr; }
+    .pt-text-answer {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+      padding: 0.45rem;
+    }
+    .pt-text-submit { justify-content: center; padding-inline: 1rem 0.75rem; }
   }
 </style>

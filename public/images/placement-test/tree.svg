@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A tree">
+  <circle cx="120" cy="120" r="112" fill="#FFF3C4"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#FFB100" stroke-width="6"/>
+  <rect x="106" y="140" width="28" height="50" rx="8" fill="#B9834A" stroke="#7A4B23" stroke-width="6"/>
+  <circle cx="120" cy="98" r="58" fill="#7BC950" stroke="#2E7D32" stroke-width="6"/>
+  <circle cx="76" cy="122" r="38" fill="#8FDB63" stroke="#2E7D32" stroke-width="6"/>
+  <circle cx="164" cy="122" r="38" fill="#8FDB63" stroke="#2E7D32" stroke-width="6"/>
+  <circle cx="100" cy="88" r="9" fill="#FF6B6B"/>
+  <circle cx="142" cy="104" r="9" fill="#FF6B6B"/>
+  <circle cx="118" cy="132" r="9" fill="#FF6B6B"/>
+</svg>

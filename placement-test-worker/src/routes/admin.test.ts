@@ -11,6 +11,9 @@ function makeEnv() {
     DB: createFakeD1([
       path.join(__dirname, '../../migrations/0001_init.sql'),
       path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
+      path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
+      path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
+      path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
     ]),
     ADMIN_SESSION_TTL_SECONDS: '43200',
     ADMIN_COOKIE_SECRET: 'test-secret-do-not-use-in-prod',
