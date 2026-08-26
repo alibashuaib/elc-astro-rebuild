@@ -8,6 +8,9 @@ function makeEnv() {
     DB: createFakeD1([
       path.join(__dirname, '../../migrations/0001_init.sql'),
       path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
+      path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
+      path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
+      path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
     ]),
     ADMIN_SESSION_TTL_SECONDS: '43200',
     ADMIN_COOKIE_SECRET: 'test-secret',
@@ -33,9 +36,41 @@ describe('session routes', () => {
     expect(data.prompt).toBeDefined();
   });
 
-  it('completes after 25 questions and returns a final level', async () => {
+  it('honors an explicit track override even when it contradicts the DOB-derived track', async () => {
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'Sam',
+        phone: '+966500000000',
+        dob: '1995-01-01', // would compute to 'adults'
+        locale: 'en',
+        track: 'kids',
+      }),
+    });
+    const res = await handleStartSession(req, env as any);
+    const data = (await res.json()) as any;
+    expect(data.track).toBe('kids');
+  });
+
+  it('falls back to the DOB-derived track when track is omitted or invalid', async () => {
+    const res = await handleStartSession(
+      new Request('http://x/api/session', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en', track: 'not-a-real-track' }),
+      }),
+      env as any
+    );
+    const data = (await res.json()) as any;
+    expect(data.track).toBe('adults');
+  });
+
+  it('walks the whole seeded adults bank (no early stop via scoring convergence) and returns a final level', async () => {
     // Seeded questions all have correct_index: 1 (see migrations/0002_seed_questions.sql),
-    // so always answering index 1 is always correct.
+    // so always answering index 1 is always correct. The session only ends once
+    // pickNextQuestion runs out of unasked questions (see session.ts's
+    // nextQuestionPayload) -- scoring.ts's isDone is just a generous safety cap now,
+    // not an early-exit (see its comment: "kids placement test missing the rest of
+    // the questions" was the bug this replaced).
     const startRes = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
@@ -46,7 +81,7 @@ describe('session routes', () => {
     let data = (await startRes.json()) as any;
     const sessionId = data.sessionId;
     let rounds = 0;
-    while (!data.done && rounds < 30) {
+    while (!data.done && rounds < 80) {
       const res = await handleAnswer(
         new Request('http://x', {
           method: 'POST',
@@ -59,7 +94,115 @@ describe('session routes', () => {
       rounds++;
     }
     expect(data.done).toBe(true);
-    expect(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']).toContain(data.level);
-    expect(rounds).toBeLessThanOrEqual(25);
+    expect(['A0', 'A1', 'A2', 'B1', 'B2', 'C1']).toContain(data.level); // adults' ladder -- see scoring.ts/LEVELS_BY_TRACK
+    expect(rounds).toBe(36); // the seeded bank's adults half (72 rows split evenly by track), not an early convergence stop
+  });
+});
+
+describe('text-type question grading', () => {
+  function makeTextEnv() {
+    return {
+      DB: createFakeD1([
+        path.join(__dirname, '../../migrations/0001_init.sql'),
+        path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
+        path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
+        path.join(__dirname, '../../migrations/0005_kids_text_and_vocab_questions.sql'),
+        path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
+      path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
+      ]),
+      ADMIN_SESSION_TTL_SECONDS: '43200',
+      ADMIN_COOKIE_SECRET: 'test-secret',
+    };
+  }
+
+  // kids-A1-1 is the handwriting item "Write the capital letter for \"a\"."
+  // with expected_answer 'A' -- see migrations/0005_kids_text_and_vocab_questions.sql.
+  const KNOWN_TEXT_QUESTION_ID = 'kids-A1-1';
+
+  async function startKidsSession(env: ReturnType<typeof makeTextEnv>, phone: string) {
+    const startRes = await handleStartSession(
+      new Request('http://x/api/session', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Kid', phone, dob: '2018-01-01', locale: 'en', track: 'kids' }),
+      }),
+      env as any
+    );
+    return ((await startRes.json()) as any).sessionId as string;
+  }
+
+  async function currentLevelIndex(env: ReturnType<typeof makeTextEnv>, sessionId: string): Promise<number> {
+    const row = await env.DB.prepare(`SELECT current_level_index FROM test_sessions WHERE id = ?`)
+      .bind(sessionId)
+      .first<{ current_level_index: number }>();
+    return row!.current_level_index;
+  }
+
+  it('grades an exact-match text answer as correct (level index moves up)', async () => {
+    const env = makeTextEnv();
+    const sessionId = await startKidsSession(env, '+966500000000');
+    const before = await currentLevelIndex(env, sessionId);
+    await handleAnswer(
+      new Request('http://x', {
+        method: 'POST',
+        body: JSON.stringify({ questionId: KNOWN_TEXT_QUESTION_ID, answerText: 'A' }),
+      }),
+      env as any,
+      sessionId
+    );
+    const after = await currentLevelIndex(env, sessionId);
+    expect(after).toBeGreaterThan(before);
+  });
+
+  it('is whitespace-tolerant', async () => {
+    const env = makeTextEnv();
+    const sessionId = await startKidsSession(env, '+966500000001');
+    const before = await currentLevelIndex(env, sessionId);
+    await handleAnswer(
+      new Request('http://x', {
+        method: 'POST',
+        body: JSON.stringify({ questionId: KNOWN_TEXT_QUESTION_ID, answerText: '  A  ' }),
+      }),
+      env as any,
+      sessionId
+    );
+    const after = await currentLevelIndex(env, sessionId);
+    expect(after).toBeGreaterThan(before);
+  });
+
+  it('is case-sensitive (lowercase does not match a capital-letter item)', async () => {
+    const env = makeTextEnv();
+    const sessionId = await startKidsSession(env, '+966500000002');
+    const before = await currentLevelIndex(env, sessionId);
+    await handleAnswer(
+      new Request('http://x', {
+        method: 'POST',
+        body: JSON.stringify({ questionId: KNOWN_TEXT_QUESTION_ID, answerText: 'a' }),
+      }),
+      env as any,
+      sessionId
+    );
+    const after = await currentLevelIndex(env, sessionId);
+    expect(after).toBeLessThan(before);
+  });
+
+  it('rejects a text-type answer submitted without answerText', async () => {
+    const env = makeTextEnv();
+    const startRes = await handleStartSession(
+      new Request('http://x/api/session', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+      }),
+      env as any
+    );
+    const sessionId = ((await startRes.json()) as any).sessionId;
+    const res = await handleAnswer(
+      new Request('http://x', {
+        method: 'POST',
+        body: JSON.stringify({ questionId: KNOWN_TEXT_QUESTION_ID, selectedIndex: 0 }),
+      }),
+      env as any,
+      sessionId
+    );
+    expect(res.status).toBe(400);
   });
 });

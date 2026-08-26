@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A pen">
+  <circle cx="120" cy="120" r="112" fill="#D8F5D0"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#4CAF50" stroke-width="6"/>
+  <g transform="translate(120 120) rotate(45)">
+    <rect x="-18" y="-78" width="36" height="120" rx="10" fill="#FFD93D" stroke="#B3261E" stroke-width="6"/>
+    <rect x="-18" y="-78" width="36" height="26" rx="8" fill="#FF9F1C" stroke="#B3261E" stroke-width="6"/>
+    <path d="M-18 42 L0 82 L18 42 Z" fill="#F2C9A0" stroke="#B3261E" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M-6 62 L0 78 L6 62 Z" fill="#3A2E2A"/>
+    <rect x="-18" y="-6" width="36" height="10" fill="#FFF6E0"/>
+  </g>
+  <circle cx="70" cy="182" r="8" fill="#FFFFFF"/>
+  <circle cx="188" cy="66" r="6" fill="#FFFFFF"/>
+</svg>

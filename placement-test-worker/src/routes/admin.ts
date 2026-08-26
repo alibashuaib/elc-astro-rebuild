@@ -50,9 +50,14 @@ export async function handleAdminCreateQuestion(req: Request, env: Env): Promise
   const id = await insertQuestion(env, {
     track: body.track,
     level: body.level as any,
+    // Admin-panel question creation only supports the mcq type for now; text-type
+    // questions (handwriting/fill-in-the-blank) are seeded via SQL migrations only.
+    type: 'mcq',
     prompt: body.prompt,
     options: JSON.stringify(body.options),
     correct_index: body.correctIndex,
+    expected_answer: null,
+    image_url: null,
     active: 1,
   });
   return json({ id }, 201);

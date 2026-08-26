@@ -77,6 +77,9 @@ export const ui = {
     'placementTest.subtitle': 'Answer a few adaptive questions to find your level, then book your oral test slot.',
     'placementTest.formName': 'Full name',
     'placementTest.formPhone': 'WhatsApp number',
+    'placementTest.formTrack': 'Which test?',
+    'placementTest.formTrackKids': 'Kids (under 16)',
+    'placementTest.formTrackAdults': 'Adults (16+)',
     'placementTest.formDob': 'Date of birth',
     'placementTest.formGuardian': 'Guardian name',
     'placementTest.formSubmit': 'Start test',
@@ -87,6 +90,7 @@ export const ui = {
     'placementTest.whatsappConfirm': 'Send confirmation on WhatsApp',
     'placementTest.whatsappMessage': "Hi, I'm {name}. My estimated level is {level} and I booked an oral test slot for {time}.",
     'placementTest.answerError': 'Something went wrong — please try again.',
+    'placementTest.answerSubmit': 'Submit',
   },
   ar: {
     'nav.courses': 'الدورات',
@@ -148,6 +152,9 @@ export const ui = {
     'placementTest.subtitle': 'أجب عن بضعة أسئلة تكيفية لتحديد مستواك، ثم احجز موعد الاختبار الشفوي.',
     'placementTest.formName': 'الاسم الكامل',
     'placementTest.formPhone': 'رقم الواتساب',
+    'placementTest.formTrack': 'أي اختبار؟',
+    'placementTest.formTrackKids': 'أطفال (أقل من 16 سنة)',
+    'placementTest.formTrackAdults': 'بالغون (16 سنة فأكثر)',
     'placementTest.formDob': 'تاريخ الميلاد',
     'placementTest.formGuardian': 'اسم ولي الأمر',
     'placementTest.formSubmit': 'ابدأ الاختبار',
@@ -158,6 +165,7 @@ export const ui = {
     'placementTest.whatsappConfirm': 'إرسال التأكيد عبر واتساب',
     'placementTest.whatsappMessage': 'مرحباً، أنا {name}. مستواي التقديري هو {level} وقد حجزت موعد الاختبار الشفوي في {time}.',
     'placementTest.answerError': 'حدث خطأ ما — يرجى المحاولة مرة أخرى.',
+    'placementTest.answerSubmit': 'إرسال',
   },
 } as const;
 

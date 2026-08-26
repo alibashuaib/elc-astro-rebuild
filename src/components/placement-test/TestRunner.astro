@@ -13,8 +13,10 @@ const { t } = Astro.props;
   hidden
   data-question-label={t('placementTest.questionOf')}
   data-answer-error={t('placementTest.answerError')}
+  data-answer-submit={t('placementTest.answerSubmit')}
 >
   <p id="pt-progress" class="pt-progress"></p>
+  <img id="pt-image" class="pt-image" alt="" hidden />
   <p id="pt-prompt" class="pt-prompt"></p>
   <div id="pt-options" class="pt-options"></div>
   <p id="pt-error" class="pt-error" hidden></p>
@@ -26,49 +28,124 @@ const { t } = Astro.props;
 
   const runner = document.getElementById('placement-test-runner') as HTMLElement;
   const progressEl = document.getElementById('pt-progress') as HTMLElement;
+  const imageEl = document.getElementById('pt-image') as HTMLImageElement;
   const promptEl = document.getElementById('pt-prompt') as HTMLElement;
   const optionsEl = document.getElementById('pt-options') as HTMLElement;
   const errorEl = document.getElementById('pt-error') as HTMLElement;
   const questionLabel = runner.dataset.questionLabel ?? '';
   const answerErrorText = runner.dataset.answerError ?? '';
+  const answerSubmitText = runner.dataset.answerSubmit ?? 'Submit';
   let sessionId = '';
   let questionNum = 0;
+
+  async function handleSubmit(
+    step: QuestionPayload,
+    answer: { selectedIndex: number } | { answerText: string },
+    disabledEls: Array<HTMLButtonElement | HTMLInputElement>
+  ) {
+    disabledEls.forEach((el) => (el.disabled = true));
+    errorEl.hidden = true;
+    try {
+      const next = await submitAnswer(sessionId, step.questionId, answer);
+      if (next.done) {
+        document.dispatchEvent(new CustomEvent('placement:done', { detail: { level: next.level, levelName: next.levelName, sessionId } }));
+        runner.hidden = true;
+      } else {
+        renderQuestion(next);
+      }
+    } catch {
+      // Network/API failure mid-test: re-enable the inputs and show an inline error
+      // instead of leaving a frozen, unresponsive question card.
+      errorEl.textContent = answerErrorText;
+      errorEl.hidden = false;
+      disabledEls.forEach((el) => (el.disabled = false));
+    }
+  }
 
   function renderQuestion(step: QuestionPayload) {
     questionNum++;
     progressEl.textContent = `${questionLabel} ${questionNum}`;
+    if (step.imageUrl) {
+      imageEl.src = step.imageUrl;
+      imageEl.hidden = false;
+    } else {
+      imageEl.hidden = true;
+      imageEl.removeAttribute('src');
+    }
     promptEl.textContent = step.prompt;
     optionsEl.innerHTML = '';
     errorEl.hidden = true;
-    step.options.forEach((opt: string, idx: number) => {
+
+    if (step.type === 'text') {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'pt-text-input';
+      input.autocomplete = 'off';
+      input.autocapitalize = 'off';
+      input.spellcheck = false;
+      const submitBtn = document.createElement('button');
+      submitBtn.type = 'button';
+      submitBtn.className = 'btn btn-primary';
+      submitBtn.textContent = answerSubmitText;
+      submitBtn.addEventListener('click', () => {
+        if (!input.value.trim()) return;
+        handleSubmit(step, { answerText: input.value }, [input, submitBtn]);
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') submitBtn.click();
+      });
+      optionsEl.appendChild(input);
+      optionsEl.appendChild(submitBtn);
+      input.focus();
+      return;
+    }
+
+    const options = step.options ?? [];
+    // True/false reading-comprehension items are still plain 2-option mcq rows
+    // in the DB (grading is identical to any other mcq), but they read better
+    // as a distinct True/False choice than as a vertical 4-option-style list.
+    const isTrueFalse = options.length === 2 && options[0] === 'True' && options[1] === 'False';
+
+    if (isTrueFalse) {
+      optionsEl.classList.add('pt-options-tf');
+      const trueBtn = makeTrueFalseButton('true', 0, step);
+      const falseBtn = makeTrueFalseButton('false', 1, step);
+      optionsEl.appendChild(trueBtn);
+      optionsEl.appendChild(falseBtn);
+      return;
+    }
+    optionsEl.classList.remove('pt-options-tf');
+
+    options.forEach((opt: string, idx: number) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-outline';
       btn.textContent = opt;
-      btn.addEventListener('click', async () => {
-        const buttons = Array.from(optionsEl.querySelectorAll('button'));
-        buttons.forEach((b) => (b.disabled = true));
-        errorEl.hidden = true;
-        try {
-          const next = await submitAnswer(sessionId, step.questionId, idx);
-          if (next.done) {
-            document.dispatchEvent(
-              new CustomEvent('placement:done', { detail: { level: next.level, sessionId } })
-            );
-            runner.hidden = true;
-          } else {
-            renderQuestion(next);
-          }
-        } catch {
-          // Network/API failure mid-test: re-enable the buttons and show an inline error
-          // instead of leaving a frozen, unresponsive question card.
-          errorEl.textContent = answerErrorText;
-          errorEl.hidden = false;
-          buttons.forEach((b) => (b.disabled = false));
-        }
+      btn.addEventListener('click', () => {
+        const buttons = Array.from(optionsEl.querySelectorAll('button')) as HTMLButtonElement[];
+        handleSubmit(step, { selectedIndex: idx }, buttons);
       });
       optionsEl.appendChild(btn);
     });
+  }
+
+  function makeTrueFalseButton(kind: 'true' | 'false', idx: number, step: QuestionPayload): HTMLButtonElement {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `pt-tf-btn pt-tf-${kind}`;
+    const icon = document.createElement('span');
+    icon.className = 'pt-tf-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = kind === 'true' ? '✓' : '✕';
+    const label = document.createElement('span');
+    label.textContent = kind === 'true' ? 'True' : 'False';
+    btn.appendChild(icon);
+    btn.appendChild(label);
+    btn.addEventListener('click', () => {
+      const buttons = Array.from(optionsEl.querySelectorAll('button')) as HTMLButtonElement[];
+      handleSubmit(step, { selectedIndex: idx }, buttons);
+    });
+    return btn;
   }
 
   document.addEventListener('placement:register', async (event: Event) => {
@@ -78,7 +155,7 @@ const { t } = Astro.props;
     runner.hidden = false;
     if (step.done) {
       document.dispatchEvent(
-        new CustomEvent('placement:done', { detail: { level: step.level, sessionId } })
+        new CustomEvent('placement:done', { detail: { level: step.level, levelName: step.levelName, sessionId } })
       );
       runner.hidden = true;
       return;
@@ -105,6 +182,13 @@ const { t } = Astro.props;
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
+  .pt-image {
+    justify-self: center;
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+  }
   .pt-prompt {
     margin: 0;
     color: var(--color-navy);
@@ -121,5 +205,64 @@ const { t } = Astro.props;
     color: var(--color-primary);
     font-size: 0.9rem;
     font-weight: 700;
+  }
+  .pt-text-input {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-surface-soft);
+    font: inherit;
+  }
+  .pt-text-input:focus {
+    outline: 3px solid rgb(182 23 51 / 0.12);
+    border-color: var(--color-primary);
+  }
+  .pt-options-tf {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pt-tf-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.85rem;
+    background: var(--color-surface-soft);
+    color: var(--color-ink);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
+      color var(--motion-fast) var(--ease);
+  }
+  .pt-tf-icon {
+    display: inline-flex;
+    width: 1.6rem;
+    height: 1.6rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .pt-tf-true .pt-tf-icon {
+    background: rgb(34 139 87 / 0.14);
+    color: #1a7a49;
+  }
+  .pt-tf-false .pt-tf-icon {
+    background: rgb(182 23 51 / 0.1);
+    color: var(--color-primary-text);
+  }
+  .pt-tf-btn:hover:not(:disabled) {
+    border-color: var(--color-primary);
+  }
+  .pt-tf-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
   }
 </style>

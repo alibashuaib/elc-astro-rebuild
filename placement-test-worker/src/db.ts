@@ -48,17 +48,21 @@ export async function completeSession(env: Env, id: string, estimatedLevel: stri
   ).bind(estimatedLevel, id).run();
 }
 
-export async function pickRandomQuestion(
+// Fixed sequential order, matching the source paper test's question order --
+// not adaptive/random. `level` is kept on each row as descriptive metadata
+// only (used by scoring.ts's estimated-level output, and the admin panel);
+// it no longer filters which question comes next -- see
+// migrations/0006_fixed_sequential_order.sql.
+export async function pickNextQuestion(
   env: Env,
   track: Track,
-  level: string,
   excludeIds: string[]
 ): Promise<QuestionRow | null> {
   const placeholders = excludeIds.length ? excludeIds.map(() => '?').join(',') : null;
   const sql = placeholders
-    ? `SELECT * FROM questions WHERE track = ? AND level = ? AND active = 1 AND id NOT IN (${placeholders}) ORDER BY RANDOM() LIMIT 1`
-    : `SELECT * FROM questions WHERE track = ? AND level = ? AND active = 1 ORDER BY RANDOM() LIMIT 1`;
-  const binds = placeholders ? [track, level, ...excludeIds] : [track, level];
+    ? `SELECT * FROM questions WHERE track = ? AND active = 1 AND id NOT IN (${placeholders}) ORDER BY sequence ASC LIMIT 1`
+    : `SELECT * FROM questions WHERE track = ? AND active = 1 ORDER BY sequence ASC LIMIT 1`;
+  const binds = placeholders ? [track, ...excludeIds] : [track];
   const row = await env.DB.prepare(sql).bind(...binds).first<QuestionRow>();
   return row ?? null;
 }
@@ -67,12 +71,16 @@ export async function insertResponse(
   env: Env,
   sessionId: string,
   questionId: string,
-  selectedIndex: number,
-  correct: boolean
+  // For type: 'text' questions there's no option index -- pass null and the row
+  // stores the documented -1 sentinel in selected_index (kept NOT NULL for
+  // backward compatibility) with the typed answer in answer_text instead.
+  selectedIndex: number | null,
+  correct: boolean,
+  answerText: string | null = null
 ): Promise<void> {
   await env.DB.prepare(
-    `INSERT INTO responses (id, session_id, question_id, selected_index, correct) VALUES (?, ?, ?, ?, ?)`
-  ).bind(newId(), sessionId, questionId, selectedIndex, correct ? 1 : 0).run();
+    `INSERT INTO responses (id, session_id, question_id, selected_index, correct, answer_text) VALUES (?, ?, ?, ?, ?, ?)`
+  ).bind(newId(), sessionId, questionId, selectedIndex ?? -1, correct ? 1 : 0, answerText).run();
 }
 
 export async function listOpenSlots(env: Env): Promise<Array<{ id: string; starts_at: string; remaining: number }>> {
@@ -147,15 +155,21 @@ export async function listBookingsWithDetails(env: Env): Promise<Array<{
 }
 
 export async function listQuestions(env: Env): Promise<QuestionRow[]> {
-  const { results } = await env.DB.prepare(`SELECT * FROM questions ORDER BY track, level, id`).all<QuestionRow>();
+  const { results } = await env.DB.prepare(`SELECT * FROM questions ORDER BY track, sequence`).all<QuestionRow>();
   return results ?? [];
 }
 
-export async function insertQuestion(env: Env, q: Omit<QuestionRow, 'id'>): Promise<string> {
+// Admin-created questions are appended after everything currently in that
+// track's fixed sequence (see migrations/0006_fixed_sequential_order.sql) --
+// callers don't pick a `sequence` themselves.
+export async function insertQuestion(env: Env, q: Omit<QuestionRow, 'id' | 'sequence'>): Promise<string> {
   const id = newId();
+  const next = await env.DB.prepare(`SELECT COALESCE(MAX(sequence), 0) + 1 AS next FROM questions WHERE track = ?`)
+    .bind(q.track)
+    .first<{ next: number }>();
   await env.DB.prepare(
-    `INSERT INTO questions (id, track, level, prompt, options, correct_index) VALUES (?, ?, ?, ?, ?, ?)`
-  ).bind(id, q.track, q.level, q.prompt, q.options, q.correct_index).run();
+    `INSERT INTO questions (id, track, level, type, prompt, options, correct_index, expected_answer, sequence) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(id, q.track, q.level, q.type, q.prompt, q.options, q.correct_index, q.expected_answer, next?.next ?? 1).run();
   return id;
 }
 

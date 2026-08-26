@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A book">
+  <circle cx="120" cy="120" r="112" fill="#FFE1A8"/>
+  <circle cx="120" cy="120" r="112" fill="none" stroke="#FFB100" stroke-width="6"/>
+  <g transform="translate(120 128)">
+    <path d="M0 -55 C-14 -63 -40 -66 -62 -60 L-62 52 C-40 46 -14 49 0 57 Z" fill="#FF6B6B" stroke="#B3261E" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M0 -55 C14 -63 40 -66 62 -60 L62 52 C40 46 14 49 0 57 Z" fill="#4D96FF" stroke="#1D4ED8" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M0 -55 L0 57" stroke="#FFF6E0" stroke-width="4"/>
+    <path d="M-46 -40 L-14 -36" stroke="#FFE9E9" stroke-width="5" stroke-linecap="round"/>
+    <path d="M-46 -20 L-14 -16" stroke="#FFE9E9" stroke-width="5" stroke-linecap="round"/>
+    <path d="M14 -36 L46 -40" stroke="#EAF2FF" stroke-width="5" stroke-linecap="round"/>
+    <path d="M14 -16 L46 -20" stroke="#EAF2FF" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <circle cx="72" cy="60" r="7" fill="#FFF6E0"/>
+  <circle cx="182" cy="180" r="9" fill="#FFF6E0"/>
+</svg>
