@@ -6,10 +6,17 @@ import {
   handleAdminListBookings, handleAdminListQuestions, handleAdminCreateQuestion, handleAdminSetQuestionActive,
 } from './routes/admin';
 
-const ALLOWED_ORIGINS = ['https://elc.com.sa', 'http://localhost:4321'];
+const ALLOWED_ORIGINS = ['https://elc.com.sa'];
+
+function isAllowedOrigin(origin: string): boolean {
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  // Astro automatically moves to the next available port during local
+  // development, so permit loopback origins without hard-coding 4321.
+  return /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
+}
 
 function withCors(res: Response, origin: string | null): Response {
-  const allow = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allow = origin && isAllowedOrigin(origin) ? origin : ALLOWED_ORIGINS[0];
   const headers = new Headers(res.headers);
   headers.set('access-control-allow-origin', allow);
   headers.set('access-control-allow-credentials', 'true');
@@ -58,7 +65,11 @@ export default {
       }
       return withCors(new Response('not found', { status: 404 }), origin);
     } catch (err) {
-      return withCors(new Response(JSON.stringify({ error: 'internal_error' }), { status: 500, headers: { 'content-type': 'application/json' } }), origin);
+      console.error('placement API request failed', err);
+      const localMessage = (env as Env & { LOCAL_DEV?: string }).LOCAL_DEV === 'true' && err instanceof Error
+        ? err.message
+        : 'internal_error';
+      return withCors(new Response(JSON.stringify({ error: localMessage }), { status: 500, headers: { 'content-type': 'application/json' } }), origin);
     }
   },
 };

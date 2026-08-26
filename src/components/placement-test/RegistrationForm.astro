@@ -9,6 +9,14 @@ const { locale, t } = Astro.props;
 ---
 
 <form id="placement-registration" class="card" data-locale={locale}>
+  <header class="card-heading">
+    <span class="step-number" aria-hidden="true">01</span>
+    <div>
+      <p class="card-eyebrow">{t('placementTest.stageDetails')}</p>
+      <h2>{t('placementTest.formHeading')}</h2>
+      <p class="card-intro">{t('placementTest.formIntro')}</p>
+    </div>
+  </header>
   <fieldset class="track-field">
     <legend>{t('placementTest.formTrack')}</legend>
     <div class="track-toggle">
@@ -22,23 +30,28 @@ const { locale, t } = Astro.props;
       </label>
     </div>
   </fieldset>
-  <label>
-    {t('placementTest.formName')}
-    <input required name="name" type="text" autocomplete="name" />
-  </label>
-  <label>
-    {t('placementTest.formPhone')}
-    <input class="numeric" required name="phone" type="tel" autocomplete="tel" inputmode="tel" />
-  </label>
-  <label>
-    {t('placementTest.formDob')}
-    <input required name="dob" type="date" />
-  </label>
-  <label id="guardian-field" hidden>
-    {t('placementTest.formGuardian')}
-    <input name="guardianName" type="text" autocomplete="name" />
-  </label>
+  <div class="form-grid">
+    <label>
+      <span>{t('placementTest.formName')}</span>
+      <input required name="name" type="text" autocomplete="name" />
+    </label>
+    <label>
+      <span>{t('placementTest.formPhone')}</span>
+      <input class="numeric" required name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+    </label>
+    <label>
+      <span>{t('placementTest.formDob')}</span>
+      <input required name="dob" type="date" />
+    </label>
+    <label id="guardian-field" hidden>
+      <span>{t('placementTest.formGuardian')}</span>
+      <input name="guardianName" type="text" autocomplete="name" />
+    </label>
+  </div>
   <button type="submit" class="btn btn-primary">{t('placementTest.formSubmit')}</button>
+  <p id="placement-registration-error" class="form-error" role="alert" hidden>
+    {t('placementTest.answerError')}
+  </p>
 </form>
 
 <script>
@@ -72,12 +85,57 @@ const { locale, t } = Astro.props;
 <style>
   .card {
     display: grid;
-    gap: 1rem;
-    padding: clamp(1.25rem, 3vw, 2rem);
+    gap: 1.5rem;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
     border: 1px solid var(--color-border);
-    border-radius: 1.5rem;
+    border-radius: 1.75rem;
     background: var(--color-bg-raised);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
+  }
+  .card-heading {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: start;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .step-number {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    place-items: center;
+    border-radius: 0.85rem;
+    color: #fff;
+    background: var(--color-primary);
+    box-shadow: 0 8px 20px rgb(182 23 51 / 0.2);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .card-eyebrow {
+    margin: 0 0 0.25rem;
+    color: var(--color-primary-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .card-heading h2 {
+    margin: 0 0 0.45rem;
+    color: var(--color-navy);
+    font-size: clamp(1.45rem, 4vw, 2rem);
+  }
+  .card-intro {
+    max-width: 38rem;
+    margin: 0;
+    color: var(--color-ink-muted);
+    font-size: 0.92rem;
+  }
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
   }
   .card label {
     display: flex;
@@ -91,10 +149,10 @@ const { locale, t } = Astro.props;
     width: 100%;
     min-height: 3.25rem;
     padding: 0.75rem 0.9rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-strong);
     border-radius: 0.85rem;
     color: var(--color-ink);
-    background: var(--color-surface-soft);
+    background: var(--color-bg-raised);
     font: inherit;
   }
   .card input:focus {
@@ -103,7 +161,9 @@ const { locale, t } = Astro.props;
   }
   .card .btn {
     justify-content: center;
-    margin-top: 0.5rem;
+    width: 100%;
+    min-height: 3.5rem;
+    margin-top: 0.25rem;
   }
   .track-field {
     display: grid;
@@ -119,8 +179,9 @@ const { locale, t } = Astro.props;
     font-weight: 700;
   }
   .track-toggle {
-    display: flex;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
   /* `.card label.track-pill` (not just `.track-pill`) so this beats the
      generic `.card label` rule's flex-direction/gap on specificity instead
@@ -133,10 +194,10 @@ const { locale, t } = Astro.props;
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    min-height: 2.9rem;
-    padding: 0.5rem 0.9rem;
+    min-height: 3.5rem;
+    padding: 0.7rem 1rem;
     border: 1px solid var(--color-border);
-    border-radius: 999px;
+    border-radius: 1rem;
     color: var(--color-ink-muted);
     background: var(--color-surface-soft);
     font-size: 0.88rem;
@@ -159,9 +220,25 @@ const { locale, t } = Astro.props;
     border-color: var(--color-primary);
     background: var(--color-primary);
     color: #fff;
+    box-shadow: 0 8px 20px rgb(182 23 51 / 0.18);
   }
   .card label.track-pill:has(input:focus-visible) {
     outline: 3px solid rgb(182 23 51 / 0.12);
     outline-offset: 2px;
+  }
+  .form-error {
+    margin: -0.5rem 0 0;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.85rem;
+    color: var(--color-primary-text);
+    background: rgb(182 23 51 / 0.09);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-align: center;
+  }
+  @media (max-width: 580px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .track-toggle { grid-template-columns: 1fr; }
+    .card-heading { grid-template-columns: 1fr; }
   }
 </style>

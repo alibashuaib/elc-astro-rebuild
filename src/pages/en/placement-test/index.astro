@@ -1,6 +1,5 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
-import PageHero from '../../../components/PageHero.astro';
 import RegistrationForm from '../../../components/placement-test/RegistrationForm.astro';
 import TestRunner from '../../../components/placement-test/TestRunner.astro';
 import ResultBooking from '../../../components/placement-test/ResultBooking.astro';
@@ -25,21 +24,195 @@ const breadcrumbs = breadcrumbSchema([
   description="Take ELC's free adaptive English placement test online, get your estimated level instantly, and book your oral test slot."
   jsonLd={breadcrumbs}
 >
-  <PageHero title={t('placementTest.heading')} subtitle={t('placementTest.subtitle')} />
+  <header class="test-hero">
+    <div class="container test-hero-inner">
+      <div class="test-hero-copy">
+        <p class="test-eyebrow">{t('placementTest.eyebrow')}</p>
+        <h1>{t('placementTest.heading')}</h1>
+        <p class="test-subtitle">{t('placementTest.subtitle')}</p>
+      </div>
+      <ul class="test-facts" role="list">
+        <li><span aria-hidden="true">⌁</span>{t('placementTest.time')}</li>
+        <li><span aria-hidden="true">✓</span>{t('placementTest.instant')}</li>
+        <li><span aria-hidden="true">↗</span>{t('placementTest.adaptive')}</li>
+      </ul>
+    </div>
+  </header>
 
-  <section class="container placement-test-wrap">
-    <RegistrationForm locale="en" t={t} />
-    <TestRunner t={t} />
-    <ResultBooking t={t} locale="en" whatsappNumber={WHATSAPP_NUMBER} />
-  </section>
+  <main class="container placement-test-wrap">
+    <ol class="test-steps" aria-label={t('placementTest.heading')}>
+      <li class="is-active" data-stage="details"><span>1</span>{t('placementTest.stageDetails')}</li>
+      <li data-stage="questions"><span>2</span>{t('placementTest.stageQuestions')}</li>
+      <li data-stage="result"><span>3</span>{t('placementTest.stageResult')}</li>
+    </ol>
+    <div class="test-surface">
+      <RegistrationForm locale="en" t={t} />
+      <TestRunner t={t} />
+      <ResultBooking t={t} locale="en" whatsappNumber={WHATSAPP_NUMBER} />
+    </div>
+  </main>
 </Layout>
 
+<script>
+  const steps = Array.from(document.querySelectorAll<HTMLElement>('.test-steps li'));
+  function setStage(stage: string) {
+    const activeIndex = steps.findIndex((step) => step.dataset.stage === stage);
+    steps.forEach((step, index) => {
+      step.classList.toggle('is-active', index === activeIndex);
+      step.classList.toggle('is-complete', index < activeIndex);
+    });
+  }
+  document.addEventListener('placement:started', () => setStage('questions'));
+  document.addEventListener('placement:done', () => setStage('result'));
+</script>
+
 <style>
+  .test-hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(3.25rem, 7vw, 6rem);
+    color: var(--zone-ink-text);
+    background:
+      radial-gradient(circle at 88% 10%, rgb(246 173 67 / 0.2), transparent 26rem),
+      linear-gradient(135deg, #292b2f 0%, #202125 100%);
+  }
+  .test-hero::after {
+    content: '';
+    position: absolute;
+    width: 18rem;
+    height: 18rem;
+    inset-inline-end: -8rem;
+    bottom: -12rem;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3rem rgb(255 255 255 / 0.025), 0 0 0 6rem rgb(255 255 255 / 0.02);
+  }
+  .test-hero-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(15rem, 0.55fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: end;
+  }
+  .test-eyebrow {
+    margin: 0 0 0.8rem;
+    color: var(--zone-ink-signal);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+  .test-hero h1 {
+    max-width: 12ch;
+    margin: 0 0 1rem;
+    color: #fff;
+    font-size: clamp(2.8rem, 7vw, 5.8rem);
+    letter-spacing: -0.055em;
+  }
+  .test-subtitle {
+    max-width: 46rem;
+    margin: 0;
+    color: var(--zone-ink-muted);
+    font-size: var(--fs-lg);
+  }
+  .test-facts {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--zone-ink-border);
+    border-radius: 1.25rem;
+    list-style: none;
+    background: rgb(255 255 255 / 0.045);
+    backdrop-filter: blur(8px);
+  }
+  .test-facts li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
+  .test-facts li + li { border-top: 1px solid var(--zone-ink-border); }
+  .test-facts span {
+    display: grid;
+    width: 1.75rem;
+    height: 1.75rem;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--zone-ink-bg);
+    background: var(--zone-ink-signal);
+    font-weight: 900;
+  }
   .placement-test-wrap {
     display: grid;
-    gap: 2rem;
-    max-width: 40rem;
+    gap: 1.5rem;
+    max-width: 54rem;
     margin-inline: auto;
-    padding-block: clamp(2rem, 5vw, 4rem);
+    padding-block: clamp(2rem, 5vw, 5rem);
+  }
+  .test-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .test-steps li {
+    position: relative;
+    display: grid;
+    gap: 0.45rem;
+    justify-items: center;
+    color: var(--color-ink-muted);
+    font-size: 0.78rem;
+    font-weight: 750;
+    text-align: center;
+  }
+  .test-steps li::before {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    top: 1rem;
+    inset-inline-start: -50%;
+    width: 100%;
+    height: 2px;
+    background: var(--color-border);
+  }
+  .test-steps li:first-child::before { display: none; }
+  .test-steps span {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: 2px solid var(--color-border);
+    border-radius: 50%;
+    color: var(--color-ink-muted);
+    background: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+  }
+  .test-steps .is-active { color: var(--color-navy); }
+  .test-steps .is-active span,
+  .test-steps .is-complete span {
+    border-color: var(--color-primary);
+    color: #fff;
+    background: var(--color-primary);
+  }
+  .test-steps .is-complete::before,
+  .test-steps .is-active::before { background: var(--color-primary); }
+  .test-surface { min-width: 0; }
+  @media (max-width: 700px) {
+    .test-hero-inner { grid-template-columns: 1fr; }
+    .test-facts { grid-template-columns: 1fr; }
+    .test-hero h1 { font-size: clamp(2.65rem, 15vw, 4.2rem); }
+  }
+  @media (max-width: 480px) {
+    .test-facts { display: none; }
+    .placement-test-wrap { padding-inline: 1rem; }
   }
 </style>
