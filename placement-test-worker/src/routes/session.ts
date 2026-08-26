@@ -1,6 +1,14 @@
 import type { Env, StudentInput } from '../types';
-import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions } from '../db';
+import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
+import { ADULT_BANDS, bandForSequence, isLastBand, evaluateBand } from '../bands';
+
+// Adults-only: the last question number this track actually serves. The
+// bank has 50 real questions (see migrations/0003_real_questions.sql), but
+// only the first 34 (sequence 1-34) are banded (see bands.ts) -- the rest
+// (35-50, the two reading passages) aren't part of the test yet, so the
+// frontend's "question N of total" should read against 34, not 50.
+const ADULT_BANDED_QUESTION_COUNT = ADULT_BANDS.at(-1)!.end;
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
@@ -55,7 +63,9 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     return { done: true, level, levelName };
   }
   const passage = q.passage_id ? await getPassage(env, q.passage_id) : null;
-  const total = await countActiveQuestions(env, track as 'kids' | 'adults');
+  // Adults only serves its banded prefix (see ADULT_BANDED_QUESTION_COUNT) --
+  // report progress against that, not the track's full 50-question bank.
+  const total = track === 'adults' ? ADULT_BANDED_QUESTION_COUNT : await countActiveQuestions(env, track as 'kids' | 'adults');
   return {
     done: false,
     questionId: q.id,
@@ -91,9 +101,9 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   }
   const body = await req.json<{ questionId: string; selectedIndex?: number; answerText?: string; skip?: boolean }>();
   const q = await env.DB
-    .prepare(`SELECT type, correct_index, expected_answer, case_sensitive FROM questions WHERE id = ?`)
+    .prepare(`SELECT type, correct_index, expected_answer, case_sensitive, sequence FROM questions WHERE id = ?`)
     .bind(body.questionId)
-    .first<{ type: 'mcq' | 'text'; correct_index: number; expected_answer: string | null; case_sensitive: number }>();
+    .first<{ type: 'mcq' | 'text'; correct_index: number; expected_answer: string | null; case_sensitive: number; sequence: number }>();
   if (!q) return json({ error: 'unknown question' }, 400);
 
   const skipped = body.skip === true;
@@ -128,6 +138,37 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   // give feedback on, and the frontend uses its absence to skip showing the
   // correct/incorrect banner (see TestRunner.astro's showFeedback).
   const feedback = skipped ? {} : { correct };
+
+  // Adults band-boundary check (see bands.ts): once the last question of a
+  // band has been answered, evaluate that band immediately. A failed band
+  // ends the session right there -- the student is placed at that band and
+  // never asked the remaining ones. A passed band either continues into the
+  // next one, or, if it was the last band in the table (Hint A), ends the
+  // session at "Above Hint A" (the un-banded reading-passage content past
+  // sequence 34 isn't served -- see ADULT_BANDED_QUESTION_COUNT).
+  if (session.track === 'adults') {
+    const band = bandForSequence(q.sequence);
+    if (band && q.sequence === band.end) {
+      const correctCount = await countBandCorrect(env, sessionId, band.start, band.end);
+      const result = evaluateBand(band, correctCount);
+      await updateSessionScoring(env, sessionId, {
+        current_level_index: nextState.currentLevelIndex,
+        step: nextState.step,
+        recent_levels: JSON.stringify(nextState.recentLevels),
+        questions_asked: nextState.questionsAsked,
+      });
+      if (!result.passed || isLastBand(band)) {
+        const level = result.passed ? 'Above Hint A' : band.name;
+        await completeSession(env, sessionId, level);
+        return json({ done: true, level, levelName: level, ...feedback });
+      }
+      const askedIds = (
+        await env.DB.prepare(`SELECT question_id FROM responses WHERE session_id = ?`).bind(sessionId).all<{ question_id: string }>()
+      ).results?.map((r) => r.question_id) ?? [];
+      const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, askedIds);
+      return json({ ...next, ...feedback });
+    }
+  }
 
   if (isDone(nextState)) {
     // In practice this only fires via scoring.ts's 200-question safety cap

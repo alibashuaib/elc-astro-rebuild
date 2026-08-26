@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
 import { handleStartSession, handleAnswer } from './session';
+import { ADULT_BANDS } from '../bands';
 import path from 'node:path';
 
 function makeEnv() {
@@ -97,6 +98,109 @@ describe('session routes', () => {
     expect(['A0', 'A1', 'A2', 'B1', 'B2', 'C1']).toContain(data.level); // adults' ladder -- see scoring.ts/LEVELS_BY_TRACK
     expect(rounds).toBe(36); // the seeded bank's adults half (72 rows split evenly by track), not an early convergence stop
   });
+});
+
+describe('adults band placement (bands.ts, real question content)', () => {
+  function makeRealAdultsEnv() {
+    return {
+      DB: createFakeD1([
+        path.join(__dirname, '../../migrations/0001_init.sql'),
+        path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
+        path.join(__dirname, '../../migrations/0003_real_questions.sql'),
+        path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
+        path.join(__dirname, '../../migrations/0005_kids_text_and_vocab_questions.sql'),
+        path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
+        path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
+        path.join(__dirname, '../../migrations/0008_kids_picture_matching.sql'),
+        path.join(__dirname, '../../migrations/0009_reading_passages.sql'),
+        path.join(__dirname, '../../migrations/0010_kids_reading_passage.sql'),
+        path.join(__dirname, '../../migrations/0011_skip_question.sql'),
+        path.join(__dirname, '../../migrations/0012_case_insensitive_grading.sql'),
+        path.join(__dirname, '../../migrations/0013_room_vocab_images.sql'),
+      ]),
+      ADMIN_SESSION_TTL_SECONDS: '43200',
+      ADMIN_COOKIE_SECRET: 'test-secret',
+    };
+  }
+
+  async function startAdultSession(env: ReturnType<typeof makeRealAdultsEnv>, phone: string) {
+    const res = await handleStartSession(
+      new Request('http://x/api/session', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Sam', phone, dob: '1995-01-01', locale: 'en' }),
+      }),
+      env as any
+    );
+    return (await res.json()) as any;
+  }
+
+  async function correctIndexFor(env: ReturnType<typeof makeRealAdultsEnv>, questionId: string): Promise<number> {
+    const row = await env.DB.prepare(`SELECT correct_index FROM questions WHERE id = ?`).bind(questionId).first<{ correct_index: number }>();
+    return row!.correct_index;
+  }
+
+  it('stops the session as soon as the first band (Fun A) fails, without asking further bands', async () => {
+    const env = makeRealAdultsEnv();
+    let data = await startAdultSession(env, '+966500000010');
+    const sessionId = data.sessionId;
+    const funA = ADULT_BANDS[0]; // { name: 'Fun A', start: 1, end: 5 }
+    let rounds = 0;
+    while (!data.done) {
+      const wantWrong = rounds < 4; // 1 correct out of 5 = 20%, below 60% -> Fun A fails
+      const correctIndex = await correctIndexFor(env, data.questionId);
+      const selectedIndex = wantWrong ? (correctIndex + 1) % 4 : correctIndex;
+      const res = await handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, selectedIndex }) }),
+        env as any,
+        sessionId
+      );
+      data = await res.json();
+      rounds++;
+    }
+    expect(rounds).toBe(bandSize(funA)); // stopped right at the end of Fun A, never reached Fun B
+    expect(data.level).toBe('Fun A');
+  });
+
+  it('passing every band places the student "Above Hint A" after exactly 34 questions (the reading-passage content at 35-50 is never served)', async () => {
+    const env = makeRealAdultsEnv();
+    let data = await startAdultSession(env, '+966500000011');
+    const sessionId = data.sessionId;
+    let rounds = 0;
+    while (!data.done) {
+      const correctIndex = await correctIndexFor(env, data.questionId);
+      const res = await handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, selectedIndex: correctIndex }) }),
+        env as any,
+        sessionId
+      );
+      data = await res.json();
+      rounds++;
+    }
+    expect(rounds).toBe(34);
+    expect(data.level).toBe('Above Hint A');
+  });
+
+  it('passing Fun A (band 1) continues into Fun B instead of stopping', async () => {
+    const env = makeRealAdultsEnv();
+    let data = await startAdultSession(env, '+966500000012');
+    const sessionId = data.sessionId;
+    const funA = ADULT_BANDS[0];
+    for (let i = 0; i < bandSize(funA); i++) {
+      const correctIndex = await correctIndexFor(env, data.questionId);
+      const res = await handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, selectedIndex: correctIndex }) }),
+        env as any,
+        sessionId
+      );
+      data = await res.json();
+    }
+    expect(data.done).toBe(false); // Fun A passed 5/5 -- session continues into Fun B, doesn't stop
+    expect(data.questionNumber).toBe(bandSize(funA) + 1);
+  });
+
+  function bandSize(band: { start: number; end: number }): number {
+    return band.end - band.start + 1;
+  }
 });
 
 describe('text-type question grading', () => {

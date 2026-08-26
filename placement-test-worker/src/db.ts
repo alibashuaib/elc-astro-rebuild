@@ -87,6 +87,22 @@ export async function countActiveQuestions(env: Env, track: Track): Promise<numb
   return row?.n ?? 0;
 }
 
+// Number of correct responses this session has recorded for questions whose
+// `sequence` falls within [start, end] -- used by session.ts's adults-track
+// band-boundary check (see bands.ts) once the last question of a band has
+// been answered.
+export async function countBandCorrect(env: Env, sessionId: string, start: number, end: number): Promise<number> {
+  const row = await env.DB
+    .prepare(
+      `SELECT COUNT(*) AS n FROM responses r
+       JOIN questions q ON q.id = r.question_id
+       WHERE r.session_id = ? AND r.correct = 1 AND q.sequence BETWEEN ? AND ?`
+    )
+    .bind(sessionId, start, end)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
+}
+
 export async function getPassage(env: Env, id: string): Promise<PassageRow | null> {
   const row = await env.DB.prepare(`SELECT * FROM passages WHERE id = ?`).bind(id).first<PassageRow>();
   return row ?? null;
