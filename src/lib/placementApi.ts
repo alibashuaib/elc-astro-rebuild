@@ -18,6 +18,7 @@ export interface QuestionPayload {
   prompt: string;
   options?: string[]; // present for type: 'mcq' only
   imageUrl?: string; // optional picture shown above the prompt (e.g. picture-matching items)
+  passage?: { id: string; title: string; body: string }; // present for reading-comprehension items
 }
 
 export interface DonePayload {

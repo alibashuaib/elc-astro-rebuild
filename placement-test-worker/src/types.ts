@@ -29,8 +29,15 @@ export interface QuestionRow {
   correct_index: number; // unused placeholder (0) for type: 'text'
   expected_answer: string | null; // set for type: 'text', null for type: 'mcq'
   image_url: string | null; // optional picture shown above the prompt (e.g. picture-matching items)
+  passage_id: string | null; // set for reading-comprehension items; joins to passages.id for the article text
   sequence: number; // fixed order within track, matching the source document
   active: number;
+}
+
+export interface PassageRow {
+  id: string;
+  title: string;
+  body: string;
 }
 
 export interface SessionRow {

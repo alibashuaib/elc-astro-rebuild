@@ -58,6 +58,7 @@ export async function handleAdminCreateQuestion(req: Request, env: Env): Promise
     correct_index: body.correctIndex,
     expected_answer: null,
     image_url: null,
+    passage_id: null,
     active: 1,
   });
   return json({ id }, 201);

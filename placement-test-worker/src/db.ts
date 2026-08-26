@@ -1,4 +1,4 @@
-import type { Env, StudentInput, QuestionRow, SessionRow, Track } from './types';
+import type { Env, StudentInput, QuestionRow, PassageRow, SessionRow, Track } from './types';
 
 function newId(): string {
   return crypto.randomUUID();
@@ -64,6 +64,11 @@ export async function pickNextQuestion(
     : `SELECT * FROM questions WHERE track = ? AND active = 1 ORDER BY sequence ASC LIMIT 1`;
   const binds = placeholders ? [track, ...excludeIds] : [track];
   const row = await env.DB.prepare(sql).bind(...binds).first<QuestionRow>();
+  return row ?? null;
+}
+
+export async function getPassage(env: Env, id: string): Promise<PassageRow | null> {
+  const row = await env.DB.prepare(`SELECT * FROM passages WHERE id = ?`).bind(id).first<PassageRow>();
   return row ?? null;
 }
 
@@ -168,8 +173,8 @@ export async function insertQuestion(env: Env, q: Omit<QuestionRow, 'id' | 'sequ
     .bind(q.track)
     .first<{ next: number }>();
   await env.DB.prepare(
-    `INSERT INTO questions (id, track, level, type, prompt, options, correct_index, expected_answer, sequence) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(id, q.track, q.level, q.type, q.prompt, q.options, q.correct_index, q.expected_answer, next?.next ?? 1).run();
+    `INSERT INTO questions (id, track, level, type, prompt, options, correct_index, expected_answer, passage_id, sequence) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(id, q.track, q.level, q.type, q.prompt, q.options, q.correct_index, q.expected_answer, q.passage_id, next?.next ?? 1).run();
   return id;
 }
 

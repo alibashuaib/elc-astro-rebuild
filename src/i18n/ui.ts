@@ -91,6 +91,7 @@ export const ui = {
     'placementTest.whatsappMessage': "Hi, I'm {name}. My estimated level is {level} and I booked an oral test slot for {time}.",
     'placementTest.answerError': 'Something went wrong — please try again.',
     'placementTest.answerSubmit': 'Submit',
+    'placementTest.readingPassage': 'Reading passage',
   },
   ar: {
     'nav.courses': 'الدورات',
@@ -166,6 +167,7 @@ export const ui = {
     'placementTest.whatsappMessage': 'مرحباً، أنا {name}. مستواي التقديري هو {level} وقد حجزت موعد الاختبار الشفوي في {time}.',
     'placementTest.answerError': 'حدث خطأ ما — يرجى المحاولة مرة أخرى.',
     'placementTest.answerSubmit': 'إرسال',
+    'placementTest.readingPassage': 'نص القراءة',
   },
 } as const;
 

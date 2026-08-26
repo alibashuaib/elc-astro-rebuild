@@ -1,5 +1,5 @@
 import type { Env, StudentInput } from '../types';
-import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse } from '../db';
+import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 
 function json(data: unknown, status = 200): Response {
@@ -27,6 +27,7 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     await completeSession(env, sessionId, level);
     return { done: true, level, levelName };
   }
+  const passage = q.passage_id ? await getPassage(env, q.passage_id) : null;
   return {
     done: false,
     questionId: q.id,
@@ -34,6 +35,7 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     prompt: q.prompt,
     options: q.type === 'mcq' ? JSON.parse(q.options) : undefined,
     imageUrl: q.image_url ?? undefined,
+    passage: passage ? { id: passage.id, title: passage.title, body: passage.body } : undefined,
   };
 }
 
