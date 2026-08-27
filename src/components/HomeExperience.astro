@@ -51,6 +51,16 @@ const copy = isArabic ? {
     { icon: 'exam-prep' as const, title: 'التحضير لاختبار IELTS', text: 'تدريب موجه على الاستماع والقراءة والكتابة والمحادثة.', meta: 'أكاديمي وعام', href: '/ar/courses/ielts-preparation', tone: 'coral' },
     { icon: 'exam-prep' as const, title: 'التحضير لاختبار STEP', text: 'مراجعة منظمة للغة واستراتيجيات الاختبار والتدريب المحدد بالوقت.', meta: 'اختبار الكفايات', href: '/ar/courses/step-exam-preparation', tone: 'blue' },
   ],
+  partnersKicker: 'شركاؤنا',
+  partnersTitle: 'شراكات أكاديمية وتدريبية موثوقة.',
+  partnersText: 'نبني شراكات استراتيجية مع مؤسسات أكاديمية وتدريبية محلية وعالمية لتعزيز الجودة وتوسيع فرص التعلم.',
+  partners: [
+    { name: 'المؤسسة العامة للتدريب التقني والمهني', logo: '/images/partners/tvtc.png' },
+    { name: 'ناشيونال جيوغرافيك ليرنينغ', logo: '/images/partners/national-geographic-learning.png' },
+    { name: 'آيلتس', logo: '/images/partners/ielts.png' },
+    { name: 'المجلس الثقافي البريطاني', logo: '/images/partners/british-council.png' },
+    { name: 'تشرشل هاوس لتعليم اللغة الإنجليزية', logo: '/images/partners/churchill-house.png' },
+  ],
   ctaKicker: 'خطوتك الأولى بسيطة',
   ctaTitle: 'اعرف مستواك، وابنِ خطتك.',
   ctaText: 'اختبار تحديد المستوى يساعدنا على توجيهك إلى البرنامج الأنسب دون تخمين.',
@@ -89,6 +99,16 @@ const copy = isArabic ? {
     { icon: 'exam-prep' as const, title: 'University & Exam Prep (PUP)', text: 'Focused preparation for admissions and target scores.', meta: 'Goal-focused prep', href: '/en/courses/university-exam-prep', tone: 'yellow' },
     { icon: 'exam-prep' as const, title: 'IELTS Exam Preparation', text: 'Focused practice across listening, reading, writing, and speaking.', meta: 'Academic & General', href: '/en/courses/ielts-preparation', tone: 'coral' },
     { icon: 'exam-prep' as const, title: 'STEP Exam Preparation', text: 'Structured language review, test strategy, and timed practice.', meta: 'Saudi proficiency test', href: '/en/courses/step-exam-preparation', tone: 'blue' },
+  ],
+  partnersKicker: 'Our partners',
+  partnersTitle: 'Trusted academic and training partnerships.',
+  partnersText: 'Building strategic partnerships with local and international academic and training institutions to strengthen quality and expand learning opportunities.',
+  partners: [
+    { name: 'Technical and Vocational Training Corporation', logo: '/images/partners/tvtc.png' },
+    { name: 'National Geographic Learning', logo: '/images/partners/national-geographic-learning.png' },
+    { name: 'IELTS', logo: '/images/partners/ielts.png' },
+    { name: 'British Council', logo: '/images/partners/british-council.png' },
+    { name: 'Churchill House School of English Language', logo: '/images/partners/churchill-house.png' },
   ],
   ctaKicker: 'Your first step is simple',
   ctaTitle: 'Know your level. Build your plan.',
@@ -185,6 +205,20 @@ const basePath = `/${locale}`;
   </div>
 </section>
 
+<section class="section partners-section">
+  <div class="container">
+    <div class="section-heading split-heading">
+      <div><span class="section-kicker">{copy.partnersKicker}</span><h2>{copy.partnersTitle}</h2></div>
+      <p>{copy.partnersText}</p>
+    </div>
+    <div class="partners-strip">
+      {copy.partners.map((partner) => (
+        <img src={partner.logo} alt={partner.name} loading="lazy" width="160" height="64" />
+      ))}
+    </div>
+  </div>
+</section>
+
 {reviews && <div class="container reviews-wrap"><Testimonials locale={locale} data={reviews} /></div>}
 
 <section class="container final-cta">
@@ -268,6 +302,12 @@ const basePath = `/${locale}`;
   .feature-2 { --card-color: var(--color-coral); --card-soft: var(--color-coral-soft); }
   .feature-3 { --card-color: var(--color-mint-ink); --card-soft: var(--color-mint-soft); }
   .feature-4 { --card-color: var(--color-yellow-ink); --card-soft: var(--color-yellow-soft); }
+  .partners-section { padding-block: clamp(3rem, 6vw, 5rem); }
+  .partners-section .split-heading { margin-bottom: 2rem; }
+  .partners-strip { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: clamp(1.5rem, 4vw, 3rem); }
+  .partners-strip img { height: clamp(2.1rem, 4vw, 2.75rem); width: auto; max-width: 9rem; object-fit: contain; filter: grayscale(1) opacity(0.55); transition: filter var(--motion-base) var(--ease), transform var(--motion-base) var(--ease); }
+  .partners-strip img:hover { filter: grayscale(0) opacity(1); transform: translateY(-2px); }
+  @media (max-width: 720px) { .partners-strip { justify-content: center; } }
   .courses-section { background: var(--zone-ink-bg); color: #fff; }
   .courses-section .section-kicker { color: #f7b75f; }
   .courses-section .section-heading h2 { color: #fff; }
