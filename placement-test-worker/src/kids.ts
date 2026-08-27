@@ -8,23 +8,27 @@
 // run as a whole -- two kids with the same score could land three levels
 // apart depending on where their mistakes fell.
 //
-// Per ELC: a full score places at Super Minds 3A, and more mistakes place
-// lower. So 3A is the ceiling, and the reachable ladder is its bottom three
-// rungs; the score share is split evenly across them.
+// Per ELC: a full score places at Super Minds 3A, more mistakes place lower,
+// and a kid falling between two A-halves is placed in the B half between them.
+// So the ladder runs Pre-Starters -> 1A -> 1B -> 2A -> 2B -> 3A, and the score
+// share is split evenly across those six rungs.
 
 import { LEVELS_BY_TRACK } from './scoring';
 
 /** Highest index the placement test can award on the kids ladder ('Super Minds 3A'). */
-export const KIDS_CEILING_INDEX = 2;
+export const KIDS_CEILING_INDEX = 5;
 
 /**
- * Minimum share of correct answers for each reachable level, highest first.
- * Even thirds: >=2/3 places at the ceiling, >=1/3 one rung down, the rest at
- * the bottom. Shares (not counts) so the bank can grow without retuning.
+ * Minimum share of correct answers for each rung, highest first. Even sixths.
+ * Shares (not counts) so the bank can grow without retuning -- against the
+ * current 44-question bank these land at 37 / 30 / 22 / 15 / 8 correct.
  */
 export const KIDS_BANDS: ReadonlyArray<{ minShare: number; index: number }> = [
-  { minShare: 2 / 3, index: 2 }, // Super Minds 3A
-  { minShare: 1 / 3, index: 1 }, // Super Minds 2A
+  { minShare: 5 / 6, index: 5 }, // Super Minds 3A
+  { minShare: 4 / 6, index: 4 }, // Super Minds 2B
+  { minShare: 3 / 6, index: 3 }, // Super Minds 2A
+  { minShare: 2 / 6, index: 2 }, // Super Minds 1B
+  { minShare: 1 / 6, index: 1 }, // Super Minds 1A
   { minShare: 0, index: 0 }, // Pre-Starters
 ];
 

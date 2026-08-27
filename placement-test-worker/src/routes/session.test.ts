@@ -378,29 +378,22 @@ describe('kids placement level reflects the whole run, not its tail', () => {
     return { level: data.level, levelName: data.levelName, answered };
   }
 
-  it('places a full score at the Super Minds 3A ceiling', async () => {
-    const { levelName, answered } = await runKidsSession(44);
-    expect(answered).toBe(44);
-    expect(levelName).toBe('Super Minds 3A');
-  });
-
-  it('places a two-thirds score at the ceiling', async () => {
-    expect((await runKidsSession(30)).levelName).toBe('Super Minds 3A');
-  });
-
-  it('places just under two thirds one rung lower', async () => {
-    expect((await runKidsSession(29)).levelName).toBe('Super Minds 2A');
-  });
-
-  it('places a one-third score at Super Minds 2A', async () => {
-    expect((await runKidsSession(15)).levelName).toBe('Super Minds 2A');
-  });
-
-  it('places just under one third at the bottom of the ladder', async () => {
-    expect((await runKidsSession(14)).levelName).toBe('Pre-Starters');
-  });
-
-  it('places a run with nothing correct at Pre-Starters', async () => {
-    expect((await runKidsSession(0)).levelName).toBe('Pre-Starters');
+  it.each([
+    [44, 'Super Minds 3A'],
+    [37, 'Super Minds 3A'],
+    [36, 'Super Minds 2B'],
+    [30, 'Super Minds 2B'],
+    [29, 'Super Minds 2A'],
+    [22, 'Super Minds 2A'],
+    [21, 'Super Minds 1B'],
+    [15, 'Super Minds 1B'],
+    [14, 'Super Minds 1A'],
+    [8, 'Super Minds 1A'],
+    [7, 'Pre-Starters'],
+    [0, 'Pre-Starters'],
+  ])('places a kid who gets %i of 44 right at %s', async (correct, expected) => {
+    const { levelName, answered } = await runKidsSession(correct);
+    expect(answered).toBe(44); // the whole bank is always served
+    expect(levelName).toBe(expected);
   });
 });

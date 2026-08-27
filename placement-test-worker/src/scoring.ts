@@ -8,7 +8,10 @@ import type { Track } from './types';
 // step/convergence math in this file doesn't need to change, only the labels.
 export const LEVELS_BY_TRACK: Record<Track, readonly string[]> = {
   adults: ['A0', 'A1', 'A2', 'B1', 'B2', 'C1'],
-  kids: ['-A1', 'A1', 'A1+', 'A2', 'A2+', 'B1'],
+  // Cambridge's own alignment for Super Minds: books 1-2 sit at pre-A1
+  // (Starters), book 3 at A1 (Movers). Several rungs share a code because the
+  // book ladder is finer-grained than CEFR at this age.
+  kids: ['-A1', '-A1', '-A1', '-A1', 'A1', 'A1'],
 };
 export type CefrLevel = string;
 
@@ -22,7 +25,10 @@ export type CefrLevel = string;
 // rather than expanding the ladder to match 1:1.
 export const STAGE_NAMES_BY_TRACK: Record<Track, readonly string[]> = {
   adults: ['Fun A', 'Lint A', 'Lint D', 'Hint A', 'Hint D', 'Advanced B'],
-  kids: ['Pre-Starters', 'Super Minds 2A', 'Super Minds 3A', 'Super Minds 4A', 'Super Minds 5A', 'Super Minds 6A'],
+  // The Super Minds books each split into an A and a B half, and a kid who
+  // lands between two A-halves is placed in the B half below the higher one.
+  // Placement tops out at 3A (see kids.ts), so the ladder ends there.
+  kids: ['Pre-Starters', 'Super Minds 1A', 'Super Minds 1B', 'Super Minds 2A', 'Super Minds 2B', 'Super Minds 3A'],
 };
 
 export interface ScoringState {
