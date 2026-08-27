@@ -341,3 +341,66 @@ describe('text-type question grading', () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe('kids placement level reflects the whole run, not its tail', () => {
+  // Walks the entire kids bank, answering the first `correctCount` questions
+  // with their real key and skipping the rest (a skip scores as incorrect).
+  async function runKidsSession(correctCount: number) {
+    const startRes = await handleStartSession(
+      new Request('http://x/api/session', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+      }),
+      env as any
+    );
+    let data = (await startRes.json()) as any;
+    const sessionId = data.sessionId;
+    let answered = 0;
+
+    while (!data.done && answered < 200) {
+      const q = await env.DB.prepare(`SELECT type, correct_index, expected_answer FROM questions WHERE id = ?`)
+        .bind(data.questionId)
+        .first<{ type: string; correct_index: number; expected_answer: string | null }>();
+
+      let answer: Record<string, unknown>;
+      if (answered >= correctCount) answer = { skip: true };
+      else if (q!.type === 'text') answer = { answerText: q!.expected_answer };
+      else answer = { selectedIndex: q!.correct_index };
+
+      const res = await handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, ...answer }) }),
+        env as any,
+        sessionId
+      );
+      data = await res.json();
+      answered++;
+    }
+    return { level: data.level, levelName: data.levelName, answered };
+  }
+
+  it('places a full score at the Super Minds 3A ceiling', async () => {
+    const { levelName, answered } = await runKidsSession(44);
+    expect(answered).toBe(44);
+    expect(levelName).toBe('Super Minds 3A');
+  });
+
+  it('places a two-thirds score at the ceiling', async () => {
+    expect((await runKidsSession(30)).levelName).toBe('Super Minds 3A');
+  });
+
+  it('places just under two thirds one rung lower', async () => {
+    expect((await runKidsSession(29)).levelName).toBe('Super Minds 2A');
+  });
+
+  it('places a one-third score at Super Minds 2A', async () => {
+    expect((await runKidsSession(15)).levelName).toBe('Super Minds 2A');
+  });
+
+  it('places just under one third at the bottom of the ladder', async () => {
+    expect((await runKidsSession(14)).levelName).toBe('Pre-Starters');
+  });
+
+  it('places a run with nothing correct at Pre-Starters', async () => {
+    expect((await runKidsSession(0)).levelName).toBe('Pre-Starters');
+  });
+});
