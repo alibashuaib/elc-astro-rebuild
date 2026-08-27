@@ -14,15 +14,13 @@ describe('kids placement level', () => {
     expect(kidsLevelIndex(44, TOTAL)).toBe(KIDS_CEILING_INDEX);
   });
 
-  it('keeps the full Super Minds ladder defined, up to 6B', () => {
+  it('keeps the upper Super Minds books defined above the ceiling', () => {
     expect(STAGE_NAMES_BY_TRACK.kids).toEqual([
       'Pre-Starters',
       'Super Minds 1A', 'Super Minds 1B',
       'Super Minds 2A', 'Super Minds 2B',
-      'Super Minds 3A', 'Super Minds 3B',
-      'Super Minds 4A', 'Super Minds 4B',
-      'Super Minds 5A', 'Super Minds 5B',
-      'Super Minds 6A', 'Super Minds 6B',
+      'Super Minds 3A',
+      'Super Minds 4A', 'Super Minds 5A', 'Super Minds 6A',
     ]);
   });
 
@@ -34,12 +32,7 @@ describe('kids placement level', () => {
       'Super Minds 3A',
     ]);
     // Above the ceiling: defined for teaching/reporting, never awarded here.
-    expect(kidsHiddenRungs()).toEqual([
-      'Super Minds 3B',
-      'Super Minds 4A', 'Super Minds 4B',
-      'Super Minds 5A', 'Super Minds 5B',
-      'Super Minds 6A', 'Super Minds 6B',
-    ]);
+    expect(kidsHiddenRungs()).toEqual(['Super Minds 4A', 'Super Minds 5A', 'Super Minds 6A']);
   });
 
   it('never awards a hidden rung, whatever the score', () => {
@@ -107,10 +100,10 @@ describe('kids placement level', () => {
 
   it('aligns the hidden rungs to Movers and Flyers too', () => {
     // Cambridge: Super Minds 3-4 are Movers (A1), 5-6 are Flyers (A2).
-    expect(KIDS_YLE_BY_INDEX[7]).toBe('Movers'); // Super Minds 4A
-    expect(KIDS_YLE_BY_INDEX[11]).toBe('Flyers'); // Super Minds 6A
-    expect(LEVELS_BY_TRACK.kids[7]).toBe('A1');
-    expect(LEVELS_BY_TRACK.kids[11]).toBe('A2');
+    expect(KIDS_YLE_BY_INDEX[6]).toBe('Movers'); // Super Minds 4A
+    expect(KIDS_YLE_BY_INDEX[8]).toBe('Flyers'); // Super Minds 6A
+    expect(LEVELS_BY_TRACK.kids[6]).toBe('A1');
+    expect(LEVELS_BY_TRACK.kids[8]).toBe('A2');
   });
 
   it('reports the Cambridge YLE exam level for each rung', () => {

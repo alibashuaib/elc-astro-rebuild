@@ -63,10 +63,9 @@ export const KIDS_YLE_BY_INDEX: ReadonlyArray<string | undefined> = [
   undefined, // Pre-Starters
   'Starters', 'Starters', // Super Minds 1A, 1B
   'Starters', 'Starters', // Super Minds 2A, 2B
-  'Movers', 'Movers', // Super Minds 3A, 3B
-  'Movers', 'Movers', // Super Minds 4A, 4B
-  'Flyers', 'Flyers', // Super Minds 5A, 5B
-  'Flyers', 'Flyers', // Super Minds 6A, 6B
+  'Movers', // Super Minds 3A -- placement ceiling
+  'Movers', // Super Minds 4A
+  'Flyers', 'Flyers', // Super Minds 5A, 6A
 ];
 
 /** Rungs the placement test can award, bottom to ceiling. */

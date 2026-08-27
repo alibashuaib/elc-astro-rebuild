@@ -17,10 +17,9 @@ export const LEVELS_BY_TRACK: Record<Track, readonly string[]> = {
     '-A1',              // Pre-Starters
     '-A1', '-A1',       // Super Minds 1A, 1B
     '-A1', '-A1',       // Super Minds 2A, 2B
-    'A1', 'A1',         // Super Minds 3A, 3B
-    'A1', 'A1',         // Super Minds 4A, 4B
-    'A2', 'A2',         // Super Minds 5A, 5B
-    'A2', 'A2',         // Super Minds 6A, 6B
+    'A1',               // Super Minds 3A -- placement ceiling
+    'A1',               // Super Minds 4A
+    'A2', 'A2',         // Super Minds 5A, 6A
   ],
 };
 export type CefrLevel = string;
@@ -43,10 +42,10 @@ export const STAGE_NAMES_BY_TRACK: Record<Track, readonly string[]> = {
     'Pre-Starters',
     'Super Minds 1A', 'Super Minds 1B',
     'Super Minds 2A', 'Super Minds 2B',
-    'Super Minds 3A', 'Super Minds 3B',
-    'Super Minds 4A', 'Super Minds 4B',
-    'Super Minds 5A', 'Super Minds 5B',
-    'Super Minds 6A', 'Super Minds 6B',
+    'Super Minds 3A',
+    // Above the placement ceiling: the A-halves only, as the upper books are
+    // reached by teaching rather than by a placement result.
+    'Super Minds 4A', 'Super Minds 5A', 'Super Minds 6A',
   ],
 };
 
