@@ -24,6 +24,11 @@ jobs:
           # once the Google Business Profile + a Places API key exist.
           GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
           GOOGLE_PLACE_ID: ${{ secrets.GOOGLE_PLACE_ID }}
+          # Baked into client-side JS at build time, so it is public by nature --
+          # a literal here rather than a secret, kept in step with the
+          # connect-src entry in public/.htaccess. Without it the placement test
+          # calls "undefined/api/session" and fails silently in production.
+          PUBLIC_PLACEMENT_API_URL: https://placement-test-worker.alibashuaib90.workers.dev
 
       # Gate every PR on the performance/a11y/SEO budgets from the rebuild plan —
       # fail the build if any page drops below the thresholds in lighthouserc.json.
