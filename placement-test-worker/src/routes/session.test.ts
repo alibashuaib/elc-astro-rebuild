@@ -12,6 +12,8 @@ function makeEnv() {
       path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
       path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
       path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
+      path.join(__dirname, '../../migrations/0011_skip_question.sql'),
+      path.join(__dirname, '../../migrations/0012_case_insensitive_grading.sql'),
     ]),
     ADMIN_SESSION_TTL_SECONDS: '43200',
     ADMIN_COOKIE_SECRET: 'test-secret',
@@ -46,6 +48,22 @@ describe('session routes', () => {
         dob: '1995-01-01', // would compute to 'adults'
         locale: 'en',
         track: 'kids',
+      }),
+    });
+    const res = await handleStartSession(req, env as any);
+    const data = (await res.json()) as any;
+    expect(data.track).toBe('kids');
+  });
+
+  it('forces children under 11 onto the kids track even when adults is requested', async () => {
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'Young student',
+        phone: '+966500000099',
+        dob: '2018-01-01',
+        locale: 'en',
+        track: 'adults',
       }),
     });
     const res = await handleStartSession(req, env as any);
@@ -212,7 +230,9 @@ describe('text-type question grading', () => {
         path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
         path.join(__dirname, '../../migrations/0005_kids_text_and_vocab_questions.sql'),
         path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
-      path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
+        path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
+        path.join(__dirname, '../../migrations/0011_skip_question.sql'),
+        path.join(__dirname, '../../migrations/0012_case_insensitive_grading.sql'),
       ]),
       ADMIN_SESSION_TTL_SECONDS: '43200',
       ADMIN_COOKIE_SECRET: 'test-secret',
@@ -222,6 +242,30 @@ describe('text-type question grading', () => {
   // kids-A1-1 is the handwriting item "Write the capital letter for \"a\"."
   // with expected_answer 'A' -- see migrations/0005_kids_text_and_vocab_questions.sql.
   const KNOWN_TEXT_QUESTION_ID = 'kids-A1-1';
+
+  it('randomizes repeated kids questions while keeping the capital-letter block first', async () => {
+    const firstQuestionIds = new Set<string>();
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const attemptEnv = makeTextEnv();
+      const res = await handleStartSession(
+        new Request('http://x/api/session', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: 'Kid',
+            phone: `+9665000001${attempt}`,
+            dob: '2018-01-01',
+            locale: 'en',
+            track: 'kids',
+          }),
+        }),
+        attemptEnv as any
+      );
+      const data = (await res.json()) as any;
+      expect(['kids-A1-1', 'kids-A1-2', 'kids-A1-3', 'kids-A1-4', 'kids-A1-5', 'kids-A1-6']).toContain(data.questionId);
+      firstQuestionIds.add(data.questionId);
+    }
+    expect(firstQuestionIds.size).toBeGreaterThan(1);
+  });
 
   async function startKidsSession(env: ReturnType<typeof makeTextEnv>, phone: string) {
     const startRes = await handleStartSession(
