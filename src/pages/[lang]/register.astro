@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import RegistrationExperience from '../../components/RegistrationExperience.astro';
+import { breadcrumbSchema } from '../../lib/schema';
+import { localePaths, meta, trail, heroKicker } from '../../i18n/pages';
+import type { Locale } from '../../i18n/ui';
+
+export const getStaticPaths = localePaths;
+
+const locale = Astro.params.lang as Locale;
+const { title, description, hero } = meta('register', locale);
+
+const courses = await getCollection('courses', (e) => e.id.startsWith(`${locale}/`) && !e.data.draft);
+---
+
+<Layout
+  locale={locale}
+  path="/register"
+  title={title}
+  description={description}
+  jsonLd={breadcrumbSchema(trail(locale, ['register']))}
+>
+  <PageHero kicker={heroKicker[locale]} title={hero!.title} subtitle={hero!.subtitle} />
+
+  <RegistrationExperience locale={locale} courses={courses} />
+</Layout>

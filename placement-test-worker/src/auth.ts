@@ -14,7 +14,14 @@ export async function checkPassword(plain: string, hash: string): Promise<boolea
 }
 
 export async function issueSessionCookie(env: Env, adminId: string): Promise<string> {
+  // A missing or malformed TTL used to yield NaN here, which serialized into the
+  // signed payload as the string "NaN". Because `Date.now() > NaN` is false, the
+  // expiry check in verifyAdminSession then passed forever -- a correctly signed
+  // admin cookie that never expired. Refuse to mint one at all instead.
   const ttl = parseInt(env.ADMIN_SESSION_TTL_SECONDS, 10);
+  if (!Number.isFinite(ttl) || ttl <= 0) {
+    throw new Error(`ADMIN_SESSION_TTL_SECONDS must be a positive number of seconds, got ${JSON.stringify(env.ADMIN_SESSION_TTL_SECONDS)}`);
+  }
   const expires = Date.now() + ttl * 1000;
   const payload = `${adminId}.${expires}`;
   const sig = await sign(payload, env.ADMIN_COOKIE_SECRET);
@@ -41,7 +48,11 @@ export async function verifyAdminSession(req: Request, env: Env): Promise<boolea
   if (!match) return false;
   const [adminId, expiresStr, sig] = match[1].split('.');
   if (!adminId || !expiresStr || !sig) return false;
-  if (Date.now() > parseInt(expiresStr, 10)) return false;
+  // Defence in depth against the NaN-expiry cookie described in
+  // issueSessionCookie: an unparseable expiry is treated as expired, not as
+  // "never expires" (which is what a bare `Date.now() > NaN` comparison gives).
+  const expires = parseInt(expiresStr, 10);
+  if (!Number.isFinite(expires) || Date.now() > expires) return false;
   const expectedSig = await sign(`${adminId}.${expiresStr}`, env.ADMIN_COOKIE_SECRET);
   return constantTimeEqual(expectedSig, sig);
 }

@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AboutExperience from '../../components/AboutExperience.astro';
+import { organizationSchema, breadcrumbSchema } from '../../lib/schema';
+import { localePaths, meta, trail } from '../../i18n/pages';
+import type { Locale } from '../../i18n/ui';
+
+export const getStaticPaths = localePaths;
+
+const locale = Astro.params.lang as Locale;
+const { title, description } = meta('about', locale);
+---
+
+<Layout
+  locale={locale}
+  path="/about"
+  title={title}
+  description={description}
+  jsonLd={[organizationSchema(undefined, locale), breadcrumbSchema(trail(locale, ['about']))]}
+>
+  <AboutExperience locale={locale} />
+</Layout>

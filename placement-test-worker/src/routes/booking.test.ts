@@ -2,17 +2,10 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
 import { handleCreateBooking, handleListSlots } from './booking';
 import { createSlot, insertStudent, insertSession } from '../db';
-import path from 'node:path';
 
 function makeEnv() {
   return {
-    DB: createFakeD1([
-      path.join(__dirname, '../../migrations/0001_init.sql'),
-      path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
-      path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
-      path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
-      path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
-    ]),
+    DB: createFakeD1(),
   };
 }
 

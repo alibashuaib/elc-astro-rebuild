@@ -1,18 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from './test-utils/fakeD1';
 import bcrypt from 'bcryptjs';
-import path from 'node:path';
 import worker from './index';
 
 function makeEnv() {
   return {
-    DB: createFakeD1([
-      path.join(__dirname, '../migrations/0001_init.sql'),
-      path.join(__dirname, '../migrations/0002_seed_questions.sql'),
-      path.join(__dirname, '../migrations/0004_add_text_question_type.sql'),
-      path.join(__dirname, '../migrations/0006_fixed_sequential_order.sql'),
-      path.join(__dirname, '../migrations/0007_elc_level_ladders.sql'),
-    ]),
+    DB: createFakeD1(),
     ADMIN_SESSION_TTL_SECONDS: '43200',
     ADMIN_COOKIE_SECRET: 'test-secret',
   };
@@ -73,6 +66,37 @@ describe('router', () => {
     expect(slotsRes.status).toBe(200);
     const data = (await slotsRes.json()) as any;
     expect(data.slots).toBeDefined();
+  });
+
+  // Loopback origins exist so `astro dev` (which picks whatever port is free)
+  // can call the Worker without hard-coding one. In production that same rule
+  // let any page served from the visitor's own machine make credentialed
+  // cross-origin calls to the live admin API, so it is now gated on LOCAL_DEV.
+  describe('loopback CORS origins', () => {
+    function preflightFrom(origin: string, envOverrides: Record<string, unknown> = {}) {
+      return worker.fetch(
+        new Request('http://x/api/session', { method: 'OPTIONS', headers: { origin } }),
+        { ...(env as any), ...envOverrides }
+      );
+    }
+
+    it('echoes a loopback origin back when running locally', async () => {
+      const res = await preflightFrom('http://localhost:4321', { LOCAL_DEV: 'true' });
+      expect(res.headers.get('access-control-allow-origin')).toBe('http://localhost:4321');
+    });
+
+    it.each(['http://localhost:4321', 'http://127.0.0.1:8788'])(
+      'does not echo %s back in production',
+      async (origin) => {
+        const res = await preflightFrom(origin);
+        expect(res.headers.get('access-control-allow-origin')).toBe('https://elc.com.sa');
+      }
+    );
+
+    it('still echoes the production site origin back', async () => {
+      const res = await preflightFrom('https://elc.com.sa');
+      expect(res.headers.get('access-control-allow-origin')).toBe('https://elc.com.sa');
+    });
   });
 
   it('returns 404 for an unknown path', async () => {

@@ -2,17 +2,10 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
 import { handleStartSession, handleAnswer } from './session';
 import { ADULT_BANDS } from '../bands';
-import path from 'node:path';
 
 function makeEnv() {
   return {
-    DB: createFakeD1([
-      path.join(__dirname, '../../migrations/0001_init.sql'),
-      path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
-      path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
-      path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
-      path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
-    ]),
+    DB: createFakeD1(),
     ADMIN_SESSION_TTL_SECONDS: '43200',
     ADMIN_COOKIE_SECRET: 'test-secret',
   };
@@ -35,6 +28,57 @@ describe('session routes', () => {
     expect(data.track).toBe('adults');
     expect(data.done).toBe(false);
     expect(data.prompt).toBeDefined();
+  });
+
+  describe('answer submissions are bound to the question the session is on', () => {
+    async function startAdultSession() {
+      const res = await handleStartSession(
+        new Request('http://x/api/session', {
+          method: 'POST',
+          body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en' }),
+        }),
+        env as any
+      );
+      return (await res.json()) as any;
+    }
+
+    function answer(sessionId: string, questionId: string, selectedIndex: number) {
+      return handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId, selectedIndex }) }),
+        env as any,
+        sessionId
+      );
+    }
+
+    async function countResponses(sessionId: string, questionId: string) {
+      const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM responses WHERE session_id = ? AND question_id = ?`)
+        .bind(sessionId, questionId)
+        .first<{ n: number }>();
+      return row!.n;
+    }
+
+    it('rejects re-answering a question the session has already moved past', async () => {
+      const start = await startAdultSession();
+      const firstQuestionId = start.questionId;
+      await answer(start.sessionId, firstQuestionId, 0);
+
+      const replay = await answer(start.sessionId, firstQuestionId, 0);
+
+      expect(replay.status).toBe(400);
+      expect(await countResponses(start.sessionId, firstQuestionId)).toBe(1);
+    });
+
+    it('rejects an answer for a question further ahead in the bank', async () => {
+      const start = await startAdultSession();
+      const ahead = await env.DB.prepare(
+        `SELECT id FROM questions WHERE track = 'adults' AND active = 1 ORDER BY sequence ASC LIMIT 1 OFFSET 3`
+      ).first<{ id: string }>();
+
+      const res = await answer(start.sessionId, ahead!.id, 0);
+
+      expect(res.status).toBe(400);
+      expect(await countResponses(start.sessionId, ahead!.id)).toBe(0);
+    });
   });
 
   it('honors an explicit track override even when it contradicts the DOB-derived track', async () => {
@@ -66,12 +110,12 @@ describe('session routes', () => {
   });
 
   it('walks the whole seeded adults bank (no early stop via scoring convergence) and returns a final level', async () => {
-    // Seeded questions all have correct_index: 1 (see migrations/0002_seed_questions.sql),
-    // so always answering index 1 is always correct. The session only ends once
-    // pickNextQuestion runs out of unasked questions (see session.ts's
-    // nextQuestionPayload) -- scoring.ts's isDone is just a generous safety cap now,
-    // not an early-exit (see its comment: "kids placement test missing the rest of
-    // the questions" was the bug this replaced).
+    // Answers each question with its real key, read from the DB -- the bank's
+    // correct_index varies per question (migrations/0003_real_questions.sql), so
+    // a hard-coded index would fail bands and stop the walk early.
+    // scoring.ts's isDone is just a generous safety cap now, not an early-exit
+    // (see its comment: "kids placement test missing the rest of the questions"
+    // was the bug this replaced).
     const startRes = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
@@ -83,10 +127,13 @@ describe('session routes', () => {
     const sessionId = data.sessionId;
     let rounds = 0;
     while (!data.done && rounds < 80) {
+      const key = await env.DB.prepare(`SELECT correct_index FROM questions WHERE id = ?`)
+        .bind(data.questionId)
+        .first<{ correct_index: number }>();
       const res = await handleAnswer(
         new Request('http://x', {
           method: 'POST',
-          body: JSON.stringify({ questionId: data.questionId, selectedIndex: 1 }), // always correct
+          body: JSON.stringify({ questionId: data.questionId, selectedIndex: key!.correct_index }),
         }),
         env as any,
         sessionId
@@ -95,29 +142,20 @@ describe('session routes', () => {
       rounds++;
     }
     expect(data.done).toBe(true);
-    expect(['A0', 'A1', 'A2', 'B1', 'B2', 'C1']).toContain(data.level); // adults' ladder -- see scoring.ts/LEVELS_BY_TRACK
-    expect(rounds).toBe(36); // the seeded bank's adults half (72 rows split evenly by track), not an early convergence stop
+    // Adults are scored by proficiency band (bands.ts), not scoring.ts's CEFR
+    // ladder: an all-correct run passes every band, and passing the last one
+    // (Hint A) places the student above the banded range.
+    expect(data.level).toBe('Above Hint A');
+    // Ends at the last banded question (ADULT_BANDS.at(-1).end), not at the
+    // full 50-row bank -- sequence 35-50 isn't banded yet, so it isn't served.
+    expect(rounds).toBe(34);
   });
 });
 
 describe('adults band placement (bands.ts, real question content)', () => {
   function makeRealAdultsEnv() {
     return {
-      DB: createFakeD1([
-        path.join(__dirname, '../../migrations/0001_init.sql'),
-        path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
-        path.join(__dirname, '../../migrations/0003_real_questions.sql'),
-        path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
-        path.join(__dirname, '../../migrations/0005_kids_text_and_vocab_questions.sql'),
-        path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
-        path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
-        path.join(__dirname, '../../migrations/0008_kids_picture_matching.sql'),
-        path.join(__dirname, '../../migrations/0009_reading_passages.sql'),
-        path.join(__dirname, '../../migrations/0010_kids_reading_passage.sql'),
-        path.join(__dirname, '../../migrations/0011_skip_question.sql'),
-        path.join(__dirname, '../../migrations/0012_case_insensitive_grading.sql'),
-        path.join(__dirname, '../../migrations/0013_room_vocab_images.sql'),
-      ]),
+      DB: createFakeD1(),
       ADMIN_SESSION_TTL_SECONDS: '43200',
       ADMIN_COOKIE_SECRET: 'test-secret',
     };
@@ -206,14 +244,7 @@ describe('adults band placement (bands.ts, real question content)', () => {
 describe('text-type question grading', () => {
   function makeTextEnv() {
     return {
-      DB: createFakeD1([
-        path.join(__dirname, '../../migrations/0001_init.sql'),
-        path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
-        path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
-        path.join(__dirname, '../../migrations/0005_kids_text_and_vocab_questions.sql'),
-        path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
-      path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
-      ]),
+      DB: createFakeD1(),
       ADMIN_SESSION_TTL_SECONDS: '43200',
       ADMIN_COOKIE_SECRET: 'test-secret',
     };

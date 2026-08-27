@@ -5,24 +5,30 @@ import FaqAccordion from '../../../components/FaqAccordion.astro';
 import Icon from '../../../components/Icon.astro';
 import CourseContentPanel from '../../../components/CourseContentPanel.astro';
 import { courseSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
-import { categoryLabels, useTranslations } from '../../../i18n/ui';
+import { categoryLabels, useTranslations, locales, type Locale } from '../../../i18n/ui';
+import { SITE, trail } from '../../../i18n/pages';
 
 export async function getStaticPaths() {
-  const courses = await getCollection('courses', (entry) => entry.id.startsWith('ar/'));
-  return courses.map((course) => ({
-    params: { slug: course.id.replace('ar/', '') },
-    props: { course },
-  }));
+  const courses = await getCollection('courses');
+  // Collection ids are locale-prefixed ("en/business-english"), so one pass
+  // over the collection yields every locale/slug pair this route builds.
+  return courses
+    .filter((course) => locales.some((lang) => course.id.startsWith(`${lang}/`)))
+    .map((course) => {
+      const [lang, ...rest] = course.id.split('/');
+      return { params: { lang, slug: rest.join('/') }, props: { course } };
+    });
 }
 
 const { course } = Astro.props;
 const { slug } = Astro.params;
+const locale = Astro.params.lang as Locale;
 const { Content } = await render(course);
-const t = useTranslations('ar');
+const t = useTranslations(locale);
 const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek, hoursPerMonth, hoursPerDay, scheduleDays, classTimes, faqs } = course.data;
 const formattedPrice = price?.toLocaleString('en-US');
 
-const url = `https://elc.com.sa/ar/courses/${slug}`;
+const url = `${SITE}/${locale}/courses/${slug}`;
 
 const ldCourse = courseSchema({
   name: title,
@@ -31,72 +37,76 @@ const ldCourse = courseSchema({
   currency,
   durationText: durationWeeks !== undefined ? `P${durationWeeks}W` : undefined,
   url,
-  providerName: 'معهد صرح المعرفة',
+  // Arabic pages name the provider in Arabic; the schema helper defaults to 'ELC'.
+  providerName: locale === 'ar' ? 'معهد صرح المعرفة' : undefined,
 });
 
-const breadcrumbs = breadcrumbSchema([
-  { name: 'الرئيسية', url: 'https://elc.com.sa/ar/' },
-  { name: 'الدورات', url: 'https://elc.com.sa/ar/courses' },
-  { name: title, url },
-]);
+const breadcrumbs = breadcrumbSchema(trail(locale, ['courses'], { name: title, path: `/courses/${slug}` }));
 
 const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(faqs)] : [])];
 ---
 
 <Layout
-  locale="ar"
+  locale={locale}
   path={`/courses/${slug}`}
-  title={`${title} — معهد صرح المعرفة`}
+  title={`${title} — ${locale === 'ar' ? 'معهد صرح المعرفة' : 'ELC'}`}
   description={summary}
   jsonLd={ldEntries}
 >
   <article class="container course-detail">
     <nav aria-label="Breadcrumb" class="breadcrumb">
-      <a href="/ar/">الرئيسية</a> / <a href="/ar/courses">الدورات</a> / <span>{title}</span>
+      <a href={`/${locale}/`}>{t('nav.home')}</a> / <a href={`/${locale}/courses`}>{t('courses.title')}</a> / <span>{title}</span>
     </nav>
 
     <header class="course-intro">
       <div class="course-head">
-        <span class="badge">{categoryLabels.ar[category]}</span>
+        <span class="badge">{categoryLabels[locale][category]}</span>
         {level && <span class="badge badge-level numeric">{level}</span>}
       </div>
       <h1>{title}</h1>
       <p class="lead">{summary}</p>
     </header>
 
-    <dl class="stats">
-        {price !== undefined && <div class="price-stat"><dt>السعر</dt><dd><strong class="numeric">{formattedPrice}</strong><span>{currency}</span></dd></div>}
-        {durationWeeks !== undefined && <div class="duration-stat"><dt>المدة</dt><dd><strong class="numeric">{durationWeeks}</strong><span>أسابيع</span></dd></div>}
+    <dl class:list={['stats', { numeric: locale !== 'ar' }]}>
+        {price !== undefined && <div class="price-stat"><dt>{t('courses.price')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{formattedPrice}</strong><span>{currency}</span></dd></div>}
+        {durationWeeks !== undefined && <div class="duration-stat"><dt>{t('courseDetail.duration')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{durationWeeks}</strong><span>{t('courses.weeks')}</span></dd></div>}
         {hoursPerMonth ? (
-          <div class="monthly-stat"><dt>الساعات الشهرية</dt><dd><strong class="numeric">{hoursPerMonth}</strong><span>ساعة/شهر</span></dd></div>
+          <div class="monthly-stat"><dt>{t('courseDetail.monthlyHours')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{hoursPerMonth}</strong><span>{t('courseDetail.hoursPerMonth')}</span></dd></div>
         ) : (
-          <div class="monthly-stat is-variable"><dt>الساعات الشهرية</dt><dd><strong>—</strong><span>تختلف حسب الدفعة</span></dd></div>
+          <div class="monthly-stat is-variable"><dt>{t('courseDetail.monthlyHours')}</dt><dd><strong>—</strong><span>{t('courseDetail.variesByIntake')}</span></dd></div>
         )}
-        {hoursPerDay !== undefined && <div class="daily-stat"><dt>الساعات اليومية</dt><dd><strong class="numeric">{hoursPerDay}</strong><span>ساعة/يوم</span></dd></div>}
-        {scheduleDays && <div class="days-stat"><dt>أيام الدراسة</dt><dd><strong>{scheduleDays}</strong></dd></div>}
+        {hoursPerDay !== undefined && <div class="daily-stat"><dt>{t('courseDetail.dailyHours')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{hoursPerDay}</strong><span>{t('courseDetail.hoursPerDay')}</span></dd></div>}
+        {scheduleDays && <div class="days-stat"><dt>{t('courseDetail.studyDays')}</dt><dd><strong>{scheduleDays}</strong></dd></div>}
     </dl>
     {hoursPerDay !== undefined && scheduleDays && (
       <section class="course-schedule" aria-labelledby="course-schedule-title">
         {classTimes && classTimes.length > 0 && (
           <div class:list={['time-options', { single: classTimes.length === 1 }]}>
-            <div class="times-heading"><strong id="course-schedule-title">فترات الدراسة المتاحة</strong><span>{classTimes.length > 1 ? 'اختر الفترة المناسبة لك' : 'فترة الدراسة الحالية'}</span></div>
+            <div class="times-heading"><strong id="course-schedule-title">{t('courseDetail.classTimes')}</strong><span>{classTimes.length > 1 ? t('courseDetail.choosePeriod') : t('courseDetail.currentPeriod')}</span></div>
             <div class="time-grid">
               {classTimes.map((period) => (
-                <div class="time-card"><span class="time-icon"><Icon name="clock" size={20} /></span><span><small>{period.label}</small><strong class="time-value" dir="rtl"><span>من</span><bdi class="numeric" dir="ltr">{period.start}</bdi><span>إلى</span><bdi class="numeric" dir="ltr">{period.end}</bdi><span>{period.meridiem}</span></strong></span></div>
+                <div class="time-card"><span class="time-icon"><Icon name="clock" size={20} /></span><span><small>{period.label}</small>
+                  {/* Arabic reads the range as "from X to Y" rather than an en-dash span, so the two locales lay the value out differently. */}
+                  {locale === 'ar' ? (
+                    <strong class="time-value" dir="rtl"><span>{t('courseDetail.from')}</span><bdi class="numeric" dir="ltr">{period.start}</bdi><span>{t('courseDetail.to')}</span><bdi class="numeric" dir="ltr">{period.end}</bdi><span>{period.meridiem}</span></strong>
+                  ) : (
+                    <strong class="time-value" dir="ltr"><bdi class="numeric" dir="ltr">{period.start}–{period.end}</bdi><span>{period.meridiem}</span></strong>
+                  )}
+                </span></div>
               ))}
             </div>
           </div>
         )}
-        <p>يؤكد فريق القبول وقت الحصة المتاح وتاريخ بدء الدفعة القادمة.</p>
+        <p>{t('courseDetail.admissionsNote')}</p>
       </section>
     )}
-    {price === undefined && durationWeeks === undefined && hoursPerWeek === undefined && <p class="details-note">تواصل معنا لمعرفة الجدول والسعر الحاليين.</p>}
+    {price === undefined && durationWeeks === undefined && hoursPerWeek === undefined && <p class="details-note">{t('courseDetail.contactNote')}</p>}
 
-    <a href="/ar/register" class="btn btn-primary">{t('courses.enroll')}</a>
+    <a href={`/${locale}/register`} class="btn btn-primary">{t('courses.enroll')}</a>
 
-    <CourseContentPanel locale="ar" Content={Content} />
+    <CourseContentPanel locale={locale} Content={Content} />
 
-    <FaqAccordion faqs={faqs} title="الأسئلة الشائعة" />
+    <FaqAccordion faqs={faqs} title={t('courseDetail.faqs')} />
   </article>
 </Layout>
 
@@ -128,7 +138,7 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
   .stats > div::before { content: ''; position: absolute; inset: 0 0 auto; height: 3px; background: var(--color-border-strong); }
   .stats .price-stat { background: linear-gradient(145deg, var(--color-bg-raised), var(--color-blue-soft)); }
   .stats .price-stat::before { background: linear-gradient(90deg, var(--color-primary), var(--color-coral)); }
-  .stats dt { margin: 0 0 .55rem; color: var(--color-ink-muted); font-size: .72rem; font-weight: 750; }
+  .stats dt { margin: 0 0 .55rem; color: var(--color-ink-muted); font-size: .72rem; font-weight: 750; text-transform: uppercase; letter-spacing: .06em; }
   .stats dd { display: flex; align-items: baseline; gap: .38rem; margin: 0; }
   .stats dd strong { color: var(--color-navy); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 850; line-height: 1; letter-spacing: -.045em; }
   .stats .price-stat dd strong, .stats .price-stat dd span { color: var(--color-primary-text); }

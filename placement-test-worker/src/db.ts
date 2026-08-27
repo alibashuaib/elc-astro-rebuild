@@ -76,6 +76,14 @@ export async function pickNextQuestion(
   return row ?? null;
 }
 
+/** Ids of every question this session has already recorded a response for, in insertion order. */
+export async function listAnsweredQuestionIds(env: Env, sessionId: string): Promise<string[]> {
+  const rows = await env.DB.prepare(`SELECT question_id FROM responses WHERE session_id = ?`)
+    .bind(sessionId)
+    .all<{ question_id: string }>();
+  return rows.results?.map((r) => r.question_id) ?? [];
+}
+
 // Total size of a track's active question bank -- used by the frontend to
 // render "question N of total" progress, since the walk-through is a fixed
 // sequential pass over this same set (see pickNextQuestion) rather than an

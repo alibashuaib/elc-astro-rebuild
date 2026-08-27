@@ -98,6 +98,6 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       <slot />
     </main>
     <Footer locale={locale} />
-    <WhatsAppButton label={locale === 'ar' ? 'تواصل عبر واتساب' : 'Chat on WhatsApp'} />
+    <WhatsAppButton label={t('whatsapp.label')} />
   </body>
 </html>

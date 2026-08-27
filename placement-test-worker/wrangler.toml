@@ -6,6 +6,15 @@ compatibility_date = "2026-08-01"
 binding = "DB"
 database_name = "placement-test"
 database_id = "00000000-0000-0000-0000-000000000000"
+# `wrangler d1 migrations apply` (npm run db:migrate:local / :remote) tracks what
+# it has already run in a d1_migrations table and applies only the new files, so
+# adding a migration no longer means editing a command chain in package.json.
+#
+# NOTE for a database that was already migrated by the old per-file `d1 execute`
+# chain: it has no d1_migrations table, so the first `migrations apply` would try
+# to replay every file from 0001. Seed that table with the already-applied
+# filenames before the first run against such a database.
+migrations_dir = "migrations"
 
 [vars]
 ADMIN_SESSION_TTL_SECONDS = "43200"

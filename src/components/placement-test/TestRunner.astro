@@ -19,6 +19,8 @@ const { t } = Astro.props;
   data-correct={t('placementTest.correct')}
   data-incorrect={t('placementTest.incorrect')}
   data-skip={t('placementTest.skip')}
+  data-true={t('placementTest.true')}
+  data-false={t('placementTest.false')}
 >
   <header class="runner-heading">
     <div>
@@ -62,16 +64,6 @@ const { t } = Astro.props;
   const feedbackEl = document.getElementById('pt-feedback') as HTMLElement;
   const errorEl = document.getElementById('pt-error') as HTMLElement;
   const skipBtn = document.getElementById('pt-skip') as HTMLButtonElement;
-  // Astro scopes component CSS with a generated data attribute. Controls in
-  // this component are created at runtime, so copy that attribute onto every
-  // generated element or the compiled selectors will not match them.
-  const scopeAttribute = Array.from(runner.attributes).find((attribute) =>
-    attribute.name.startsWith('data-astro-cid-')
-  )?.name;
-  function scopeElements(...elements: HTMLElement[]) {
-    if (!scopeAttribute) return;
-    elements.forEach((element) => element.setAttribute(scopeAttribute, ''));
-  }
   const questionLabel = runner.dataset.questionLabel ?? '';
   const answerErrorText = runner.dataset.answerError ?? '';
   const answerSubmitText = runner.dataset.answerSubmit ?? 'Submit';
@@ -80,6 +72,8 @@ const { t } = Astro.props;
   const correctText = runner.dataset.correct ?? 'Correct!';
   const incorrectText = runner.dataset.incorrect ?? 'Incorrect';
   skipBtn.textContent = runner.dataset.skip ?? "I don't understand — skip";
+  const trueText = runner.dataset.true ?? 'True';
+  const falseText = runner.dataset.false ?? 'False';
   // How long the correct/incorrect feedback stays on screen before the next
   // question loads -- long enough to register, short enough not to feel like
   // a stall between questions.
@@ -210,7 +204,6 @@ const { t } = Astro.props;
       textAnswer.className = 'pt-text-answer';
       textAnswer.appendChild(input);
       textAnswer.appendChild(submitBtn);
-      scopeElements(input, submitBtn, submitLabel, submitIcon, textAnswer);
       optionsEl.appendChild(textAnswer);
       input.focus();
       return;
@@ -245,7 +238,6 @@ const { t } = Astro.props;
       label.textContent = opt;
       btn.appendChild(key);
       btn.appendChild(label);
-      scopeElements(btn, key, label);
       btn.addEventListener('click', () => {
         const buttons = Array.from(optionsEl.querySelectorAll('button')) as HTMLButtonElement[];
         handleSubmit(step, { selectedIndex: idx }, buttons, btn);
@@ -263,10 +255,9 @@ const { t } = Astro.props;
     icon.setAttribute('aria-hidden', 'true');
     icon.textContent = kind === 'true' ? '✓' : '✕';
     const label = document.createElement('span');
-    label.textContent = kind === 'true' ? 'True' : 'False';
+    label.textContent = kind === 'true' ? trueText : falseText;
     btn.appendChild(icon);
     btn.appendChild(label);
-    scopeElements(btn, icon, label);
     btn.addEventListener('click', () => {
       const buttons = Array.from(optionsEl.querySelectorAll('button')) as HTMLButtonElement[];
       handleSubmit(step, { selectedIndex: idx }, buttons, btn);
@@ -424,12 +415,12 @@ const { t } = Astro.props;
     background: rgb(182 23 51 / 0.1);
     color: var(--color-primary-text);
   }
-  .pt-selected-correct {
+  #pt-options :global(.pt-selected-correct) {
     border-color: transparent !important;
     background: rgb(34 139 87 / 0.1) !important;
     box-shadow: inset 0 0 0 2px #1a7a49, 0 12px 28px rgb(34 139 87 / 0.14) !important;
   }
-  .pt-selected-incorrect {
+  #pt-options :global(.pt-selected-incorrect) {
     border-color: transparent !important;
     background: rgb(182 23 51 / 0.08) !important;
     box-shadow: inset 0 0 0 2px var(--color-primary), 0 12px 28px rgb(182 23 51 / 0.12) !important;
@@ -478,7 +469,7 @@ const { t } = Astro.props;
     display: grid;
     gap: 0.8rem;
   }
-  .pt-option-btn {
+  #pt-options :global(.pt-option-btn) {
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -501,7 +492,7 @@ const { t } = Astro.props;
     transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease),
       background var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
   }
-  .pt-option-btn::before {
+  #pt-options :global(.pt-option-btn::before) {
     content: '';
     position: absolute;
     z-index: -1;
@@ -513,7 +504,7 @@ const { t } = Astro.props;
     transform-origin: center;
     transition: transform var(--motion-fast) var(--ease);
   }
-  .pt-option-btn::after {
+  #pt-options :global(.pt-option-btn::after) {
     content: '';
     width: 1.2rem;
     height: 1.2rem;
@@ -524,25 +515,25 @@ const { t } = Astro.props;
     transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
       transform var(--motion-fast) var(--ease);
   }
-  .pt-option-btn:hover:not(:disabled) {
+  #pt-options :global(.pt-option-btn:hover:not(:disabled)) {
     transform: translateY(-2px);
     background: linear-gradient(135deg, var(--color-bg-raised), rgb(182 23 51 / 0.065));
     box-shadow: inset 0 0 0 1px rgb(182 23 51 / 0.42), 0 14px 30px rgb(49 43 40 / 0.1);
   }
-  .pt-option-btn:hover:not(:disabled)::before { transform: scaleY(1); }
-  .pt-option-btn:hover:not(:disabled)::after {
+  #pt-options :global(.pt-option-btn:hover:not(:disabled)::before) { transform: scaleY(1); }
+  #pt-options :global(.pt-option-btn:hover:not(:disabled)::after) {
     border-color: var(--color-primary);
     background: var(--color-primary);
     transform: scale(1.08);
   }
-  .pt-option-btn:active:not(:disabled) { transform: translateY(0) scale(0.995); }
-  .pt-option-btn:focus-visible {
+  #pt-options :global(.pt-option-btn:active:not(:disabled)) { transform: translateY(0) scale(0.995); }
+  #pt-options :global(.pt-option-btn:focus-visible) {
     outline: 3px solid rgb(182 23 51 / 0.2);
     outline-offset: 3px;
   }
-  .pt-option-btn:disabled { cursor: default; }
-  .pt-option-btn:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect) { opacity: 0.52; }
-  .pt-option-key {
+  #pt-options :global(.pt-option-btn:disabled) { cursor: default; }
+  #pt-options :global(.pt-option-btn:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect)) { opacity: 0.52; }
+  #pt-options :global(.pt-option-key) {
     display: grid;
     width: 2rem;
     height: 2rem;
@@ -559,16 +550,16 @@ const { t } = Astro.props;
     transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
       box-shadow var(--motion-fast) var(--ease);
   }
-  .pt-option-label { line-height: 1.45; }
-  .pt-option-btn:hover:not(:disabled) .pt-option-key {
+  #pt-options :global(.pt-option-label) { line-height: 1.45; }
+  #pt-options :global(.pt-option-btn:hover:not(:disabled) .pt-option-key) {
     color: #fff;
     background: var(--color-primary);
     border-color: var(--color-primary);
     box-shadow: 0 6px 14px rgb(182 23 51 / 0.2);
   }
-  .pt-option-btn.pt-selected-correct::before,
-  .pt-option-btn.pt-selected-incorrect::before { transform: scaleY(1); }
-  .pt-option-btn.pt-selected-correct::after {
+  #pt-options :global(.pt-option-btn.pt-selected-correct::before),
+  #pt-options :global(.pt-option-btn.pt-selected-incorrect::before) { transform: scaleY(1); }
+  #pt-options :global(.pt-option-btn.pt-selected-correct::after) {
     content: '✓';
     display: grid;
     place-items: center;
@@ -579,7 +570,7 @@ const { t } = Astro.props;
     font-size: 0.75rem;
     font-weight: 900;
   }
-  .pt-option-btn.pt-selected-incorrect::after {
+  #pt-options :global(.pt-option-btn.pt-selected-incorrect::after) {
     content: '×';
     display: grid;
     place-items: center;
@@ -590,13 +581,13 @@ const { t } = Astro.props;
     font-size: 0.9rem;
     font-weight: 900;
   }
-  .pt-option-btn.pt-selected-correct .pt-option-key {
+  #pt-options :global(.pt-option-btn.pt-selected-correct .pt-option-key) {
     color: #fff;
     background: #1a7a49;
     border-color: #1a7a49;
     box-shadow: 0 7px 16px rgb(34 139 87 / 0.2);
   }
-  .pt-option-btn.pt-selected-incorrect .pt-option-key {
+  #pt-options :global(.pt-option-btn.pt-selected-incorrect .pt-option-key) {
     color: #fff;
     background: var(--color-primary);
     border-color: var(--color-primary);
@@ -608,7 +599,7 @@ const { t } = Astro.props;
     font-size: 0.9rem;
     font-weight: 700;
   }
-  .pt-text-input {
+  #pt-options :global(.pt-text-input) {
     min-width: 0;
     width: 100%;
     min-height: 3.75rem;
@@ -622,12 +613,12 @@ const { t } = Astro.props;
     font-weight: 600;
     outline: none;
   }
-  .pt-text-input::placeholder {
+  #pt-options :global(.pt-text-input::placeholder) {
     color: var(--color-ink-muted);
     font-weight: 500;
     opacity: 0.72;
   }
-  .pt-text-answer {
+  #pt-options :global(.pt-text-answer) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.5rem;
@@ -640,12 +631,12 @@ const { t } = Astro.props;
     transition: border-color var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease),
       background var(--motion-fast) var(--ease);
   }
-  .pt-text-answer:focus-within {
+  #pt-options :global(.pt-text-answer:focus-within) {
     border-color: var(--color-primary);
     background: var(--color-bg-raised);
     box-shadow: 0 0 0 4px rgb(182 23 51 / 0.1), 0 12px 28px rgb(49 43 40 / 0.08);
   }
-  .pt-text-submit {
+  #pt-options :global(.pt-text-submit) {
     display: inline-flex;
     gap: 0.65rem;
     align-items: center;
@@ -664,14 +655,14 @@ const { t } = Astro.props;
     transition: transform var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
       box-shadow var(--motion-fast) var(--ease);
   }
-  .pt-text-submit:hover:not(:disabled) {
+  #pt-options :global(.pt-text-submit:hover:not(:disabled)) {
     transform: translateY(-1px);
     background: var(--color-primary-deep);
     box-shadow: 0 11px 24px rgb(182 23 51 / 0.26);
   }
-  .pt-text-submit:active:not(:disabled) { transform: translateY(0); }
-  .pt-text-submit:disabled { opacity: 0.6; cursor: default; }
-  .pt-text-submit-icon {
+  #pt-options :global(.pt-text-submit:active:not(:disabled)) { transform: translateY(0); }
+  #pt-options :global(.pt-text-submit:disabled) { opacity: 0.6; cursor: default; }
+  #pt-options :global(.pt-text-submit-icon) {
     display: grid;
     width: 1.75rem;
     height: 1.75rem;
@@ -685,7 +676,7 @@ const { t } = Astro.props;
   .pt-options-tf {
     grid-template-columns: 1fr 1fr;
   }
-  .pt-tf-btn {
+  #pt-options :global(.pt-tf-btn) {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -702,7 +693,7 @@ const { t } = Astro.props;
     transition: border-color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease),
       color var(--motion-fast) var(--ease);
   }
-  .pt-tf-icon {
+  #pt-options :global(.pt-tf-icon) {
     display: inline-flex;
     width: 1.6rem;
     height: 1.6rem;
@@ -712,18 +703,18 @@ const { t } = Astro.props;
     font-size: 1rem;
     line-height: 1;
   }
-  .pt-tf-true .pt-tf-icon {
+  #pt-options :global(.pt-tf-true .pt-tf-icon) {
     background: rgb(34 139 87 / 0.14);
     color: #1a7a49;
   }
-  .pt-tf-false .pt-tf-icon {
+  #pt-options :global(.pt-tf-false .pt-tf-icon) {
     background: rgb(182 23 51 / 0.1);
     color: var(--color-primary-text);
   }
-  .pt-tf-btn:hover:not(:disabled) {
+  #pt-options :global(.pt-tf-btn:hover:not(:disabled)) {
     border-color: var(--color-primary);
   }
-  .pt-tf-btn:disabled {
+  #pt-options :global(.pt-tf-btn:disabled) {
     opacity: 0.6;
     cursor: default;
   }
@@ -731,11 +722,11 @@ const { t } = Astro.props;
     .runner-heading { display: grid; }
     .pt-progress-percent { justify-self: start; }
     .pt-options-tf { grid-template-columns: 1fr; }
-    .pt-text-answer {
+    #pt-options :global(.pt-text-answer) {
       grid-template-columns: 1fr;
       gap: 0.35rem;
       padding: 0.45rem;
     }
-    .pt-text-submit { justify-content: center; padding-inline: 1rem 0.75rem; }
+    #pt-options :global(.pt-text-submit) { justify-content: center; padding-inline: 1rem 0.75rem; }
   }
 </style>

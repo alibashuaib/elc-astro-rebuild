@@ -1,0 +1,23 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import HomeExperience from '../../components/HomeExperience.astro';
+import { organizationSchema } from '../../lib/schema';
+import { fetchGoogleReviews } from '../../lib/googleReviews';
+import { localePaths, meta } from '../../i18n/pages';
+import type { Locale } from '../../i18n/ui';
+
+export const getStaticPaths = localePaths;
+
+const locale = Astro.params.lang as Locale;
+const { title, description } = meta('home', locale);
+
+const reviews = await fetchGoogleReviews(locale);
+const orgSchema = organizationSchema(
+  reviews ? { rating: reviews.overallRating, reviewCount: reviews.totalReviewCount } : undefined,
+  locale
+);
+---
+
+<Layout locale={locale} path="/" title={title} description={description} jsonLd={orgSchema}>
+  <HomeExperience locale={locale} reviews={reviews} />
+</Layout>

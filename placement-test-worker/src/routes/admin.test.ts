@@ -4,17 +4,10 @@ import bcrypt from 'bcryptjs';
 import { handleAdminLogin, handleAdminCreateSlot, handleAdminListSlots, handleAdminDeleteSlot } from './admin';
 import { verifyAdminSession } from '../auth';
 import { createSlot, insertStudent, insertSession, bookSlotAtomic } from '../db';
-import path from 'node:path';
 
 function makeEnv() {
   return {
-    DB: createFakeD1([
-      path.join(__dirname, '../../migrations/0001_init.sql'),
-      path.join(__dirname, '../../migrations/0002_seed_questions.sql'),
-      path.join(__dirname, '../../migrations/0004_add_text_question_type.sql'),
-      path.join(__dirname, '../../migrations/0006_fixed_sequential_order.sql'),
-      path.join(__dirname, '../../migrations/0007_elc_level_ladders.sql'),
-    ]),
+    DB: createFakeD1(),
     ADMIN_SESSION_TTL_SECONDS: '43200',
     ADMIN_COOKIE_SECRET: 'test-secret-do-not-use-in-prod',
   };

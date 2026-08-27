@@ -1,7 +1,7 @@
 import type { Env, StudentInput } from '../types';
-import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect } from '../db';
+import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, listAnsweredQuestionIds } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
-import { ADULT_BANDS, bandForSequence, isLastBand, evaluateBand } from '../bands';
+import { ADULT_BANDS, bandForSequence, isLastBand, evaluateBand, placementLevel } from '../bands';
 
 // Adults-only: the last question number this track actually serves. The
 // bank has 50 real questions (see migrations/0003_real_questions.sql), but
@@ -100,11 +100,20 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     return json({ error: 'session not found or already completed' }, 404);
   }
   const body = await req.json<{ questionId: string; selectedIndex?: number; answerText?: string; skip?: boolean }>();
-  const q = await env.DB
-    .prepare(`SELECT type, correct_index, expected_answer, case_sensitive, sequence FROM questions WHERE id = ?`)
-    .bind(body.questionId)
-    .first<{ type: 'mcq' | 'text'; correct_index: number; expected_answer: string | null; case_sensitive: number; sequence: number }>();
-  if (!q) return json({ error: 'unknown question' }, 400);
+
+  // Grade only the question this session is actually on. The walk-through is a
+  // deterministic pass over the track's active bank in `sequence` order (see
+  // db.ts/pickNextQuestion), so "the first unanswered question" *is* the one the
+  // student was last served -- no extra state needed to know what's pending.
+  // Without this check the handler graded whatever `questionId` the client sent,
+  // so a student could re-submit an easy question they'd already cleared (or skip
+  // ahead to one they knew), inflating `questionNumber`, adding duplicate rows to
+  // `responses`, and skewing the adults band counts in countBandCorrect.
+  const askedIds = await listAnsweredQuestionIds(env, sessionId);
+  const q = await pickNextQuestion(env, session.track, askedIds);
+  if (!q || q.id !== body.questionId) {
+    return json({ error: 'not the question this session is on' }, 400);
+  }
 
   const skipped = body.skip === true;
   let correct: boolean;
@@ -125,6 +134,10 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     correct = q.correct_index === body.selectedIndex;
   }
   await insertResponse(env, sessionId, body.questionId, body.selectedIndex ?? null, correct, body.answerText ?? null, skipped);
+  // Everything answered *including* the response just written -- the two
+  // branches below both advance past it, and re-reading `responses` to learn
+  // what we already know costs a round-trip per answer for nothing.
+  const answeredIds = [...askedIds, q.id];
 
   const priorState = {
     currentLevelIndex: session.current_level_index,
@@ -133,6 +146,16 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     questionsAsked: session.questions_asked,
   };
   const nextState = applyAnswer(priorState, correct);
+
+  // Persisted identically on every path below (band boundary, safety cap, and
+  // the ordinary next-question case), so it happens once here rather than being
+  // repeated in each branch.
+  await updateSessionScoring(env, sessionId, {
+    current_level_index: nextState.currentLevelIndex,
+    step: nextState.step,
+    recent_levels: JSON.stringify(nextState.recentLevels),
+    questions_asked: nextState.questionsAsked,
+  });
 
   // `correct` is omitted from a skipped answer's response -- there's nothing to
   // give feedback on, and the frontend uses its absence to skip showing the
@@ -151,21 +174,14 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     if (band && q.sequence === band.end) {
       const correctCount = await countBandCorrect(env, sessionId, band.start, band.end);
       const result = evaluateBand(band, correctCount);
-      await updateSessionScoring(env, sessionId, {
-        current_level_index: nextState.currentLevelIndex,
-        step: nextState.step,
-        recent_levels: JSON.stringify(nextState.recentLevels),
-        questions_asked: nextState.questionsAsked,
-      });
       if (!result.passed || isLastBand(band)) {
-        const level = result.passed ? 'Above Hint A' : band.name;
+        // Bands are evaluated one at a time and the walk stops at the first
+        // failure, so this single result is the whole placement input.
+        const level = placementLevel([result]);
         await completeSession(env, sessionId, level);
         return json({ done: true, level, levelName: level, ...feedback });
       }
-      const askedIds = (
-        await env.DB.prepare(`SELECT question_id FROM responses WHERE session_id = ?`).bind(sessionId).all<{ question_id: string }>()
-      ).results?.map((r) => r.question_id) ?? [];
-      const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, askedIds);
+      const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, answeredIds);
       return json({ ...next, ...feedback });
     }
   }
@@ -178,27 +194,10 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     const override = session.track === 'kids' ? await kidsLevelOverrideIndex(env, sessionId) : null;
     const level = override !== null ? LEVELS_BY_TRACK.kids[override] : finalLevel(nextState, session.track);
     const levelName = override !== null ? STAGE_NAMES_BY_TRACK.kids[override] : finalLevelName(nextState, session.track);
-    await updateSessionScoring(env, sessionId, {
-      current_level_index: nextState.currentLevelIndex,
-      step: nextState.step,
-      recent_levels: JSON.stringify(nextState.recentLevels),
-      questions_asked: nextState.questionsAsked,
-    });
     await completeSession(env, sessionId, level);
     return json({ done: true, level, levelName, ...feedback });
   }
 
-  await updateSessionScoring(env, sessionId, {
-    current_level_index: nextState.currentLevelIndex,
-    step: nextState.step,
-    recent_levels: JSON.stringify(nextState.recentLevels),
-    questions_asked: nextState.questionsAsked,
-  });
-
-  const askedIds = (
-    await env.DB.prepare(`SELECT question_id FROM responses WHERE session_id = ?`).bind(sessionId).all<{ question_id: string }>()
-  ).results?.map((r) => r.question_id) ?? [];
-
-  const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, askedIds);
+  const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, answeredIds);
   return json({ ...next, ...feedback });
 }
