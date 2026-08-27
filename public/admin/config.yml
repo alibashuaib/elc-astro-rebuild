@@ -1,14 +1,13 @@
 # Decap CMS config — git-backed visual editor for non-technical staff.
 #
-# TODO before this works in production:
-#   Deploy cms-oauth-worker/ (see its README) and replace `base_url` below with
-#   the deployed Worker's URL.
+# `base_url` points at the deployed cms-oauth-worker (see its README). It must
+# also appear in the Content-Security-Policy connect-src in public/.htaccess.
 
 backend:
   name: github
   repo: alibashuaib/elc-astro-rebuild
   branch: main
-  base_url: https://TODO-deploy-cms-oauth-worker.workers.dev
+  base_url: https://elc-cms-oauth.alibashuaib90.workers.dev
   auth_endpoint: auth
 
 # Draft/staging preview before anything goes live — important for price/schedule changes.

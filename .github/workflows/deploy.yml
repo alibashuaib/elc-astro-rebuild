@@ -34,6 +34,11 @@ jobs:
         env:
           GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
           GOOGLE_PLACE_ID: ${{ secrets.GOOGLE_PLACE_ID }}
+          # Baked into client-side JS at build time, so it is public by nature --
+          # a literal here rather than a secret, kept in step with the
+          # connect-src entry in public/.htaccess. Without it the placement test
+          # calls "undefined/api/session" and fails silently in production.
+          PUBLIC_PLACEMENT_API_URL: https://placement-test-worker.alibashuaib90.workers.dev
 
       # TODO before this runs for real: add FTP_SERVER / FTP_USERNAME / FTP_PASSWORD
       # as repo secrets (Settings → Secrets and variables → Actions), pointing at the
