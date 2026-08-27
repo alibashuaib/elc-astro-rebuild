@@ -18,6 +18,7 @@ export const categoryLabels: Record<Locale, Record<string, string>> = {
 
 export const ui = {
   en: {
+    'nav.home': 'Home',
     'nav.courses': 'Courses',
     'nav.about': 'About',
     'nav.blog': 'News',
@@ -108,8 +109,31 @@ export const ui = {
     'placementTest.correct': 'Correct!',
     'placementTest.incorrect': 'Incorrect',
     'placementTest.skip': "I don't understand — skip",
+    // Displayed on true/false reading-comprehension items. The question bank
+    // stores the options as the English strings 'True'/'False' regardless of
+    // locale (that's what the item detection matches on) -- these are the
+    // labels the student actually reads.
+    'placementTest.true': 'True',
+    'placementTest.false': 'False',
+    'courseDetail.duration': 'Duration',
+    'courseDetail.monthlyHours': 'Monthly hours',
+    'courseDetail.hoursPerMonth': 'hours/month',
+    'courseDetail.dailyHours': 'Daily hours',
+    'courseDetail.hoursPerDay': 'hours/day',
+    'courseDetail.studyDays': 'Study days',
+    'courseDetail.variesByIntake': 'Varies by intake',
+    'courseDetail.classTimes': 'Available class times',
+    'courseDetail.choosePeriod': 'Choose the period that suits you',
+    'courseDetail.currentPeriod': 'Current class period',
+    'courseDetail.admissionsNote': 'Admissions will confirm the available class time and next start date.',
+    'courseDetail.contactNote': 'Contact us for the current schedule and pricing.',
+    'courseDetail.faqs': 'FAQs',
+    'courseDetail.from': 'from',
+    'courseDetail.to': 'to',
+    'whatsapp.label': 'Chat on WhatsApp',
   },
   ar: {
+    'nav.home': 'الرئيسية',
     'nav.courses': 'الدورات',
     'nav.about': 'من نحن',
     'nav.blog': 'الأخبار',
@@ -200,6 +224,24 @@ export const ui = {
     'placementTest.correct': 'إجابة صحيحة!',
     'placementTest.incorrect': 'إجابة خاطئة',
     'placementTest.skip': 'لا أفهم — تخطي',
+    'placementTest.true': 'صح',
+    'placementTest.false': 'خطأ',
+    'courseDetail.duration': 'المدة',
+    'courseDetail.monthlyHours': 'الساعات الشهرية',
+    'courseDetail.hoursPerMonth': 'ساعة/شهر',
+    'courseDetail.dailyHours': 'الساعات اليومية',
+    'courseDetail.hoursPerDay': 'ساعة/يوم',
+    'courseDetail.studyDays': 'أيام الدراسة',
+    'courseDetail.variesByIntake': 'تختلف حسب الدفعة',
+    'courseDetail.classTimes': 'فترات الدراسة المتاحة',
+    'courseDetail.choosePeriod': 'اختر الفترة المناسبة لك',
+    'courseDetail.currentPeriod': 'فترة الدراسة الحالية',
+    'courseDetail.admissionsNote': 'يؤكد فريق القبول وقت الحصة المتاح وتاريخ بدء الدفعة القادمة.',
+    'courseDetail.contactNote': 'تواصل معنا لمعرفة الجدول والسعر الحاليين.',
+    'courseDetail.faqs': 'الأسئلة الشائعة',
+    'courseDetail.from': 'من',
+    'courseDetail.to': 'إلى',
+    'whatsapp.label': 'تواصل عبر واتساب',
   },
 } as const;
 

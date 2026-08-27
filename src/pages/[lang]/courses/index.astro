@@ -5,48 +5,52 @@ import PageHero from '../../../components/PageHero.astro';
 import CourseCard from '../../../components/CourseCard.astro';
 import CourseFilter from '../../../components/CourseFilter.astro';
 import { breadcrumbSchema } from '../../../lib/schema';
+import { localePaths, meta, trail, heroKicker, SITE } from '../../../i18n/pages';
+import type { Locale } from '../../../i18n/ui';
+
+export const getStaticPaths = localePaths;
+
+const locale = Astro.params.lang as Locale;
+const { title, description, hero, crumb } = meta('courses', locale);
 
 const allCourses = await getCollection('courses', (entry) => {
-  return entry.id.startsWith('en/') && !entry.data.draft;
+  return entry.id.startsWith(`${locale}/`) && !entry.data.draft;
 });
 const categories = [...new Set(allCourses.map((c) => c.data.category))];
 
 const collectionPageSchema = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
-  name: 'Courses',
+  name: crumb,
   mainEntity: {
     '@type': 'ItemList',
     itemListElement: allCourses.map((c, i) => ({
       '@type': 'ListItem',
       position: i + 1,
-      url: `https://elc.com.sa/en/courses/${c.id.replace('en/', '')}`,
+      url: `${SITE}/${locale}/courses/${c.id.replace(`${locale}/`, '')}`,
       name: c.data.title,
     })),
   },
 };
 
-const breadcrumbs = breadcrumbSchema([
-  { name: 'Home', url: 'https://elc.com.sa/en/' },
-  { name: 'Courses', url: 'https://elc.com.sa/en/courses' },
-]);
+const breadcrumbs = breadcrumbSchema(trail(locale, ['courses']));
 ---
 
 <Layout
-  locale="en"
+  locale={locale}
   path="/courses"
-  title="English Courses in Jeddah — ELC"
-  description="Browse ELC's full course catalog: Kids, Adults, Women's General English, Business English, and Exam Prep. See price, duration, and level at a glance."
+  title={title}
+  description={description}
   jsonLd={[collectionPageSchema, breadcrumbs]}
 >
-  <PageHero title="Courses" subtitle="Find the right course by level, duration, and price." />
+  <PageHero kicker={heroKicker[locale]} title={hero!.title} subtitle={hero!.subtitle} />
 
   <section class="container">
-    <CourseFilter locale="en" categories={categories} />
+    <CourseFilter locale={locale} categories={categories} />
 
     <div class="course-grid">
       {allCourses.map((course) => (
-        <CourseCard locale="en" course={course} slug={course.id.replace('en/', '')} />
+        <CourseCard locale={locale} course={course} slug={course.id.replace(`${locale}/`, '')} />
       ))}
     </div>
   </section>

@@ -33,13 +33,20 @@ export interface DonePayload {
 
 export type SessionStep = (QuestionPayload | DonePayload) & { sessionId?: string; track?: string };
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
+/**
+ * `expectedErrors` lists non-OK statuses whose JSON body is a meaningful result
+ * rather than a failure — they're returned to the caller instead of throwing.
+ */
+async function request<T>(path: string, init?: RequestInit & { expectedErrors?: number[] }): Promise<T> {
+  const { expectedErrors = [], ...fetchInit } = init ?? {};
   const res = await fetch(`${BASE}${path}`, {
-    ...init,
+    ...fetchInit,
     credentials: 'include',
     headers: { 'content-type': 'application/json', ...(init?.headers ?? {}) },
   });
-  if (!res.ok) throw new Error(`placement API ${path} failed: ${res.status}`);
+  if (!res.ok && !expectedErrors.includes(res.status)) {
+    throw new Error(`placement API ${path} failed: ${res.status}`);
+  }
   return res.json();
 }
 
@@ -65,20 +72,12 @@ export function listSlots() {
   return request<{ slots: Array<{ id: string; starts_at: string; remaining: number }> }>('/api/slots');
 }
 
-export async function createBooking(
-  sessionId: string,
-  slotId: string
-): Promise<{ bookingId: string } | { error: string }> {
-  const res = await fetch(`${BASE}/api/bookings`, {
+export function createBooking(sessionId: string, slotId: string) {
+  // 409 means the slot filled up between listing and booking -- a normal
+  // outcome the caller renders, not a transport failure.
+  return request<{ bookingId: string } | { error: string }>('/api/bookings', {
     method: 'POST',
-    credentials: 'include',
-    headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ sessionId, slotId }),
+    expectedErrors: [409],
   });
-  if (res.status === 409) {
-    const body = await res.json();
-    return { error: body.error };
-  }
-  if (!res.ok) throw new Error(`placement API /api/bookings failed: ${res.status}`);
-  return res.json();
 }

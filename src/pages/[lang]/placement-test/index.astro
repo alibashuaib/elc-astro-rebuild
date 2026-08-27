@@ -3,26 +3,26 @@ import Layout from '../../../layouts/Layout.astro';
 import RegistrationForm from '../../../components/placement-test/RegistrationForm.astro';
 import TestRunner from '../../../components/placement-test/TestRunner.astro';
 import ResultBooking from '../../../components/placement-test/ResultBooking.astro';
-import { useTranslations } from '../../../i18n/ui';
+import { useTranslations, type Locale } from '../../../i18n/ui';
 import { breadcrumbSchema } from '../../../lib/schema';
+import { localePaths, meta, trail } from '../../../i18n/pages';
 
-const t = useTranslations('en');
+export const getStaticPaths = localePaths;
+
+const locale = Astro.params.lang as Locale;
+const t = useTranslations(locale);
+const { title, description } = meta('placementTest', locale);
 
 // Real center WhatsApp number, same as WhatsAppButton.astro's live wa.me link.
 const WHATSAPP_NUMBER = '966546656000';
-
-const breadcrumbs = breadcrumbSchema([
-  { name: 'Home', url: 'https://elc.com.sa/en/' },
-  { name: 'Placement Test', url: 'https://elc.com.sa/en/placement-test/' },
-]);
 ---
 
 <Layout
-  locale="en"
+  locale={locale}
   path="/placement-test"
-  title={`${t('placementTest.heading')} — ELC English Courses in Jeddah`}
-  description="Take ELC's free adaptive English placement test online, get your estimated level instantly, and book your oral test slot."
-  jsonLd={breadcrumbs}
+  title={title}
+  description={description}
+  jsonLd={breadcrumbSchema(trail(locale, ['placementTest']))}
 >
   <header class="test-hero">
     <div class="container test-hero-inner">
@@ -46,9 +46,9 @@ const breadcrumbs = breadcrumbSchema([
       <li data-stage="result"><span>3</span>{t('placementTest.stageResult')}</li>
     </ol>
     <div class="test-surface">
-      <RegistrationForm locale="en" t={t} />
+      <RegistrationForm locale={locale} t={t} />
       <TestRunner t={t} />
-      <ResultBooking t={t} locale="en" whatsappNumber={WHATSAPP_NUMBER} />
+      <ResultBooking t={t} locale={locale} whatsappNumber={WHATSAPP_NUMBER} />
     </div>
   </main>
 </Layout>
@@ -214,5 +214,22 @@ const breadcrumbs = breadcrumbSchema([
   @media (max-width: 480px) {
     .test-facts { display: none; }
     .placement-test-wrap { padding-inline: 1rem; }
+  }
+
+  /* RTL adjustments the Arabic copy of this page used to hard-code.
+     The hero gradient is mirrored, and Arabic is a connected script: letter
+     spacing breaks the joins, and uppercasing does nothing, so both are off. */
+  :global(html[dir='rtl']) .test-hero {
+    background:
+      radial-gradient(circle at 12% 10%, rgb(246 173 67 / 0.2), transparent 26rem),
+      linear-gradient(225deg, #292b2f 0%, #202125 100%);
+  }
+  :global(html[dir='rtl']) .test-eyebrow {
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  :global(html[dir='rtl']) .test-hero h1 {
+    line-height: 1.25;
+    letter-spacing: -0.025em;
   }
 </style>

@@ -4,6 +4,8 @@ export interface Env {
   DB: D1Database;
   ADMIN_SESSION_TTL_SECONDS: string;
   ADMIN_COOKIE_SECRET: string; // set via `wrangler secret put ADMIN_COOKIE_SECRET`
+  /** 'true' only under local dev (see scripts/local-dev.ts) -- gates loopback CORS origins and verbose error messages. */
+  LOCAL_DEV?: string;
 }
 
 export type Track = 'kids' | 'adults';

@@ -29,3 +29,27 @@ jobs:
       # fail the build if any page drops below the thresholds in lighthouserc.json.
       - name: Lighthouse CI
         run: npx @lhci/cli@0.13.x autorun
+
+  # The placement-test Worker is a separate npm project with its own lockfile, so
+  # it needs its own install/test step — it is not covered by the job above.
+  # Until this existed, the scoring, band-placement, grading, and admin-auth
+  # tests never ran on any PR, and five of them had silently rotted against
+  # migrations that landed after they were written.
+  placement-test-worker:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: placement-test-worker
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: placement-test-worker/package-lock.json
+
+      - run: npm ci
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - run: npm test

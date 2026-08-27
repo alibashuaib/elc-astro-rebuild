@@ -15,12 +15,23 @@
 // workerd (e.g. running outside this sandbox).
 
 import Database from 'better-sqlite3';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 
-export function createFakeD1(migrationFiles: string[]): D1Database {
+const MIGRATIONS_DIR = path.join(__dirname, '../../migrations');
+
+/**
+ * Every migration in migrations/, applied in filename order.
+ *
+ * Deliberately not a per-test hand-picked subset: test files used to list the
+ * migrations they thought they needed, so a new migration reached production
+ * without ever reaching the tests. That drift is how `case_sensitive`
+ * (migration 0012) and `skipped` (0011) ended up breaking five session tests.
+ */
+export function createFakeD1(): D1Database {
   const db = new Database(':memory:');
-  for (const file of migrationFiles) {
-    db.exec(readFileSync(file, 'utf8'));
+  for (const file of readdirSync(MIGRATIONS_DIR).filter((f) => f.endsWith('.sql')).sort()) {
+    db.exec(readFileSync(path.join(MIGRATIONS_DIR, file), 'utf8'));
   }
 
   function wrapStatement(sql: string) {
