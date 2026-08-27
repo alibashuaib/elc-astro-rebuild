@@ -37,19 +37,28 @@ describe('scoring', () => {
     expect(isDone(state)).toBe(true);
   });
 
-  it('LEVELS_BY_TRACK has the 6 ELC levels per track, matching the curricular-structure diagrams', () => {
+  it('LEVELS_BY_TRACK has the 6 ELC levels for adults, matching the curricular-structure diagram', () => {
     expect(LEVELS_BY_TRACK.adults).toEqual(['A0', 'A1', 'A2', 'B1', 'B2', 'C1']);
-    // Kids share codes across rungs: Cambridge places Super Minds 1-2 at pre-A1
-    // and 3 at A1, which is coarser than the book ladder.
-    expect(LEVELS_BY_TRACK.kids).toEqual(['-A1', '-A1', '-A1', '-A1', '-A1', 'A1']);
+    // Kids share codes across rungs: Cambridge places Super Minds 1-2 at pre-A1,
+    // 3-4 at A1 and 5-6 at A2, which is coarser than the book ladder.
+    expect(LEVELS_BY_TRACK.kids).toEqual([
+      '-A1', '-A1', '-A1', '-A1', '-A1', 'A1', 'A1', 'A1', 'A1', 'A2', 'A2', 'A2', 'A2',
+    ]);
   });
 
-  it('STAGE_NAMES_BY_TRACK has a short ELC code for every level slot, matching the diagrams', () => {
+  it('STAGE_NAMES_BY_TRACK has a name for every level slot, matching the diagrams', () => {
     expect(STAGE_NAMES_BY_TRACK.adults).toEqual(['Fun A', 'Lint A', 'Lint D', 'Hint A', 'Hint D', 'Advanced B']);
     // A- and B-halves alternate: a kid between two A-halves lands in the B half
-    // between them. Placement tops out at 3A (see kids.ts).
+    // between them. The whole teaching ladder is listed here; placement only
+    // awards up to 'Super Minds 3A' (see kids.ts/KIDS_CEILING_INDEX).
     expect(STAGE_NAMES_BY_TRACK.kids).toEqual([
-      'Pre-Starters', 'Super Minds 1A', 'Super Minds 1B', 'Super Minds 2A', 'Super Minds 2B', 'Super Minds 3A',
+      'Pre-Starters',
+      'Super Minds 1A', 'Super Minds 1B',
+      'Super Minds 2A', 'Super Minds 2B',
+      'Super Minds 3A', 'Super Minds 3B',
+      'Super Minds 4A', 'Super Minds 4B',
+      'Super Minds 5A', 'Super Minds 5B',
+      'Super Minds 6A', 'Super Minds 6B',
     ]);
   });
 

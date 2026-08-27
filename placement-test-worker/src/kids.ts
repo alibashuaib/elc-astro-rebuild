@@ -13,9 +13,13 @@
 // So the ladder runs Pre-Starters -> 1A -> 1B -> 2A -> 2B -> 3A, and the score
 // share is split evenly across those six rungs.
 
-import { LEVELS_BY_TRACK } from './scoring';
+import { LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from './scoring';
 
-/** Highest index the placement test can award on the kids ladder ('Super Minds 3A'). */
+/**
+ * Highest index the placement test can award on the kids ladder
+ * ('Super Minds 3A'). The ladder continues past it up to 6B for teaching and
+ * reporting; those rungs are simply never reachable from a placement result.
+ */
 export const KIDS_CEILING_INDEX = 5;
 
 /**
@@ -57,12 +61,27 @@ export function kidsLevel(correct: number, total: number): string {
  */
 export const KIDS_YLE_BY_INDEX: ReadonlyArray<string | undefined> = [
   undefined, // Pre-Starters
-  'Starters', // Super Minds 1A
-  'Starters', // Super Minds 1B
-  'Starters', // Super Minds 2A
-  'Starters', // Super Minds 2B
-  'Movers', // Super Minds 3A
+  'Starters', 'Starters', // Super Minds 1A, 1B
+  'Starters', 'Starters', // Super Minds 2A, 2B
+  'Movers', 'Movers', // Super Minds 3A, 3B
+  'Movers', 'Movers', // Super Minds 4A, 4B
+  'Flyers', 'Flyers', // Super Minds 5A, 5B
+  'Flyers', 'Flyers', // Super Minds 6A, 6B
 ];
+
+/** Rungs the placement test can award, bottom to ceiling. */
+export function kidsPlaceableRungs(): string[] {
+  return STAGE_NAMES_BY_TRACK.kids.slice(0, KIDS_CEILING_INDEX + 1);
+}
+
+/**
+ * Rungs above the ceiling: part of the teaching ladder, never awarded by the
+ * placement test. Kept defined so reporting and future harder question banks
+ * have names to refer to.
+ */
+export function kidsHiddenRungs(): string[] {
+  return STAGE_NAMES_BY_TRACK.kids.slice(KIDS_CEILING_INDEX + 1);
+}
 
 /** Cambridge YLE exam level for a kids placement, or undefined below Starters. */
 export function kidsYleLevel(correct: number, total: number): string | undefined {
