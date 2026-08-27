@@ -97,6 +97,22 @@ describe('session routes', () => {
     expect(data.track).toBe('kids');
   });
 
+  it('forces children under 11 onto the kids track even when adults is requested', async () => {
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'Young student',
+        phone: '+966500000099',
+        dob: '2018-01-01',
+        locale: 'en',
+        track: 'adults',
+      }),
+    });
+    const res = await handleStartSession(req, env as any);
+    const data = (await res.json()) as any;
+    expect(data.track).toBe('kids');
+  });
+
   it('falls back to the DOB-derived track when track is omitted or invalid', async () => {
     const res = await handleStartSession(
       new Request('http://x/api/session', {

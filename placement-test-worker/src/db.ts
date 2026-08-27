@@ -20,6 +20,18 @@ export function computeTrack(dob: string): Track {
   return age <= 12 ? 'kids' : 'adults';
 }
 
+export function isUnderEleven(dob: string): boolean {
+  const birth = new Date(dob);
+  if (Number.isNaN(birth.getTime())) return false;
+  const today = new Date();
+  let age = today.getUTCFullYear() - birth.getUTCFullYear();
+  const hadBirthdayThisYear =
+    today.getUTCMonth() > birth.getUTCMonth() ||
+    (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() >= birth.getUTCDate());
+  if (!hadBirthdayThisYear) age--;
+  return age < 11;
+}
+
 export async function insertStudent(env: Env, input: StudentInput): Promise<string> {
   const id = newId();
   await env.DB.prepare(
@@ -57,11 +69,9 @@ export async function completeSession(env: Env, id: string, estimatedLevel: stri
   ).bind(estimatedLevel, id).run();
 }
 
-// Fixed sequential order, matching the source paper test's question order --
-// not adaptive/random. `level` is kept on each row as descriptive metadata
-// only (used by scoring.ts's estimated-level output, and the admin panel);
-// it no longer filters which question comes next -- see
-// migrations/0006_fixed_sequential_order.sql.
+// Fixed sequential order, matching the source paper test's question order.
+// This also lets the answer endpoint independently reconstruct which question
+// is currently pending, preventing replay or question-skipping attacks.
 export async function pickNextQuestion(
   env: Env,
   track: Track,

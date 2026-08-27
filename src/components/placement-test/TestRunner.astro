@@ -38,7 +38,23 @@ const { t } = Astro.props;
     <summary id="pt-passage-title" class="pt-passage-title"></summary>
     <p id="pt-passage-body" class="pt-passage-body"></p>
   </details>
-  <img id="pt-image" class="pt-image" alt="" hidden />
+  <div id="pt-image-stage" class="pt-image-stage" hidden>
+    <span class="pt-image-spark pt-image-spark-one" aria-hidden="true">★</span>
+    <span class="pt-image-spark pt-image-spark-two" aria-hidden="true">●</span>
+    <img id="pt-image" class="pt-image" alt="" />
+  </div>
+  <div id="pt-counting-strip" class="pt-counting-strip" aria-label="Count in order from 1 to 7" hidden>
+    <button type="button">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button><button type="button">6</button><button type="button">7</button>
+  </div>
+  <div id="pt-picture-word-bank" class="pt-picture-word-bank" aria-label="Choose from these words" hidden>
+    <button type="button">Book</button><button type="button">Pen</button><button type="button">Car</button><button type="button">Tree</button><button type="button">Apple</button>
+  </div>
+  <div id="pt-room-word-bank" class="pt-picture-word-bank" aria-label="Choose from these room words" hidden>
+    <button type="button">Sofa</button><button type="button">Curtain</button><button type="button">Picture</button><button type="button">TV</button><button type="button">Lamps</button>
+  </div>
+  <div id="pt-action-word-bank" class="pt-picture-word-bank" aria-label="Choose from these action words" hidden>
+    <button type="button">Climbing</button><button type="button">Flying</button><button type="button">Playing</button><button type="button">Riding</button><button type="button">Throwing</button>
+  </div>
   <p id="pt-prompt" class="pt-prompt"></p>
   <div id="pt-options" class="pt-options"></div>
   <button type="button" id="pt-skip" class="pt-skip-btn"></button>
@@ -58,7 +74,12 @@ const { t } = Astro.props;
   const passageEl = document.getElementById('pt-passage') as HTMLDetailsElement;
   const passageTitleEl = document.getElementById('pt-passage-title') as HTMLElement;
   const passageBodyEl = document.getElementById('pt-passage-body') as HTMLElement;
+  const imageStageEl = document.getElementById('pt-image-stage') as HTMLElement;
   const imageEl = document.getElementById('pt-image') as HTMLImageElement;
+  const countingStripEl = document.getElementById('pt-counting-strip') as HTMLElement;
+  const pictureWordBankEl = document.getElementById('pt-picture-word-bank') as HTMLElement;
+  const roomWordBankEl = document.getElementById('pt-room-word-bank') as HTMLElement;
+  const actionWordBankEl = document.getElementById('pt-action-word-bank') as HTMLElement;
   const promptEl = document.getElementById('pt-prompt') as HTMLElement;
   const optionsEl = document.getElementById('pt-options') as HTMLElement;
   const feedbackEl = document.getElementById('pt-feedback') as HTMLElement;
@@ -142,7 +163,9 @@ const { t } = Astro.props;
     // *this* question's id and disables *this* question's currently-rendered
     // inputs, whatever type they are.
     skipBtn.onclick = () => {
-      const inputEls = Array.from(optionsEl.querySelectorAll('button, input')) as Array<HTMLButtonElement | HTMLInputElement>;
+      const inputEls = Array.from(
+        runner.querySelectorAll('#pt-options button, #pt-options input, #pt-picture-word-bank:not([hidden]) button, #pt-room-word-bank:not([hidden]) button, #pt-action-word-bank:not([hidden]) button, #pt-counting-strip:not([hidden]) button')
+      ) as Array<HTMLButtonElement | HTMLInputElement>;
       handleSubmit(step, { skip: true }, inputEls, null);
     };
 
@@ -164,14 +187,95 @@ const { t } = Astro.props;
 
     if (step.imageUrl) {
       imageEl.src = step.imageUrl;
-      imageEl.hidden = false;
+      imageStageEl.hidden = false;
     } else {
-      imageEl.hidden = true;
+      imageStageEl.hidden = true;
       imageEl.removeAttribute('src');
     }
-    promptEl.textContent = step.prompt;
+    const countingPrefix = /^Count in order:\s*1,\s*2,\s*3,\s*4,\s*5,\s*6,\s*7\.\s*/i;
+    const isCountingQuestion = countingPrefix.test(step.prompt);
+    const isPictureMatch = /^Match the picture to the word:/i.test(step.prompt);
+    const isRoomPicture = /\/(sofa|curtain|picture|tv|lamps)\.svg$/i.test(step.imageUrl ?? '');
+    const actionWordPrefix = /^Word bank:\s*climbing,\s*flying,\s*playing,\s*riding,\s*throwing\.\s*/i;
+    const isActionWordQuestion = actionWordPrefix.test(step.prompt);
+    const letterMatch = step.prompt.match(/^Write the (capital|small) letter for "([A-Za-z])"\.$/i);
+    countingStripEl.hidden = !isCountingQuestion;
+    pictureWordBankEl.hidden = !isPictureMatch;
+    roomWordBankEl.hidden = !isRoomPicture;
+    actionWordBankEl.hidden = !isActionWordQuestion;
+    imageStageEl.classList.toggle('is-match-picture', isPictureMatch || isRoomPicture);
+    promptEl.textContent = isCountingQuestion
+      ? step.prompt.replace(countingPrefix, '')
+      : isPictureMatch
+        ? 'Which word matches this picture?'
+        : letterMatch
+          ? `Choose the ${letterMatch[1].toLowerCase()} letter for “${letterMatch[2]}”.`
+        : isActionWordQuestion
+          ? step.prompt.replace(actionWordPrefix, '')
+        : step.prompt;
     optionsEl.innerHTML = '';
     errorEl.hidden = true;
+
+    if (isPictureMatch) {
+      const wordButtons = Array.from(pictureWordBankEl.querySelectorAll('button')) as HTMLButtonElement[];
+      wordButtons.forEach((button) => {
+        button.disabled = false;
+        button.classList.remove('pt-selected-correct', 'pt-selected-incorrect');
+        button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, wordButtons, button);
+      });
+      return;
+    }
+
+    if (isRoomPicture) {
+      const roomButtons = Array.from(roomWordBankEl.querySelectorAll('button')) as HTMLButtonElement[];
+      roomButtons.forEach((button) => {
+        button.disabled = false;
+        button.classList.remove('pt-selected-correct', 'pt-selected-incorrect');
+        button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, roomButtons, button);
+      });
+      return;
+    }
+
+    if (isActionWordQuestion) {
+      const actionButtons = Array.from(actionWordBankEl.querySelectorAll('button')) as HTMLButtonElement[];
+      actionButtons.forEach((button) => {
+        button.disabled = false;
+        button.classList.remove('pt-selected-correct', 'pt-selected-incorrect');
+        button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, actionButtons, button);
+      });
+      return;
+    }
+
+    if (isCountingQuestion) {
+      const numberButtons = Array.from(countingStripEl.querySelectorAll('button')) as HTMLButtonElement[];
+      numberButtons.forEach((button) => {
+        button.disabled = false;
+        button.classList.remove('pt-selected-correct', 'pt-selected-incorrect');
+        button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, numberButtons, button);
+      });
+      return;
+    }
+
+    if (letterMatch) {
+      const sourceLetter = letterMatch[2];
+      const choices = [sourceLetter.toUpperCase(), sourceLetter.toLowerCase()];
+      const letterOptions = document.createElement('div');
+      letterOptions.className = 'pt-letter-options';
+      const buttons = choices.map((choice) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'pt-letter-choice';
+        button.textContent = choice;
+        letterOptions.appendChild(button);
+        return button;
+      });
+      buttons.forEach((button) => {
+        button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, buttons, button);
+      });
+      scopeElements(letterOptions, ...buttons);
+      optionsEl.appendChild(letterOptions);
+      return;
+    }
 
     if (step.type === 'text') {
       const input = document.createElement('input');
@@ -277,6 +381,7 @@ const { t } = Astro.props;
       return;
     }
     sessionId = step.sessionId;
+    runner.classList.toggle('is-kids', step.track === 'kids');
     const registration = document.getElementById('placement-registration') as HTMLFormElement | null;
     if (registration) registration.hidden = true;
     runner.hidden = false;
@@ -448,14 +553,89 @@ const { t } = Astro.props;
     line-height: 1.55;
     white-space: pre-line;
   }
-  .pt-image {
+  .pt-image-stage {
+    position: relative;
+    isolation: isolate;
     justify-self: center;
-    width: min(100%, 18rem);
+    display: grid;
+    width: min(100%, 20rem);
+    min-height: 18rem;
+    place-items: center;
+    padding: 1.25rem;
+    border: 2px solid rgb(255 255 255 / 0.85);
+    border-radius: 2.25rem;
+    background:
+      radial-gradient(circle at 28% 20%, rgb(255 255 255 / 0.95) 0 8%, transparent 9%),
+      linear-gradient(145deg, #fff4c7, #ffd98f 48%, #ffb86b);
+    box-shadow:
+      inset 0 2px 0 rgb(255 255 255 / 0.9),
+      inset 0 -8px 18px rgb(178 92 35 / 0.16),
+      0 12px 0 #df9551,
+      0 22px 34px rgb(81 54 35 / 0.2);
+    perspective: 700px;
+  }
+  .pt-image-stage[hidden] { display: none; }
+  .pt-image-stage::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset-inline: 16%;
+    bottom: 0.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: rgb(77 53 35 / 0.25);
+    filter: blur(10px);
+  }
+  .pt-image {
+    position: relative;
+    z-index: 1;
+    justify-self: center;
+    width: min(100%, 15.5rem);
     height: auto;
-    max-height: 15rem;
+    max-height: 15.5rem;
     object-fit: contain;
-    border-radius: 1.25rem;
-    box-shadow: var(--shadow-sm);
+    border-radius: 50%;
+    filter: drop-shadow(0 15px 10px rgb(77 53 35 / 0.28));
+    transform: rotateX(4deg) rotateY(-5deg) translateY(-3px);
+    transition: transform 260ms var(--ease), filter 260ms var(--ease);
+  }
+  .pt-image-stage:hover .pt-image {
+    filter: drop-shadow(0 19px 12px rgb(77 53 35 / 0.3));
+    transform: rotateX(0) rotateY(5deg) translateY(-9px) scale(1.025);
+  }
+  .pt-image-spark {
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    filter: drop-shadow(0 4px 3px rgb(81 54 35 / 0.2));
+    animation: pt-float 2.8s ease-in-out infinite;
+  }
+  .pt-image-spark-one {
+    inset-block-start: 1.1rem;
+    inset-inline-end: 1.4rem;
+    color: #ff6b6b;
+    font-size: 2rem;
+    transform: rotate(12deg);
+  }
+  .pt-image-spark-two {
+    inset-block-end: 1.5rem;
+    inset-inline-start: 1.4rem;
+    width: 1.15rem;
+    height: 1.15rem;
+    border: 4px solid #4d96ff;
+    border-radius: 50%;
+    color: transparent;
+    animation-delay: -1.4s;
+  }
+  @keyframes pt-float {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -7px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pt-image-spark { animation: none; }
+    .pt-image { transition: none; }
   }
   .pt-prompt {
     margin: 0;
@@ -469,6 +649,35 @@ const { t } = Astro.props;
     display: grid;
     gap: 0.8rem;
   }
+  .pt-letter-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    width: min(100%, 30rem);
+    margin-inline: auto;
+  }
+  .pt-letter-choice {
+    min-height: clamp(7rem, 22vw, 10rem);
+    border: 3px solid rgb(255 255 255 / 0.9);
+    border-radius: 1.75rem;
+    color: #fff;
+    background: linear-gradient(145deg, #69b8ff, #347fd1);
+    box-shadow: inset 0 5px 0 rgb(255 255 255 / 0.25), 0 9px 0 #2262a8, 0 17px 28px rgb(34 98 168 / 0.2);
+    font-family: var(--font-sans);
+    font-size: clamp(3rem, 12vw, 5.25rem);
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+    transition: translate var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
+  }
+  .pt-letter-choice:nth-child(2) {
+    background: linear-gradient(145deg, #ff8d91, #e34c59);
+    box-shadow: inset 0 5px 0 rgb(255 255 255 / 0.25), 0 9px 0 #a92f3a, 0 17px 28px rgb(169 47 58 / 0.2);
+  }
+  .pt-letter-choice:hover:not(:disabled) { translate: 0 -4px; }
+  .pt-letter-choice:active:not(:disabled) { translate: 0 5px; box-shadow: 0 3px 0 #2262a8; }
+  .pt-letter-choice:focus-visible { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 4px; }
+  .pt-letter-choice:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect) { opacity: 0.45; cursor: default; }
   #pt-options :global(.pt-option-btn) {
     position: relative;
     isolation: isolate;
@@ -569,6 +778,172 @@ const { t } = Astro.props;
     box-shadow: none;
     font-size: 0.75rem;
     font-weight: 900;
+  }
+  .pt-counting-strip {
+    justify-self: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(0.4rem, 2vw, 0.75rem);
+    width: min(100%, 34rem);
+    padding: 1rem;
+    border: 2px solid rgb(246 173 67 / 0.5);
+    border-radius: 1.75rem;
+    background: linear-gradient(145deg, #fff9df, #fff0bd);
+    box-shadow: 0 8px 0 rgb(223 149 81 / 0.28), 0 15px 28px rgb(81 54 35 / 0.1);
+  }
+  .pt-counting-strip[hidden] { display: none; }
+  .pt-counting-strip button {
+    display: grid;
+    width: clamp(2.65rem, 9vw, 3.6rem);
+    height: clamp(2.65rem, 9vw, 3.6rem);
+    place-items: center;
+    border: 3px solid rgb(255 255 255 / 0.8);
+    border-radius: 50%;
+    color: #fff;
+    background: #4d96ff;
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #2869bd, 0 10px 14px rgb(40 105 189 / 0.2);
+    font-family: var(--font-mono);
+    font-size: clamp(1.15rem, 4vw, 1.55rem);
+    font-weight: 900;
+    cursor: pointer;
+    transition: translate var(--motion-fast) var(--ease), filter var(--motion-fast) var(--ease);
+  }
+  .pt-counting-strip button:hover:not(:disabled) { translate: 0 -5px; filter: brightness(1.06); }
+  .pt-counting-strip button:active:not(:disabled) { translate: 0 3px; }
+  .pt-counting-strip button:focus-visible { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 3px; }
+  .pt-counting-strip button:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect) { opacity: 0.42; cursor: default; }
+  .pt-counting-strip button:nth-child(2),
+  .pt-counting-strip button:nth-child(6) {
+    background: #ff6b6b;
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #c53e3e, 0 10px 14px rgb(197 62 62 / 0.2);
+  }
+  .pt-counting-strip button:nth-child(3),
+  .pt-counting-strip button:nth-child(7) {
+    background: #35ad71;
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #207c4d, 0 10px 14px rgb(32 124 77 / 0.2);
+  }
+  .pt-counting-strip button:nth-child(4) {
+    background: #9b67db;
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #6c3ca6, 0 10px 14px rgb(108 60 166 / 0.2);
+  }
+  .pt-counting-strip button:nth-child(5) {
+    background: #f39a28;
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #b96b10, 0 10px 14px rgb(185 107 16 / 0.2);
+  }
+  .pt-picture-word-bank {
+    position: sticky;
+    z-index: 3;
+    top: 5.25rem;
+    justify-self: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.55rem;
+    width: min(100%, 38rem);
+    padding: 0.8rem;
+    border: 2px solid rgb(64 160 205 / 0.35);
+    border-radius: 1.4rem;
+    background: rgb(255 255 255 / 0.94);
+    box-shadow: 0 8px 22px rgb(49 43 40 / 0.13);
+    backdrop-filter: blur(10px);
+  }
+  .pt-picture-word-bank[hidden] { display: none; }
+  .pt-picture-word-bank button {
+    padding: 0.55rem 0.9rem;
+    border: 2px solid rgb(255 255 255 / 0.9);
+    border-radius: 999px;
+    color: #fff;
+    background: #3488b5;
+    box-shadow: 0 4px 0 #24668b;
+    font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+    font-weight: 850;
+    cursor: pointer;
+    transition: translate var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
+  }
+  .pt-picture-word-bank button:hover:not(:disabled) { translate: 0 -3px; }
+  .pt-picture-word-bank button:active:not(:disabled) { translate: 0 3px; box-shadow: 0 1px 0 #24668b; }
+  .pt-picture-word-bank button:focus-visible { outline: 3px solid rgb(52 136 181 / 0.25); outline-offset: 3px; }
+  .pt-picture-word-bank button:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect) { opacity: 0.48; cursor: default; }
+  .pt-picture-word-bank button:nth-child(2),
+  .pt-picture-word-bank button:nth-child(5) { background: #e9535d; box-shadow: 0 4px 0 #a92f38; }
+  .pt-picture-word-bank button:nth-child(3) { background: #35a86f; box-shadow: 0 4px 0 #23774e; }
+  .pt-picture-word-bank button:nth-child(4) { background: #9461cf; box-shadow: 0 4px 0 #653a99; }
+  .pt-image-stage.is-match-picture {
+    min-height: 15rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .pt-image-stage.is-match-picture::after { display: none; }
+  .pt-image-stage.is-match-picture .pt-image {
+    width: min(100%, 17rem);
+    max-height: 17rem;
+    border-radius: 0;
+  }
+  .pt-image-stage.is-match-picture .pt-image-spark { display: none; }
+  .card.is-kids {
+    border-color: rgb(246 173 67 / 0.55);
+    background:
+      radial-gradient(circle at 100% 0%, rgb(246 173 67 / 0.16), transparent 14rem),
+      radial-gradient(circle at 0% 100%, rgb(64 160 205 / 0.12), transparent 16rem),
+      var(--color-bg-raised);
+  }
+  .is-kids .pt-prompt {
+    font-size: clamp(1.35rem, 4vw, 1.75rem);
+    text-align: center;
+  }
+  .is-kids .pt-options {
+    gap: 1rem;
+  }
+  .is-kids .pt-option-btn {
+    min-height: 5.25rem;
+    padding: 1rem 1.15rem;
+    border-radius: 1.35rem;
+    border: 2px solid rgb(64 160 205 / 0.35);
+    background: linear-gradient(135deg, #fff, rgb(64 160 205 / 0.09));
+    box-shadow: 0 8px 0 rgb(64 160 205 / 0.16), 0 14px 28px rgb(49 43 40 / 0.08);
+    font-size: clamp(1.05rem, 3vw, 1.25rem);
+  }
+  .is-kids .pt-option-btn:nth-child(2n) {
+    border-color: rgb(246 173 67 / 0.5);
+    background: linear-gradient(135deg, #fff, rgb(246 173 67 / 0.13));
+    box-shadow: 0 8px 0 rgb(246 173 67 / 0.18), 0 14px 28px rgb(49 43 40 / 0.08);
+  }
+  .is-kids .pt-option-btn:active:not(:disabled) {
+    transform: translateY(5px);
+    box-shadow: 0 3px 0 rgb(64 160 205 / 0.16), 0 8px 18px rgb(49 43 40 / 0.08);
+  }
+  .is-kids .pt-option-key {
+    width: 2.65rem;
+    height: 2.65rem;
+    border: 0;
+    color: #fff;
+    background: #3488b5;
+    font-size: 0;
+    box-shadow: 0 5px 12px rgb(52 136 181 / 0.25);
+  }
+  .is-kids .pt-option-key::after {
+    content: 'A';
+    font-size: 1rem;
+  }
+  .is-kids .pt-option-btn:nth-child(2) .pt-option-key::after { content: 'B'; }
+  .is-kids .pt-option-btn:nth-child(3) .pt-option-key::after { content: 'C'; }
+  .is-kids .pt-option-btn:nth-child(4) .pt-option-key::after { content: 'D'; }
+  .is-kids .pt-text-input {
+    min-height: 4.25rem;
+    border-width: 2px;
+    border-color: rgb(64 160 205 / 0.5);
+    border-radius: 1.2rem;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  .is-kids .pt-text-submit {
+    min-height: 4.25rem;
+    border-radius: 1.2rem;
+    font-size: 1rem;
+    box-shadow: 0 6px 0 rgb(126 15 36 / 0.22);
   }
   #pt-options :global(.pt-option-btn.pt-selected-incorrect::after) {
     content: '×';

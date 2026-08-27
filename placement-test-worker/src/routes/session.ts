@@ -1,5 +1,5 @@
 import type { Env, StudentInput } from '../types';
-import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, listAnsweredQuestionIds } from '../db';
+import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, listAnsweredQuestionIds } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 import { ADULT_BANDS, bandForSequence, isLastBand, evaluateBand, placementLevel } from '../bands';
 import { kidsLevelIndex, KIDS_YLE_BY_INDEX } from '../kids';
@@ -81,7 +81,8 @@ export async function handleStartSession(req: Request, env: Env): Promise<Respon
   if (!body.name || !body.phone || !body.dob || !body.locale) {
     return json({ error: 'name, phone, dob, and locale are required' }, 400);
   }
-  const track = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
+  const requestedTrack = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
+  const track = isUnderEleven(body.dob) ? 'kids' : requestedTrack;
   const studentId = await insertStudent(env, body);
   const sessionId = await insertSession(env, studentId, track);
   const state = initialState();
