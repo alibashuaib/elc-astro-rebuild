@@ -2,6 +2,7 @@ import type { Env, StudentInput } from '../types';
 import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, listAnsweredQuestionIds } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 import { ADULT_BANDS, bandForSequence, isLastBand, evaluateBand, placementLevel } from '../bands';
+import { kidsLevelIndex, KIDS_YLE_BY_INDEX } from '../kids';
 
 // Adults-only: the last question number this track actually serves. The
 // bank has 50 real questions (see migrations/0003_real_questions.sql), but
@@ -25,26 +26,17 @@ function normalizeAnswer(s: string, caseSensitive: boolean): string {
   return caseSensitive ? trimmed : trimmed.toLowerCase();
 }
 
-// Kids-only override on top of the adaptive level estimate: a perfect run
-// (every question answered correctly) is reported as 'Super Minds 3A'
-// regardless of where the adaptive walk ended up, and a run with zero
-// correct answers is reported at the bottom of the ladder ('Pre-Starters').
-// User-requested floor/ceiling for the two extreme outcomes -- everything
-// in between still uses the normal adaptive estimate. A skip counts as "not
-// correct" here (same as scoring.ts treats it), so it breaks the "perfect
-// run" case but not the "zero correct" one.
-const KIDS_PERFECT_INDEX = 2; // LEVELS_BY_TRACK.kids[2] / STAGE_NAMES_BY_TRACK.kids[2] = 'A1+' / 'Super Minds 3A'
-const KIDS_ZERO_INDEX = 0; // '-A1' / 'Pre-Starters'
-
-async function kidsLevelOverrideIndex(env: Env, sessionId: string): Promise<number | null> {
+// Kids placement is the share of the bank answered correctly (see kids.ts),
+// not the adaptive walk in scoring.ts -- that walk stepped a level index by
+// +/-1 per answer and clamped it to 0-5, so the result tracked the last few
+// answers rather than the run: a kid answering 30 of 44 correctly could still
+// finish at the bottom of the ladder if their mistakes fell at the end.
+async function kidsPlacementIndex(env: Env, sessionId: string): Promise<number> {
   const row = await env.DB
     .prepare(`SELECT COUNT(*) AS total, COALESCE(SUM(correct), 0) AS correctCount FROM responses WHERE session_id = ?`)
     .bind(sessionId)
     .first<{ total: number; correctCount: number }>();
-  if (!row || row.total === 0) return null;
-  if (row.correctCount === row.total) return KIDS_PERFECT_INDEX;
-  if (row.correctCount === 0) return KIDS_ZERO_INDEX;
-  return null;
+  return kidsLevelIndex(row?.correctCount ?? 0, row?.total ?? 0);
 }
 
 // Questions are served in fixed order (see migrations/0006_fixed_sequential_order.sql
@@ -56,11 +48,14 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
   const q = await pickNextQuestion(env, track as any, excludeIds);
   if (!q) {
     // bank exhausted (asked every question in the track): end the session at the current estimate rather than error
-    const finalIndex = track === 'kids' ? (await kidsLevelOverrideIndex(env, sessionId)) ?? levelIndex : levelIndex;
+    const finalIndex = track === 'kids' ? await kidsPlacementIndex(env, sessionId) : levelIndex;
     const level = LEVELS_BY_TRACK[track as 'kids' | 'adults'][finalIndex];
     const levelName = STAGE_NAMES_BY_TRACK[track as 'kids' | 'adults'][finalIndex];
     await completeSession(env, sessionId, level);
-    return { done: true, level, levelName };
+    // Cambridge YLE exam level, kids only -- adults aren't on that scale, and
+    // Pre-Starters sits below the lowest YLE exam, so it stays absent there.
+    const yle = track === 'kids' ? KIDS_YLE_BY_INDEX[finalIndex] : undefined;
+    return { done: true, level, levelName, ...(yle ? { yle } : {}) };
   }
   const passage = q.passage_id ? await getPassage(env, q.passage_id) : null;
   // Adults only serves its banded prefix (see ADULT_BANDED_QUESTION_COUNT) --
@@ -191,11 +186,12 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     // (the real end-of-test path is nextQuestionPayload's bank-exhausted
     // branch above), but apply the same kids perfect/zero override here too
     // for consistency if it's ever reached.
-    const override = session.track === 'kids' ? await kidsLevelOverrideIndex(env, sessionId) : null;
+    const override = session.track === 'kids' ? await kidsPlacementIndex(env, sessionId) : null;
     const level = override !== null ? LEVELS_BY_TRACK.kids[override] : finalLevel(nextState, session.track);
     const levelName = override !== null ? STAGE_NAMES_BY_TRACK.kids[override] : finalLevelName(nextState, session.track);
     await completeSession(env, sessionId, level);
-    return json({ done: true, level, levelName, ...feedback });
+    const yle = override !== null ? KIDS_YLE_BY_INDEX[override] : undefined;
+    return json({ done: true, level, levelName, ...(yle ? { yle } : {}), ...feedback });
   }
 
   const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, answeredIds);

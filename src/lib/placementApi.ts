@@ -27,7 +27,8 @@ export interface QuestionPayload {
 export interface DonePayload {
   done: true;
   level: string;
-  levelName: string; // stage name for `level`, e.g. "Elementary" for kids A2 -- see scoring.ts/STAGE_NAMES_BY_TRACK
+  levelName: string; // stage name for `level`, e.g. "Super Minds 3A" for kids -- see scoring.ts/STAGE_NAMES_BY_TRACK
+  yle?: string; // Cambridge YLE exam level ("Starters"/"Movers") -- kids only, absent below Starters
   correct?: boolean; // whether the final answer was correct; absent if the session ended without answering (bank pre-exhausted)
 }
 

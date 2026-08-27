@@ -8,7 +8,19 @@ import type { Track } from './types';
 // step/convergence math in this file doesn't need to change, only the labels.
 export const LEVELS_BY_TRACK: Record<Track, readonly string[]> = {
   adults: ['A0', 'A1', 'A2', 'B1', 'B2', 'C1'],
-  kids: ['-A1', 'A1', 'A1+', 'A2', 'A2+', 'B1'],
+  // Cambridge's own alignment for Super Minds: books 1-2 sit at pre-A1
+  // (Starters), 3-4 at A1 (Movers), 5-6 at A2 (Flyers). Several rungs share a
+  // code because the book ladder is finer-grained than CEFR at this age.
+  // Rungs above index 5 are never awarded by the placement test -- see
+  // kids.ts/KIDS_CEILING_INDEX -- but stay defined for teaching and reporting.
+  kids: [
+    '-A1',              // Pre-Starters
+    '-A1', '-A1',       // Super Minds 1A, 1B
+    '-A1', '-A1',       // Super Minds 2A, 2B
+    'A1',               // Super Minds 3A -- placement ceiling
+    'A1',               // Super Minds 4A
+    'A2', 'A2',         // Super Minds 5A, 6A
+  ],
 };
 export type CefrLevel = string;
 
@@ -22,7 +34,19 @@ export type CefrLevel = string;
 // rather than expanding the ladder to match 1:1.
 export const STAGE_NAMES_BY_TRACK: Record<Track, readonly string[]> = {
   adults: ['Fun A', 'Lint A', 'Lint D', 'Hint A', 'Hint D', 'Advanced B'],
-  kids: ['Pre-Starters', 'Super Minds 2A', 'Super Minds 3A', 'Super Minds 4A', 'Super Minds 5A', 'Super Minds 6A'],
+  // The Super Minds books each split into an A and a B half, and a kid who
+  // lands between two A-halves is placed in the B half below the higher one.
+  // The full teaching ladder is listed; the placement test only awards up to
+  // 'Super Minds 3A' (index 5) -- see kids.ts/KIDS_CEILING_INDEX.
+  kids: [
+    'Pre-Starters',
+    'Super Minds 1A', 'Super Minds 1B',
+    'Super Minds 2A', 'Super Minds 2B',
+    'Super Minds 3A',
+    // Above the placement ceiling: the A-halves only, as the upper books are
+    // reached by teaching rather than by a placement result.
+    'Super Minds 4A', 'Super Minds 5A', 'Super Minds 6A',
+  ],
 };
 
 export interface ScoringState {

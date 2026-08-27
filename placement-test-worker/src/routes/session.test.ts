@@ -341,3 +341,72 @@ describe('text-type question grading', () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe('kids placement level reflects the whole run, not its tail', () => {
+  // Walks the entire kids bank, answering the first `correctCount` questions
+  // with their real key and skipping the rest (a skip scores as incorrect).
+  async function runKidsSession(correctCount: number) {
+    const startRes = await handleStartSession(
+      new Request('http://x/api/session', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+      }),
+      env as any
+    );
+    let data = (await startRes.json()) as any;
+    const sessionId = data.sessionId;
+    let answered = 0;
+
+    while (!data.done && answered < 200) {
+      const q = await env.DB.prepare(`SELECT type, correct_index, expected_answer FROM questions WHERE id = ?`)
+        .bind(data.questionId)
+        .first<{ type: string; correct_index: number; expected_answer: string | null }>();
+
+      let answer: Record<string, unknown>;
+      if (answered >= correctCount) answer = { skip: true };
+      else if (q!.type === 'text') answer = { answerText: q!.expected_answer };
+      else answer = { selectedIndex: q!.correct_index };
+
+      const res = await handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, ...answer }) }),
+        env as any,
+        sessionId
+      );
+      data = await res.json();
+      answered++;
+    }
+    return { level: data.level, levelName: data.levelName, yle: data.yle, answered };
+  }
+
+  it.each([
+    [44, 'Super Minds 3A'],
+    [37, 'Super Minds 3A'],
+    [36, 'Super Minds 2B'],
+    [30, 'Super Minds 2B'],
+    [29, 'Super Minds 2A'],
+    [22, 'Super Minds 2A'],
+    [21, 'Super Minds 1B'],
+    [15, 'Super Minds 1B'],
+    [14, 'Super Minds 1A'],
+    [8, 'Super Minds 1A'],
+    [7, 'Pre-Starters'],
+    [0, 'Pre-Starters'],
+  ])('places a kid who gets %i of 44 right at %s', async (correct, expected) => {
+    const { levelName, answered } = await runKidsSession(correct);
+    expect(answered).toBe(44); // the whole bank is always served
+    expect(levelName).toBe(expected);
+  });
+
+  it.each([
+    [44, 'Movers'],
+    [37, 'Movers'],
+    [36, 'Starters'],
+    [8, 'Starters'],
+  ])('reports the Cambridge YLE level for a kid who gets %i of 44 right', async (correct, expected) => {
+    expect((await runKidsSession(correct)).yle).toBe(expected);
+  });
+
+  it('omits the YLE level below Starters', async () => {
+    expect((await runKidsSession(0)).yle).toBeUndefined();
+  });
+});
