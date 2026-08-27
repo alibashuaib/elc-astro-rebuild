@@ -69,20 +69,53 @@ export async function completeSession(env: Env, id: string, estimatedLevel: stri
   ).bind(estimatedLevel, id).run();
 }
 
-// Fixed sequential order, matching the source paper test's question order.
-// This also lets the answer endpoint independently reconstruct which question
-// is currently pending, preventing replay or question-skipping attacks.
+// Adults keep the source paper's exact sequence. Kids keep the paper's
+// exercise-block progression, but questions inside repeated blocks are
+// shuffled so letter, number, picture, vocabulary, and reading drills do not
+// appear in the same predictable order on every attempt.
 export async function pickNextQuestion(
   env: Env,
   track: Track,
   excludeIds: string[]
 ): Promise<QuestionRow | null> {
   const placeholders = excludeIds.length ? excludeIds.map(() => '?').join(',') : null;
-  const sql = placeholders
-    ? `SELECT * FROM questions WHERE track = ? AND active = 1 AND id NOT IN (${placeholders}) ORDER BY sequence ASC LIMIT 1`
-    : `SELECT * FROM questions WHERE track = ? AND active = 1 ORDER BY sequence ASC LIMIT 1`;
+  const where = placeholders
+    ? `track = ? AND active = 1 AND id NOT IN (${placeholders})`
+    : `track = ? AND active = 1`;
+  const kidsOrder = `CASE
+    WHEN sequence BETWEEN 1 AND 6 THEN 1
+    WHEN sequence BETWEEN 7 AND 12 THEN 7
+    WHEN sequence BETWEEN 13 AND 16 THEN 13
+    WHEN sequence BETWEEN 17 AND 21 THEN 17
+    WHEN sequence BETWEEN 22 AND 26 THEN 22
+    WHEN sequence BETWEEN 27 AND 31 THEN 27
+    WHEN sequence BETWEEN 32 AND 36 THEN 32
+    ELSE sequence
+  END ASC, RANDOM()`;
+  const order = track === 'kids' ? kidsOrder : 'sequence ASC';
+  const sql = `SELECT * FROM questions WHERE ${where} ORDER BY ${order} LIMIT 1`;
   const binds = placeholders ? [track, ...excludeIds] : [track];
   const row = await env.DB.prepare(sql).bind(...binds).first<QuestionRow>();
+  return row ?? null;
+}
+
+/**
+ * Record which question the session is now waiting on, so handleAnswer can
+ * check an incoming answer against it. Pass null when the session ends.
+ *
+ * The alternative -- re-deriving the pending question with pickNextQuestion --
+ * only holds while the walk is deterministic, and the kids track shuffles
+ * within each exercise block.
+ */
+export async function setCurrentQuestion(env: Env, sessionId: string, questionId: string | null): Promise<void> {
+  await env.DB.prepare(`UPDATE test_sessions SET current_question_id = ? WHERE id = ?`)
+    .bind(questionId, sessionId)
+    .run();
+}
+
+/** One question row by id. */
+export async function getQuestion(env: Env, id: string): Promise<QuestionRow | null> {
+  const row = await env.DB.prepare(`SELECT * FROM questions WHERE id = ?`).bind(id).first<QuestionRow>();
   return row ?? null;
 }
 

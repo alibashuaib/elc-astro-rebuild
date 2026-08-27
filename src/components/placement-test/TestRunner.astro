@@ -272,7 +272,6 @@ const { t } = Astro.props;
       buttons.forEach((button) => {
         button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, buttons, button);
       });
-      scopeElements(letterOptions, ...buttons);
       optionsEl.appendChild(letterOptions);
       return;
     }
@@ -649,14 +648,14 @@ const { t } = Astro.props;
     display: grid;
     gap: 0.8rem;
   }
-  .pt-letter-options {
+  #pt-options :global(.pt-letter-options) {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
     width: min(100%, 30rem);
     margin-inline: auto;
   }
-  .pt-letter-choice {
+  #pt-options :global(.pt-letter-choice) {
     min-height: clamp(7rem, 22vw, 10rem);
     border: 3px solid rgb(255 255 255 / 0.9);
     border-radius: 1.75rem;
@@ -670,14 +669,15 @@ const { t } = Astro.props;
     cursor: pointer;
     transition: translate var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
   }
-  .pt-letter-choice:nth-child(2) {
+  #pt-options :global(.pt-letter-choice:nth-child(2)) {
     background: linear-gradient(145deg, #ff8d91, #e34c59);
     box-shadow: inset 0 5px 0 rgb(255 255 255 / 0.25), 0 9px 0 #a92f3a, 0 17px 28px rgb(169 47 58 / 0.2);
   }
-  .pt-letter-choice:hover:not(:disabled) { translate: 0 -4px; }
-  .pt-letter-choice:active:not(:disabled) { translate: 0 5px; box-shadow: 0 3px 0 #2262a8; }
-  .pt-letter-choice:focus-visible { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 4px; }
-  .pt-letter-choice:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect) { opacity: 0.45; cursor: default; }
+  #pt-options :global(.pt-letter-choice:hover:not(:disabled)) { translate: 0 -4px; }
+  #pt-options :global(.pt-letter-choice:active:not(:disabled)) { translate: 0 5px; box-shadow: 0 3px 0 #2262a8; }
+  #pt-options :global(.pt-letter-choice:focus-visible) { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 4px; }
+  #pt-options :global(.pt-letter-choice:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect)) { opacity: 0.45; cursor: default; }
+
   #pt-options :global(.pt-option-btn) {
     position: relative;
     isolation: isolate;
@@ -792,8 +792,10 @@ const { t } = Astro.props;
     background: linear-gradient(145deg, #fff9df, #fff0bd);
     box-shadow: 0 8px 0 rgb(223 149 81 / 0.28), 0 15px 28px rgb(81 54 35 / 0.1);
   }
+
   .pt-counting-strip[hidden] { display: none; }
-  .pt-counting-strip button {
+
+  .pt-counting-strip :global(button) {
     display: grid;
     width: clamp(2.65rem, 9vw, 3.6rem);
     height: clamp(2.65rem, 9vw, 3.6rem);
@@ -809,28 +811,37 @@ const { t } = Astro.props;
     cursor: pointer;
     transition: translate var(--motion-fast) var(--ease), filter var(--motion-fast) var(--ease);
   }
-  .pt-counting-strip button:hover:not(:disabled) { translate: 0 -5px; filter: brightness(1.06); }
-  .pt-counting-strip button:active:not(:disabled) { translate: 0 3px; }
-  .pt-counting-strip button:focus-visible { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 3px; }
-  .pt-counting-strip button:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect) { opacity: 0.42; cursor: default; }
-  .pt-counting-strip button:nth-child(2),
-  .pt-counting-strip button:nth-child(6) {
+
+  .pt-counting-strip :global(button:hover:not(:disabled)) { translate: 0 -5px; filter: brightness(1.06); }
+
+  .pt-counting-strip :global(button:active:not(:disabled)) { translate: 0 3px; }
+
+  .pt-counting-strip :global(button:focus-visible) { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 3px; }
+
+  .pt-counting-strip :global(button:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect)) { opacity: 0.42; cursor: default; }
+
+  .pt-counting-strip :global(button:nth-child(2)),
+  .pt-counting-strip :global(button:nth-child(6)) {
     background: #ff6b6b;
     box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #c53e3e, 0 10px 14px rgb(197 62 62 / 0.2);
   }
-  .pt-counting-strip button:nth-child(3),
-  .pt-counting-strip button:nth-child(7) {
+
+  .pt-counting-strip :global(button:nth-child(3)),
+  .pt-counting-strip :global(button:nth-child(7)) {
     background: #35ad71;
     box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #207c4d, 0 10px 14px rgb(32 124 77 / 0.2);
   }
-  .pt-counting-strip button:nth-child(4) {
+
+  .pt-counting-strip :global(button:nth-child(4)) {
     background: #9b67db;
     box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #6c3ca6, 0 10px 14px rgb(108 60 166 / 0.2);
   }
-  .pt-counting-strip button:nth-child(5) {
+
+  .pt-counting-strip :global(button:nth-child(5)) {
     background: #f39a28;
     box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #b96b10, 0 10px 14px rgb(185 107 16 / 0.2);
   }
+
   .pt-picture-word-bank {
     position: sticky;
     z-index: 3;
@@ -848,8 +859,10 @@ const { t } = Astro.props;
     box-shadow: 0 8px 22px rgb(49 43 40 / 0.13);
     backdrop-filter: blur(10px);
   }
+
   .pt-picture-word-bank[hidden] { display: none; }
-  .pt-picture-word-bank button {
+
+  .pt-picture-word-bank :global(button) {
     padding: 0.55rem 0.9rem;
     border: 2px solid rgb(255 255 255 / 0.9);
     border-radius: 999px;
@@ -861,28 +874,32 @@ const { t } = Astro.props;
     cursor: pointer;
     transition: translate var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
   }
-  .pt-picture-word-bank button:hover:not(:disabled) { translate: 0 -3px; }
-  .pt-picture-word-bank button:active:not(:disabled) { translate: 0 3px; box-shadow: 0 1px 0 #24668b; }
-  .pt-picture-word-bank button:focus-visible { outline: 3px solid rgb(52 136 181 / 0.25); outline-offset: 3px; }
-  .pt-picture-word-bank button:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect) { opacity: 0.48; cursor: default; }
-  .pt-picture-word-bank button:nth-child(2),
-  .pt-picture-word-bank button:nth-child(5) { background: #e9535d; box-shadow: 0 4px 0 #a92f38; }
-  .pt-picture-word-bank button:nth-child(3) { background: #35a86f; box-shadow: 0 4px 0 #23774e; }
-  .pt-picture-word-bank button:nth-child(4) { background: #9461cf; box-shadow: 0 4px 0 #653a99; }
-  .pt-image-stage.is-match-picture {
+
+  .pt-picture-word-bank :global(button:hover:not(:disabled)) { translate: 0 -3px; }
+
+  .pt-picture-word-bank :global(button:active:not(:disabled)) { translate: 0 3px; box-shadow: 0 1px 0 #24668b; }
+
+  .pt-picture-word-bank :global(button:focus-visible) { outline: 3px solid rgb(52 136 181 / 0.25); outline-offset: 3px; }
+
+  .pt-picture-word-bank :global(button:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect)) { opacity: 0.48; cursor: default; }
+
+  .pt-picture-word-bank :global(button:nth-child(2)),
+  .pt-picture-word-bank :global(button:nth-child(5)) { background: #e9535d; box-shadow: 0 4px 0 #a92f38; }
+
+  .pt-picture-word-bank :global(button:nth-child(3)) { background: #35a86f; box-shadow: 0 4px 0 #23774e; }
+
+  .pt-picture-word-bank :global(button:nth-child(4)) { background: #9461cf; box-shadow: 0 4px 0 #653a99; }
+#pt-options :global(.pt-image-stage.is-match-picture) {
     min-height: 15rem;
     padding: 0;
     border: 0;
     background: transparent;
     box-shadow: none;
-  }
-  .pt-image-stage.is-match-picture::after { display: none; }
-  .pt-image-stage.is-match-picture .pt-image {
+  }#pt-options :global(.pt-image-stage.is-match-picture::after) { display: none; }#pt-options :global(.pt-image-stage.is-match-picture .pt-image) {
     width: min(100%, 17rem);
     max-height: 17rem;
     border-radius: 0;
-  }
-  .pt-image-stage.is-match-picture .pt-image-spark { display: none; }
+  }#pt-options :global(.pt-image-stage.is-match-picture .pt-image-spark) { display: none; }
   .card.is-kids {
     border-color: rgb(246 173 67 / 0.55);
     background:
@@ -896,8 +913,7 @@ const { t } = Astro.props;
   }
   .is-kids .pt-options {
     gap: 1rem;
-  }
-  .is-kids .pt-option-btn {
+  }#pt-options :global(.is-kids .pt-option-btn) {
     min-height: 5.25rem;
     padding: 1rem 1.15rem;
     border-radius: 1.35rem;
@@ -905,17 +921,14 @@ const { t } = Astro.props;
     background: linear-gradient(135deg, #fff, rgb(64 160 205 / 0.09));
     box-shadow: 0 8px 0 rgb(64 160 205 / 0.16), 0 14px 28px rgb(49 43 40 / 0.08);
     font-size: clamp(1.05rem, 3vw, 1.25rem);
-  }
-  .is-kids .pt-option-btn:nth-child(2n) {
+  }#pt-options :global(.is-kids .pt-option-btn:nth-child(2n)) {
     border-color: rgb(246 173 67 / 0.5);
     background: linear-gradient(135deg, #fff, rgb(246 173 67 / 0.13));
     box-shadow: 0 8px 0 rgb(246 173 67 / 0.18), 0 14px 28px rgb(49 43 40 / 0.08);
-  }
-  .is-kids .pt-option-btn:active:not(:disabled) {
+  }#pt-options :global(.is-kids .pt-option-btn:active:not(:disabled)) {
     transform: translateY(5px);
     box-shadow: 0 3px 0 rgb(64 160 205 / 0.16), 0 8px 18px rgb(49 43 40 / 0.08);
-  }
-  .is-kids .pt-option-key {
+  }#pt-options :global(.is-kids .pt-option-key) {
     width: 2.65rem;
     height: 2.65rem;
     border: 0;
@@ -923,28 +936,24 @@ const { t } = Astro.props;
     background: #3488b5;
     font-size: 0;
     box-shadow: 0 5px 12px rgb(52 136 181 / 0.25);
-  }
-  .is-kids .pt-option-key::after {
+  }#pt-options :global(.is-kids .pt-option-key::after) {
     content: 'A';
     font-size: 1rem;
-  }
-  .is-kids .pt-option-btn:nth-child(2) .pt-option-key::after { content: 'B'; }
-  .is-kids .pt-option-btn:nth-child(3) .pt-option-key::after { content: 'C'; }
-  .is-kids .pt-option-btn:nth-child(4) .pt-option-key::after { content: 'D'; }
-  .is-kids .pt-text-input {
+  }#pt-options :global(.is-kids .pt-option-btn:nth-child(2) .pt-option-key::after) { content: 'B'; }#pt-options :global(.is-kids .pt-option-btn:nth-child(3) .pt-option-key::after) { content: 'C'; }#pt-options :global(.is-kids .pt-option-btn:nth-child(4) .pt-option-key::after) { content: 'D'; }#pt-options :global(.is-kids .pt-text-input) {
     min-height: 4.25rem;
     border-width: 2px;
     border-color: rgb(64 160 205 / 0.5);
     border-radius: 1.2rem;
     font-size: 1.2rem;
     text-align: center;
-  }
-  .is-kids .pt-text-submit {
+  }#pt-options :global(.is-kids .pt-text-submit) {
     min-height: 4.25rem;
     border-radius: 1.2rem;
     font-size: 1rem;
     box-shadow: 0 6px 0 rgb(126 15 36 / 0.22);
   }
+  .pt-option-btn.pt-selected-incorrect::after {
+
   #pt-options :global(.pt-option-btn.pt-selected-incorrect::after) {
     content: '×';
     display: grid;

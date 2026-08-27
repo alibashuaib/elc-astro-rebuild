@@ -53,4 +53,10 @@ export interface SessionRow {
   recent_levels: string; // JSON string
   questions_asked: number;
   estimated_level: string | null;
+  /**
+   * The question this session was last served and is waiting on an answer for.
+   * NULL once the session ends, and for sessions started before migration 0014.
+   * See db.ts/setCurrentQuestion and the guard in routes/session.ts.
+   */
+  current_question_id: string | null;
 }
