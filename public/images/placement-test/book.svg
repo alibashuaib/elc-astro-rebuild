@@ -1,15 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="A book">
-  <circle cx="120" cy="120" r="112" fill="#FFE1A8"/>
-  <circle cx="120" cy="120" r="112" fill="none" stroke="#FFB100" stroke-width="6"/>
-  <g transform="translate(120 128)">
-    <path d="M0 -55 C-14 -63 -40 -66 -62 -60 L-62 52 C-40 46 -14 49 0 57 Z" fill="#FF6B6B" stroke="#B3261E" stroke-width="6" stroke-linejoin="round"/>
-    <path d="M0 -55 C14 -63 40 -66 62 -60 L62 52 C40 46 14 49 0 57 Z" fill="#4D96FF" stroke="#1D4ED8" stroke-width="6" stroke-linejoin="round"/>
-    <path d="M0 -55 L0 57" stroke="#FFF6E0" stroke-width="4"/>
-    <path d="M-46 -40 L-14 -36" stroke="#FFE9E9" stroke-width="5" stroke-linecap="round"/>
-    <path d="M-46 -20 L-14 -16" stroke="#FFE9E9" stroke-width="5" stroke-linecap="round"/>
-    <path d="M14 -36 L46 -40" stroke="#EAF2FF" stroke-width="5" stroke-linecap="round"/>
-    <path d="M14 -16 L46 -20" stroke="#EAF2FF" stroke-width="5" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="redCover" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FF8B8B"/><stop offset=".58" stop-color="#F34F59"/><stop offset="1" stop-color="#A9212C"/></linearGradient>
+    <linearGradient id="blueCover" x1="1" y1="0" x2="0" y2="1"><stop stop-color="#7DB8FF"/><stop offset=".58" stop-color="#397FE6"/><stop offset="1" stop-color="#174FA8"/></linearGradient>
+    <linearGradient id="pages" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFFDF2"/><stop offset="1" stop-color="#E8D6AA"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="190%"><feDropShadow dx="0" dy="14" stdDeviation="9" flood-color="#38271E" flood-opacity=".42"/></filter>
+  </defs>
+  <ellipse cx="120" cy="202" rx="83" ry="15" fill="#38271E" opacity=".22"/>
+  <g filter="url(#shadow)">
+    <path d="M120 178 L45 164 L42 180 L120 199 Z" fill="#9F2430" stroke="#7B1720" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M120 178 L195 164 L198 180 L120 199 Z" fill="#174F9E" stroke="#123B76" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M120 70 C96 57 67 55 42 65 L45 164 C70 154 99 158 120 178 Z" fill="url(#redCover)" stroke="#8D1D27" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M120 70 C144 57 173 55 198 65 L195 164 C170 154 141 158 120 178 Z" fill="url(#blueCover)" stroke="#174A99" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M120 76 C99 65 73 63 50 71 L53 153 C75 146 101 150 120 165 Z" fill="url(#pages)" stroke="#D8C38E" stroke-width="3"/>
+    <path d="M120 76 C141 65 167 63 190 71 L187 153 C165 146 139 150 120 165 Z" fill="url(#pages)" stroke="#D8C38E" stroke-width="3"/>
+    <path d="M120 70 L120 181" stroke="#6F2D35" stroke-width="7" stroke-linecap="round"/>
+    <path d="M59 91 C80 85 99 88 112 96 M59 111 C80 105 99 108 112 116 M181 91 C160 85 141 88 128 96 M181 111 C160 105 141 108 128 116" fill="none" stroke="#C6AD76" stroke-width="5" stroke-linecap="round"/>
+    <path d="M55 75 C74 68 92 70 106 76" fill="none" stroke="#FFF" stroke-width="6" stroke-linecap="round" opacity=".55"/>
   </g>
-  <circle cx="72" cy="60" r="7" fill="#FFF6E0"/>
-  <circle cx="182" cy="180" r="9" fill="#FFF6E0"/>
 </svg>

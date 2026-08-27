@@ -29,6 +29,7 @@ const { locale, t } = Astro.props;
         <span>{t('placementTest.formTrackKids')}</span>
       </label>
     </div>
+    <p id="age-track-rule" class="age-track-rule" hidden></p>
   </fieldset>
   <div class="form-grid">
     <label>
@@ -58,6 +59,10 @@ const { locale, t } = Astro.props;
   const form = document.getElementById('placement-registration') as HTMLFormElement;
   const trackInputs = form.querySelectorAll<HTMLInputElement>('input[name="track"]');
   const guardianField = document.getElementById('guardian-field') as HTMLElement;
+  const dobInput = form.querySelector<HTMLInputElement>('input[name="dob"]')!;
+  const adultsInput = form.querySelector<HTMLInputElement>('input[name="track"][value="adults"]')!;
+  const kidsInput = form.querySelector<HTMLInputElement>('input[name="track"][value="kids"]')!;
+  const ageRule = document.getElementById('age-track-rule') as HTMLElement;
 
   function selectedTrack(): string {
     return (form.querySelector<HTMLInputElement>('input[name="track"]:checked'))?.value ?? 'adults';
@@ -70,7 +75,31 @@ const { locale, t } = Astro.props;
     guardianInput.required = isKids;
   }
 
+  function isUnderEleven(dob: string): boolean {
+    const parts = dob.split('-').map(Number);
+    if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part))) return false;
+    const [year, month, day] = parts;
+    const today = new Date();
+    let age = today.getFullYear() - year;
+    const hadBirthday = today.getMonth() + 1 > month || (today.getMonth() + 1 === month && today.getDate() >= day);
+    if (!hadBirthday) age--;
+    return age < 11;
+  }
+
+  function enforceAgeTrack() {
+    const forcedKids = isUnderEleven(dobInput.value);
+    adultsInput.disabled = forcedKids;
+    ageRule.hidden = !forcedKids;
+    ageRule.textContent = form.dataset.locale === 'ar'
+      ? 'يتم اختيار اختبار الأطفال تلقائيًا للطلاب دون سن 11 عامًا.'
+      : 'Students under 11 are automatically assigned to the Kids test.';
+    if (forcedKids) kidsInput.checked = true;
+    updateGuardianField();
+  }
+
   trackInputs.forEach((input) => input.addEventListener('change', updateGuardianField));
+  dobInput.addEventListener('input', enforceAgeTrack);
+  dobInput.addEventListener('change', enforceAgeTrack);
   updateGuardianField();
 
   form.addEventListener('submit', (event) => {
@@ -177,6 +206,20 @@ const { locale, t } = Astro.props;
     color: var(--color-navy);
     font-size: 0.88rem;
     font-weight: 700;
+  }
+  .age-track-rule {
+    margin: 0;
+    padding: 0.65rem 0.8rem;
+    border-radius: 0.8rem;
+    color: #1a6f48;
+    background: rgb(53 168 111 / 0.12);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-align: center;
+  }
+  .card label.track-pill:has(input:disabled) {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
   .track-toggle {
     display: grid;

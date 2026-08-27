@@ -1,0 +1,16 @@
+-- Record which question a session is currently on.
+--
+-- handleAnswer has to reject an answer for anything other than the question the
+-- student was actually served, or a student can re-submit an easy question they
+-- already cleared, or skip ahead to one they know. That check previously
+-- re-derived the pending question by calling pickNextQuestion again, which only
+-- worked because the walk-through was a deterministic pass in `sequence` order.
+--
+-- The kids track now shuffles questions within each exercise block, so calling
+-- pickNextQuestion twice can return two different rows -- re-deriving would
+-- reject every legitimate answer. Store what was served instead.
+--
+-- NULL for sessions that are finished, or that predate this column; handleAnswer
+-- falls back to the old derive-and-compare when it is NULL so in-flight sessions
+-- from before this migration keep working.
+ALTER TABLE test_sessions ADD COLUMN current_question_id TEXT REFERENCES questions(id);

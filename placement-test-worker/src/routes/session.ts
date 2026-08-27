@@ -1,5 +1,5 @@
 import type { Env, StudentInput } from '../types';
-import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, listAnsweredQuestionIds } from '../db';
+import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, listAnsweredQuestionIds, setCurrentQuestion, getQuestion } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 import { ADULT_BANDS, bandForSequence, isLastBand, evaluateBand, placementLevel } from '../bands';
 import { kidsLevelIndex, KIDS_YLE_BY_INDEX } from '../kids';
@@ -52,11 +52,15 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     const level = LEVELS_BY_TRACK[track as 'kids' | 'adults'][finalIndex];
     const levelName = STAGE_NAMES_BY_TRACK[track as 'kids' | 'adults'][finalIndex];
     await completeSession(env, sessionId, level);
+    await setCurrentQuestion(env, sessionId, null);
     // Cambridge YLE exam level, kids only -- adults aren't on that scale, and
     // Pre-Starters sits below the lowest YLE exam, so it stays absent there.
     const yle = track === 'kids' ? KIDS_YLE_BY_INDEX[finalIndex] : undefined;
     return { done: true, level, levelName, ...(yle ? { yle } : {}) };
   }
+  // Remember what we are about to serve: the answer handler checks against it
+  // rather than re-deriving, which the kids track's shuffling would break.
+  await setCurrentQuestion(env, sessionId, q.id);
   const passage = q.passage_id ? await getPassage(env, q.passage_id) : null;
   // Adults only serves its banded prefix (see ADULT_BANDED_QUESTION_COUNT) --
   // report progress against that, not the track's full 50-question bank.
@@ -81,7 +85,8 @@ export async function handleStartSession(req: Request, env: Env): Promise<Respon
   if (!body.name || !body.phone || !body.dob || !body.locale) {
     return json({ error: 'name, phone, dob, and locale are required' }, 400);
   }
-  const track = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
+  const requestedTrack = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
+  const track = isUnderEleven(body.dob) ? 'kids' : requestedTrack;
   const studentId = await insertStudent(env, body);
   const sessionId = await insertSession(env, studentId, track);
   const state = initialState();
@@ -96,19 +101,26 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   }
   const body = await req.json<{ questionId: string; selectedIndex?: number; answerText?: string; skip?: boolean }>();
 
-  // Grade only the question this session is actually on. The walk-through is a
-  // deterministic pass over the track's active bank in `sequence` order (see
-  // db.ts/pickNextQuestion), so "the first unanswered question" *is* the one the
-  // student was last served -- no extra state needed to know what's pending.
-  // Without this check the handler graded whatever `questionId` the client sent,
-  // so a student could re-submit an easy question they'd already cleared (or skip
-  // ahead to one they knew), inflating `questionNumber`, adding duplicate rows to
-  // `responses`, and skewing the adults band counts in countBandCorrect.
+  // Grade only the question this session is actually on. Without this check the
+  // handler graded whatever `questionId` the client sent, so a student could
+  // re-submit an easy question they'd already cleared (or skip ahead to one they
+  // knew), inflating `questionNumber`, adding duplicate rows to `responses`, and
+  // skewing the adults band counts in countBandCorrect.
+  //
+  // `current_question_id` records what was served (migration 0014). Sessions
+  // started before that migration have NULL there, so they fall back to
+  // re-deriving the pending question -- valid for the adults track, which is
+  // still a deterministic pass in `sequence` order. The kids track shuffles
+  // within each exercise block, which is exactly why the column exists.
   const askedIds = await listAnsweredQuestionIds(env, sessionId);
-  const q = await pickNextQuestion(env, session.track, askedIds);
-  if (!q || q.id !== body.questionId) {
+  const expectedId = session.current_question_id
+    ?? (await pickNextQuestion(env, session.track, askedIds))?.id
+    ?? null;
+  if (!expectedId || expectedId !== body.questionId) {
     return json({ error: 'not the question this session is on' }, 400);
   }
+  const q = await getQuestion(env, expectedId);
+  if (!q) return json({ error: 'unknown question' }, 400);
 
   const skipped = body.skip === true;
   let correct: boolean;
@@ -174,6 +186,7 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
         // failure, so this single result is the whole placement input.
         const level = placementLevel([result]);
         await completeSession(env, sessionId, level);
+        await setCurrentQuestion(env, sessionId, null);
         return json({ done: true, level, levelName: level, ...feedback });
       }
       const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, answeredIds);
@@ -190,6 +203,7 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     const level = override !== null ? LEVELS_BY_TRACK.kids[override] : finalLevel(nextState, session.track);
     const levelName = override !== null ? STAGE_NAMES_BY_TRACK.kids[override] : finalLevelName(nextState, session.track);
     await completeSession(env, sessionId, level);
+    await setCurrentQuestion(env, sessionId, null);
     const yle = override !== null ? KIDS_YLE_BY_INDEX[override] : undefined;
     return json({ done: true, level, levelName, ...(yle ? { yle } : {}), ...feedback });
   }
