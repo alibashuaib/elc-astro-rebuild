@@ -375,7 +375,7 @@ describe('kids placement level reflects the whole run, not its tail', () => {
       data = await res.json();
       answered++;
     }
-    return { level: data.level, levelName: data.levelName, answered };
+    return { level: data.level, levelName: data.levelName, yle: data.yle, answered };
   }
 
   it.each([
@@ -395,5 +395,18 @@ describe('kids placement level reflects the whole run, not its tail', () => {
     const { levelName, answered } = await runKidsSession(correct);
     expect(answered).toBe(44); // the whole bank is always served
     expect(levelName).toBe(expected);
+  });
+
+  it.each([
+    [44, 'Movers'],
+    [37, 'Movers'],
+    [36, 'Starters'],
+    [8, 'Starters'],
+  ])('reports the Cambridge YLE level for a kid who gets %i of 44 right', async (correct, expected) => {
+    expect((await runKidsSession(correct)).yle).toBe(expected);
+  });
+
+  it('omits the YLE level below Starters', async () => {
+    expect((await runKidsSession(0)).yle).toBeUndefined();
   });
 });

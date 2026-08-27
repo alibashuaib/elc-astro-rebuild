@@ -11,7 +11,7 @@ export const LEVELS_BY_TRACK: Record<Track, readonly string[]> = {
   // Cambridge's own alignment for Super Minds: books 1-2 sit at pre-A1
   // (Starters), book 3 at A1 (Movers). Several rungs share a code because the
   // book ladder is finer-grained than CEFR at this age.
-  kids: ['-A1', '-A1', '-A1', '-A1', 'A1', 'A1'],
+  kids: ['-A1', '-A1', '-A1', '-A1', '-A1', 'A1'],
 };
 export type CefrLevel = string;
 

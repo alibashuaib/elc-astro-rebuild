@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { KIDS_CEILING_INDEX, kidsLevelIndex, kidsLevel } from './kids';
+import { KIDS_CEILING_INDEX, kidsLevelIndex, kidsLevel, kidsYleLevel } from './kids';
 import { STAGE_NAMES_BY_TRACK } from './scoring';
 
 const TOTAL = 44; // the active kids bank, for readable correct-count cases
@@ -60,13 +60,35 @@ describe('kids placement level', () => {
     expect(kidsLevelIndex(0, 0)).toBe(0);
   });
 
-  // Cambridge's own alignment for the series: Super Minds 1-2 sit at pre-A1
-  // (Starters), 3 at A1 (Movers).
+  // Cambridge's own alignment for the series: Super Minds books 1-2 are
+  // Starters (pre-A1), book 3 is Movers (A1).
   it('reports Cambridge-aligned CEFR codes, not the adults ladder', () => {
     expect(kidsLevel(0, TOTAL)).toBe('-A1'); // Pre-Starters
     expect(kidsLevel(8, TOTAL)).toBe('-A1'); // Super Minds 1A
     expect(kidsLevel(22, TOTAL)).toBe('-A1'); // Super Minds 2A
-    expect(kidsLevel(30, TOTAL)).toBe('A1'); // Super Minds 2B
+    expect(kidsLevel(30, TOTAL)).toBe('-A1'); // Super Minds 2B -- still book 2
     expect(kidsLevel(44, TOTAL)).toBe('A1'); // Super Minds 3A
+  });
+
+  it('reports the Cambridge YLE exam level for each rung', () => {
+    expect(kidsYleLevel(8, TOTAL)).toBe('Starters'); // Super Minds 1A
+    expect(kidsYleLevel(15, TOTAL)).toBe('Starters'); // Super Minds 1B
+    expect(kidsYleLevel(22, TOTAL)).toBe('Starters'); // Super Minds 2A
+    expect(kidsYleLevel(30, TOTAL)).toBe('Starters'); // Super Minds 2B
+    expect(kidsYleLevel(44, TOTAL)).toBe('Movers'); // Super Minds 3A
+  });
+
+  it('has no YLE level below Starters', () => {
+    // Pre-Starters sits beneath the lowest YLE exam, so it maps to nothing.
+    expect(kidsYleLevel(0, TOTAL)).toBeUndefined();
+    expect(kidsYleLevel(7, TOTAL)).toBeUndefined();
+  });
+
+  it('never reports a YLE level that contradicts the CEFR code', () => {
+    for (let correct = 0; correct <= TOTAL; correct++) {
+      const yle = kidsYleLevel(correct, TOTAL);
+      if (yle === 'Movers') expect(kidsLevel(correct, TOTAL)).toBe('A1');
+      if (yle === 'Starters') expect(kidsLevel(correct, TOTAL)).toBe('-A1');
+    }
   });
 });

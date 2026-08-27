@@ -54,7 +54,24 @@ const { t, locale, whatsappNumber } = Astro.props;
     studentName = (event as CustomEvent).detail.name;
   });
 
-  async function renderSlots(detail: { sessionId: string; level: string; levelName?: string }) {
+  interface DoneDetail {
+    sessionId: string;
+    level: string;
+    levelName?: string;
+    /** Cambridge YLE exam level -- kids only, and absent below Starters. */
+    yle?: string;
+  }
+
+  // "A1 · Movers · Super Minds 3A", dropping whichever parts this track and
+  // level don't have (adults have no YLE; Pre-Starters sits below Starters).
+  // Deduplicated because the adults band path reports the same string as both
+  // level and levelName, which otherwise renders as "Hint A · Hint A".
+  function formatLevel(detail: DoneDetail): string {
+    const parts = [detail.level, detail.yle, detail.levelName].filter(Boolean) as string[];
+    return [...new Set(parts)].join(' · ');
+  }
+
+  async function renderSlots(detail: DoneDetail) {
     const { slots } = await listSlots();
     slotsEl.innerHTML = '';
     slots.forEach((slot) => {
@@ -78,10 +95,9 @@ const { t, locale, whatsappNumber } = Astro.props;
           await renderSlots(detail);
           return;
         }
-        const levelDisplay = detail.levelName ? `${detail.level} (${detail.levelName})` : detail.level;
         const message = messageTemplate
           .replace('{name}', studentName)
-          .replace('{level}', levelDisplay)
+          .replace('{level}', formatLevel(detail))
           .replace('{time}', new Date(slot.starts_at).toLocaleString(locale));
         const text = encodeURIComponent(message);
         waLink.href = `https://wa.me/${whatsappNumber}?text=${text}`;
@@ -95,7 +111,7 @@ const { t, locale, whatsappNumber } = Astro.props;
   document.addEventListener('placement:done', async (event: Event) => {
     const detail = (event as CustomEvent).detail;
     section.hidden = false;
-    levelEl.textContent = detail.levelName ? `${detail.level} · ${detail.levelName}` : detail.level;
+    levelEl.textContent = formatLevel(detail);
     await renderSlots(detail);
     section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });

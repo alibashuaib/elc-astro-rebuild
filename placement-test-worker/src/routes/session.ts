@@ -2,7 +2,7 @@ import type { Env, StudentInput } from '../types';
 import { computeTrack, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, listAnsweredQuestionIds } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 import { ADULT_BANDS, bandForSequence, isLastBand, evaluateBand, placementLevel } from '../bands';
-import { kidsLevelIndex } from '../kids';
+import { kidsLevelIndex, KIDS_YLE_BY_INDEX } from '../kids';
 
 // Adults-only: the last question number this track actually serves. The
 // bank has 50 real questions (see migrations/0003_real_questions.sql), but
@@ -52,7 +52,10 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     const level = LEVELS_BY_TRACK[track as 'kids' | 'adults'][finalIndex];
     const levelName = STAGE_NAMES_BY_TRACK[track as 'kids' | 'adults'][finalIndex];
     await completeSession(env, sessionId, level);
-    return { done: true, level, levelName };
+    // Cambridge YLE exam level, kids only -- adults aren't on that scale, and
+    // Pre-Starters sits below the lowest YLE exam, so it stays absent there.
+    const yle = track === 'kids' ? KIDS_YLE_BY_INDEX[finalIndex] : undefined;
+    return { done: true, level, levelName, ...(yle ? { yle } : {}) };
   }
   const passage = q.passage_id ? await getPassage(env, q.passage_id) : null;
   // Adults only serves its banded prefix (see ADULT_BANDED_QUESTION_COUNT) --
@@ -187,7 +190,8 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
     const level = override !== null ? LEVELS_BY_TRACK.kids[override] : finalLevel(nextState, session.track);
     const levelName = override !== null ? STAGE_NAMES_BY_TRACK.kids[override] : finalLevelName(nextState, session.track);
     await completeSession(env, sessionId, level);
-    return json({ done: true, level, levelName, ...feedback });
+    const yle = override !== null ? KIDS_YLE_BY_INDEX[override] : undefined;
+    return json({ done: true, level, levelName, ...(yle ? { yle } : {}), ...feedback });
   }
 
   const next = await nextQuestionPayload(env, sessionId, session.track, nextState.currentLevelIndex, answeredIds);

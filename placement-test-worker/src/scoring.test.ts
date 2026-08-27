@@ -41,7 +41,7 @@ describe('scoring', () => {
     expect(LEVELS_BY_TRACK.adults).toEqual(['A0', 'A1', 'A2', 'B1', 'B2', 'C1']);
     // Kids share codes across rungs: Cambridge places Super Minds 1-2 at pre-A1
     // and 3 at A1, which is coarser than the book ladder.
-    expect(LEVELS_BY_TRACK.kids).toEqual(['-A1', '-A1', '-A1', '-A1', 'A1', 'A1']);
+    expect(LEVELS_BY_TRACK.kids).toEqual(['-A1', '-A1', '-A1', '-A1', '-A1', 'A1']);
   });
 
   it('STAGE_NAMES_BY_TRACK has a short ELC code for every level slot, matching the diagrams', () => {
