@@ -177,7 +177,7 @@ describe('adults band placement (bands.ts, real question content)', () => {
     return row!.correct_index;
   }
 
-  it('stops the session as soon as the first band (Fun A) fails, without asking further bands', async () => {
+  it('stops the moment the first band becomes unwinnable, placing below it', async () => {
     const env = makeRealAdultsEnv();
     let data = await startAdultSession(env, '+966500000010');
     const sessionId = data.sessionId;
@@ -195,8 +195,11 @@ describe('adults band placement (bands.ts, real question content)', () => {
       data = await res.json();
       rounds++;
     }
-    expect(rounds).toBe(bandSize(funA)); // stopped right at the end of Fun A, never reached Fun B
-    expect(data.level).toBe('Fun A');
+    // Fun A needs 3 of 5. After 3 wrong the band is already lost, so the test
+    // ends there rather than serving the remaining two questions.
+    expect(rounds).toBe(3);
+    expect(rounds).toBeLessThan(bandSize(funA));
+    expect(data.level).toBe('Pre Fun'); // nothing below the first band
   });
 
   it('passing every band places the student "Above Hint A" after exactly 34 questions (the reading-passage content at 35-50 is never served)', async () => {
@@ -507,5 +510,88 @@ describe('kids question order is randomized within each exercise block', () => {
       data.sessionId
     );
     expect(res.status).toBe(400);
+  });
+});
+
+describe('adults get one skip per band', () => {
+  async function startAdults(env2: ReturnType<typeof makeEnv>) {
+    const res = await handleStartSession(
+      new Request('http://x/api/session', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en' }),
+      }),
+      env2 as any
+    );
+    return (await res.json()) as any;
+  }
+
+  function answer(env2: any, sessionId: string, questionId: string, body: Record<string, unknown>) {
+    return handleAnswer(
+      new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId, ...body }) }),
+      env2,
+      sessionId
+    );
+  }
+
+  async function keyFor(env2: ReturnType<typeof makeEnv>, questionId: string) {
+    const q = await env2.DB.prepare(`SELECT correct_index FROM questions WHERE id = ?`)
+      .bind(questionId)
+      .first<{ correct_index: number }>();
+    return { selectedIndex: q!.correct_index };
+  }
+
+  it('keeps the skip on offer while the band can still be passed', async () => {
+    const env2 = makeEnv();
+    let data = await startAdults(env2);
+    const sessionId = data.sessionId;
+
+    // Fun A is 5 questions needing 3. Two skips still leave 3 winnable.
+    expect(data.skipAvailable).toBe(true);
+    data = await (await answer(env2, sessionId, data.questionId, { skip: true })).json();
+    expect(data.skipAvailable).toBe(true);
+    data = await (await answer(env2, sessionId, data.questionId, { skip: true })).json();
+    // Two skipped, three left, three needed -- a third skip would end it, so it
+    // is no longer offered.
+    expect(data.skipAvailable).toBe(false);
+  });
+
+  it('ends the test at the previous band once skipping makes the band unwinnable', async () => {
+    const env2 = makeEnv();
+    let data = await startAdults(env2);
+    const sessionId = data.sessionId;
+
+    // Clear Fun A, then skip Fun B (4 questions, needs 3) into the ground.
+    while (!data.done && data.skipAvailable !== false) {
+      const res = await answer(env2, sessionId, data.questionId, await keyFor(env2, data.questionId));
+      data = await res.json();
+    }
+    let guard = 0;
+    while (!data.done && guard++ < 40) {
+      const res = await answer(env2, sessionId, data.questionId, { skip: true });
+      if (res.status !== 200) break;
+      data = await res.json();
+    }
+    expect(data.done).toBe(true);
+    // Placed at the last band actually cleared, never at the one just failed.
+    expect(data.level).not.toBe('Pre Fun');
+  });
+
+  it('still lets kids skip as often as they need', async () => {
+    const env2 = makeEnv();
+    const res = await handleStartSession(
+      new Request('http://x/api/session', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+      }),
+      env2 as any
+    );
+    let data = (await res.json()) as any;
+    const sessionId = data.sessionId; // only the start payload carries it
+    for (let i = 0; i < 5; i++) {
+      const r = await answer(env2, sessionId, data.questionId, { skip: true });
+      expect(r.status).toBe(200);
+      data = await r.json();
+      expect(data.skipAvailable).toBe(true);
+    }
   });
 });

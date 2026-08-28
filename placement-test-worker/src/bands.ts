@@ -25,6 +25,9 @@ export interface Band {
 
 export const PASS_THRESHOLD = 0.6;
 
+/** Placement for a student who never cleared the first band. */
+export const BELOW_FIRST_BAND = 'Pre Fun';
+
 export const ADULT_BANDS: Band[] = [
   { name: 'Fun A', start: 1, end: 5 },
   { name: 'Fun B', start: 6, end: 9 },
@@ -53,6 +56,27 @@ export interface BandResult {
   total: number;
   pct: number;
   passed: boolean;
+}
+
+/** Correct answers needed to clear PASS_THRESHOLD for this band. */
+export function requiredCorrect(band: Band): number {
+  return Math.ceil(PASS_THRESHOLD * bandCount(band));
+}
+
+/**
+ * Whether the band can still be passed given what has been answered so far.
+ * Every remaining question is assumed correct: once even a perfect run of the
+ * remainder falls short, the band is lost and there is nothing left to measure.
+ */
+export function canStillPass(band: Band, correctSoFar: number, answeredSoFar: number): boolean {
+  const remaining = bandCount(band) - answeredSoFar;
+  return correctSoFar + remaining >= requiredCorrect(band);
+}
+
+/** The band immediately below this one, or null for the first. */
+export function previousBand(band: Band, bands: readonly Band[] = ADULT_BANDS): Band | null {
+  const i = bands.indexOf(band);
+  return i > 0 ? bands[i - 1] : null;
 }
 
 export function evaluateBand(band: Band, correctCount: number): BandResult {

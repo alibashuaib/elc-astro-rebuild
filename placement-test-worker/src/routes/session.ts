@@ -1,7 +1,7 @@
 import type { Env, StudentInput } from '../types';
-import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, listAnsweredQuestionIds, setCurrentQuestion, getQuestion } from '../db';
+import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, countBandAnswered, listAnsweredQuestionIds, setCurrentQuestion, getQuestion } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
-import { ADULT_BANDS, bandForSequence, isLastBand, evaluateBand, placementLevel } from '../bands';
+import { ADULT_BANDS, BELOW_FIRST_BAND, bandForSequence, isLastBand, evaluateBand, placementLevel, canStillPass, previousBand } from '../bands';
 import { kidsLevelIndex, KIDS_YLE_BY_INDEX } from '../kids';
 
 // Adults-only: the last question number this track actually serves. The
@@ -44,6 +44,28 @@ async function kidsPlacementIndex(env: Env, sessionId: string): Promise<number> 
 // state's current estimate, used to label the session if the whole track's
 // bank runs out before scoring naturally concludes (see isDone/finalLevel in
 // scoring.ts); it no longer selects which question comes next.
+/**
+ * Adults may skip for as long as the band is still winnable. A skip scores as
+ * incorrect, so it is offered only while passing remains reachable *after*
+ * taking it -- once it isn't, there is nothing left to skip toward and the
+ * answer handler ends the test. Kids may always skip: each one lowers their
+ * share of correct answers, which is the measurement rather than a way around
+ * it.
+ */
+async function skipAvailableFor(env: Env, sessionId: string, track: string, sequence: number): Promise<boolean> {
+  if (track !== 'adults') return true;
+  const band = bandForSequence(sequence);
+  if (!band) return true;
+  const { correct, answered } = await bandProgress(env, sessionId, band);
+  return canStillPass(band, correct, answered + 1); // as if this one were skipped
+}
+
+async function bandProgress(env: Env, sessionId: string, band: { start: number; end: number }) {
+  const correct = await countBandCorrect(env, sessionId, band.start, band.end);
+  const answered = await countBandAnswered(env, sessionId, band.start, band.end);
+  return { correct, answered };
+}
+
 async function nextQuestionPayload(env: Env, sessionId: string, track: string, levelIndex: number, excludeIds: string[]) {
   const q = await pickNextQuestion(env, track as any, excludeIds);
   if (!q) {
@@ -77,6 +99,7 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     // so "excludeIds so far + this one" is exactly this question's 1-based position in it.
     questionNumber: excludeIds.length + 1,
     total,
+    skipAvailable: await skipAvailableFor(env, sessionId, track, q.sequence),
   };
 }
 
@@ -127,9 +150,10 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   if (skipped) {
     // A student who doesn't understand the question can skip it instead of
     // guessing. Scored the same as a wrong answer -- the level estimate has
-    // no third "unknown" outcome to give it -- but recorded distinctly (see
-    // migrations/0011_skip_question.sql) so admin reporting can tell
-    // "answered wrong" apart from "never attempted".
+    // no third "unknown" outcome to give it, and for kids that is exactly the
+    // point: every skip lowers their share of correct answers. Recorded
+    // distinctly (see migrations/0011_skip_question.sql) so admin reporting can
+    // tell "answered wrong" apart from "never attempted".
     correct = false;
   } else if (q.type === 'text') {
     if (typeof body.answerText !== 'string') return json({ error: 'answerText is required for this question' }, 400);
@@ -178,12 +202,27 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   // sequence 34 isn't served -- see ADULT_BANDED_QUESTION_COUNT).
   if (session.track === 'adults') {
     const band = bandForSequence(q.sequence);
+    if (band) {
+      const { correct: correctCount, answered } = await bandProgress(env, sessionId, band);
+
+      // The moment a perfect run of what's left can no longer clear the band,
+      // the test is over -- there is nothing further to measure. The student is
+      // placed at the last band they actually cleared, not at the one they just
+      // failed. Failing the very first band leaves nothing below it, so they
+      // are placed at 'Pre Fun'.
+      if (!canStillPass(band, correctCount, answered)) {
+        const below = previousBand(band);
+        const level = below ? below.name : BELOW_FIRST_BAND;
+        await completeSession(env, sessionId, level);
+        await setCurrentQuestion(env, sessionId, null);
+        return json({ done: true, level, levelName: level, ...feedback });
+      }
+    }
     if (band && q.sequence === band.end) {
-      const correctCount = await countBandCorrect(env, sessionId, band.start, band.end);
-      const result = evaluateBand(band, correctCount);
+      const result = evaluateBand(band, await countBandCorrect(env, sessionId, band.start, band.end));
       if (!result.passed || isLastBand(band)) {
-        // Bands are evaluated one at a time and the walk stops at the first
-        // failure, so this single result is the whole placement input.
+        // Reaching the end of a band that is still winnable but not won can
+        // only happen on the last band; earlier failures stop above.
         const level = placementLevel([result]);
         await completeSession(env, sessionId, level);
         await setCurrentQuestion(env, sessionId, null);

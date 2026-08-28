@@ -21,6 +21,7 @@ export interface QuestionPayload {
   passage?: { id: string; title: string; body: string }; // present for reading-comprehension items
   questionNumber: number; // 1-based position in the track's fixed sequential walk-through
   total: number; // size of the track's active question bank, for progress display
+  skipAvailable?: boolean; // adults get one skip per band; kids may always skip
   correct?: boolean; // whether the *previous* answer (the one this response is replying to) was correct; absent for the first question
 }
 
