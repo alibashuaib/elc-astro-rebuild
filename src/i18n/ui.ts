@@ -224,8 +224,10 @@ export const ui = {
     'placementTest.correct': 'إجابة صحيحة!',
     'placementTest.incorrect': 'إجابة خاطئة',
     'placementTest.skip': 'لا أفهم — تخطي',
-    'placementTest.true': 'صح',
-    'placementTest.false': 'خطأ',
+    // Deliberately English on the Arabic side too: these are answer options in
+    // an English test, not interface chrome.
+    'placementTest.true': 'True',
+    'placementTest.false': 'False',
     'courseDetail.duration': 'المدة',
     'courseDetail.monthlyHours': 'الساعات الشهرية',
     'courseDetail.hoursPerMonth': 'ساعة/شهر',

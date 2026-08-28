@@ -158,6 +158,9 @@ const { t } = Astro.props;
   function renderQuestion(step: QuestionPayload) {
     setProgress(step.questionNumber, step.total);
     feedbackEl.hidden = true;
+    // Adults get one skip per band, so the control disappears once it is spent
+    // and returns at the next band. Kids always have it.
+    skipBtn.hidden = step.skipAvailable === false;
     skipBtn.disabled = false;
     // Re-bound each render (rather than once) so the closure always skips
     // *this* question's id and disables *this* question's currently-rendered

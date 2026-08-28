@@ -113,6 +113,19 @@ export async function setCurrentQuestion(env: Env, sessionId: string, questionId
     .run();
 }
 
+/** Responses recorded for questions whose `sequence` falls within [start, end]. */
+export async function countBandAnswered(env: Env, sessionId: string, start: number, end: number): Promise<number> {
+  const row = await env.DB
+    .prepare(
+      `SELECT COUNT(*) AS n FROM responses r
+       JOIN questions q ON q.id = r.question_id
+       WHERE r.session_id = ? AND q.sequence BETWEEN ? AND ?`
+    )
+    .bind(sessionId, start, end)
+    .first<{ n: number }>();
+  return row?.n ?? 0;
+}
+
 /** One question row by id. */
 export async function getQuestion(env: Env, id: string): Promise<QuestionRow | null> {
   const row = await env.DB.prepare(`SELECT * FROM questions WHERE id = ?`).bind(id).first<QuestionRow>();

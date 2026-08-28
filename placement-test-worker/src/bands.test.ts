@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ADULT_BANDS, PASS_THRESHOLD, bandCount, bandForSequence, isLastBand, evaluateBand, placementLevel } from './bands';
+import { ADULT_BANDS, PASS_THRESHOLD, bandCount, bandForSequence, isLastBand, evaluateBand, placementLevel, requiredCorrect, canStillPass, previousBand } from './bands';
 
 describe('bands', () => {
   it('ADULT_BANDS covers sequence 1-34 contiguously with no gaps or overlaps', () => {
@@ -69,5 +69,37 @@ describe('bands', () => {
       { name: 'Hint A', correct: 8, total: 8, pct: 1, passed: true },
     ];
     expect(placementLevel(results)).toBe('Above Hint A');
+  });
+});
+
+describe('band progress while the test is still running', () => {
+  const funA = ADULT_BANDS[0]; // sequence 1-5, needs 3 of 5 for 60%
+  const lintE = ADULT_BANDS.find((b) => b.name === 'Lint E')!; // 3 questions
+  const hintA = ADULT_BANDS.at(-1)!; // 8 questions
+
+  it('knows how many correct answers a band needs', () => {
+    expect(requiredCorrect(funA)).toBe(3); // 3/5 = 60% exactly
+    expect(requiredCorrect(lintE)).toBe(2); // 1/3 = 33%, 2/3 = 67%
+    expect(requiredCorrect(hintA)).toBe(5); // 4/8 = 50%, 5/8 = 63%
+  });
+
+  it('says passing is still reachable while enough questions remain', () => {
+    // Fun A needs 3 of 5.
+    expect(canStillPass(funA, 0, 0)).toBe(true); // nothing answered yet
+    expect(canStillPass(funA, 0, 2)).toBe(true); // 0 of 2, 3 left -> still possible
+    expect(canStillPass(funA, 1, 3)).toBe(true); // 1 correct, 2 left -> exactly 3 possible
+  });
+
+  it('says passing is impossible once too many are lost', () => {
+    // Fun A needs 3 of 5: after 3 answered with 0 correct, only 2 remain.
+    expect(canStillPass(funA, 0, 3)).toBe(false);
+    expect(canStillPass(funA, 2, 4)).toBe(true); // 2 correct, 1 left -> 3 possible
+    expect(canStillPass(funA, 1, 4)).toBe(false); // 1 correct, 1 left -> max 2
+  });
+
+  it('names the band below a given one, and nothing below the first', () => {
+    expect(previousBand(ADULT_BANDS[1])?.name).toBe('Fun A');
+    expect(previousBand(hintA)?.name).toBe('Lint E');
+    expect(previousBand(funA)).toBeNull();
   });
 });
