@@ -6,3 +6,7 @@ dist/
 .DS_Store
 .lighthouseci/
 .superpowers/
+
+# Playwright smoke-test output
+/test-results/
+/playwright-report/
