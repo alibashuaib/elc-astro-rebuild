@@ -14,7 +14,7 @@ describe('scoring', () => {
     let state = initialState();
     for (let i = 0; i < 10; i++) state = applyAnswer(state, true);
     expect(finalLevel(state, 'adults')).toBe('C1');
-    // convergence (4 identical recentLevels in a row, which this scenario hits well before
+    // convergence (4 identical level indexes in a row, which this scenario hits well before
     // question 10) no longer ends the session early -- see isDone's comment. Only the fixed
     // question bank running out (handled in session.ts, not here) or the generous safety cap do.
     expect(isDone(state)).toBe(false);

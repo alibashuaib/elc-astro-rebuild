@@ -50,7 +50,6 @@ export interface SessionRow {
   status: 'in_progress' | 'completed' | 'abandoned';
   current_level_index: number;
   step: number;
-  recent_levels: string; // JSON string
   questions_asked: number;
   estimated_level: string | null;
   /**

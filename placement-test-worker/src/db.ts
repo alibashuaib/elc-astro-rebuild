@@ -56,11 +56,11 @@ export async function getSession(env: Env, id: string): Promise<SessionRow | nul
 export async function updateSessionScoring(
   env: Env,
   id: string,
-  fields: { current_level_index: number; step: number; recent_levels: string; questions_asked: number }
+  fields: { current_level_index: number; step: number; questions_asked: number }
 ): Promise<void> {
   await env.DB.prepare(
-    `UPDATE test_sessions SET current_level_index = ?, step = ?, recent_levels = ?, questions_asked = ? WHERE id = ?`
-  ).bind(fields.current_level_index, fields.step, fields.recent_levels, fields.questions_asked, id).run();
+    `UPDATE test_sessions SET current_level_index = ?, step = ?, questions_asked = ? WHERE id = ?`
+  ).bind(fields.current_level_index, fields.step, fields.questions_asked, id).run();
 }
 
 export async function completeSession(env: Env, id: string, estimatedLevel: string): Promise<void> {
