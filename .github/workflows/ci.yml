@@ -58,3 +58,53 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
       - run: npm test
+
+  # The build and the unit suites cannot see runtime faults inside Astro client
+  # scripts: a call to a helper that no longer existed shipped to main with both
+  # green, and the kids test threw on its first question. This job loads the
+  # real built site against a real Worker and fails on any console error.
+  placement-test-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm ci --prefix placement-test-worker
+
+      - name: Create the local D1 database
+        run: npm run db:migrate:local --prefix placement-test-worker
+
+      - name: Start the Worker
+        run: |
+          npm run dev --prefix placement-test-worker > /tmp/wrangler.log 2>&1 &
+          timeout 90 bash -c 'until curl -sf -o /dev/null http://localhost:8787/api/slots; do sleep 2; done'
+
+      - name: Build and serve the site
+        run: |
+          npx astro build
+          npx astro preview --port 4322 > /tmp/preview.log 2>&1 &
+          timeout 90 bash -c 'until curl -sf -o /dev/null http://localhost:4322/en/placement-test/; do sleep 2; done'
+        env:
+          # Must match the Worker started above, not the deployed origin.
+          PUBLIC_PLACEMENT_API_URL: http://localhost:8787
+
+      - run: npx playwright install --with-deps chromium
+      - run: npm run smoke
+        env:
+          SMOKE_BASE_URL: http://localhost:4322
+
+      - name: Worker log on failure
+        if: failure()
+        run: tail -50 /tmp/wrangler.log /tmp/preview.log || true
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-trace
+          path: test-results/
+          retention-days: 7
