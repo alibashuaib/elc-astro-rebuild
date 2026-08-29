@@ -52,23 +52,20 @@ export const STAGE_NAMES_BY_TRACK: Record<Track, readonly string[]> = {
 export interface ScoringState {
   currentLevelIndex: number; // 0-5
   step: number;
-  recentLevels: number[];    // trailing history of currentLevelIndex, most recent last
   questionsAsked: number;
 }
 
 export function initialState(): ScoringState {
-  return { currentLevelIndex: 2, step: 2, recentLevels: [2], questionsAsked: 0 };
+  return { currentLevelIndex: 2, step: 2, questionsAsked: 0 };
 }
 
 export function applyAnswer(state: ScoringState, correct: boolean): ScoringState {
   const delta = correct ? state.step : -state.step;
   const nextIndex = Math.min(5, Math.max(0, state.currentLevelIndex + delta));
   const nextStep = Math.max(1, state.step - 1);
-  const recentLevels = [...state.recentLevels, nextIndex].slice(-4);
   return {
     currentLevelIndex: nextIndex,
     step: nextStep,
-    recentLevels,
     questionsAsked: state.questionsAsked + 1,
   };
 }
@@ -78,7 +75,7 @@ export function applyAnswer(state: ScoringState, correct: boolean): ScoringState
 // pickNextQuestion has nothing left to serve in fixed sequence order (see
 // migrations/0006_fixed_sequential_order.sql). This function used to also
 // end the session early once the level estimate converged (4 identical
-// recentLevels in a row), a leftover from the old adaptive-CEFR-jumping
+// level indexes in a row), a leftover from the old adaptive-CEFR-jumping
 // engine -- with the fixed sequential walk-through, that cut sessions off
 // after as few as 4-5 questions instead of the ~40-50 in the track's bank
 // (bug report: "kids placement test missing the rest of the questions").

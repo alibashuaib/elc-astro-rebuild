@@ -173,7 +173,6 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   const priorState = {
     currentLevelIndex: session.current_level_index,
     step: session.step,
-    recentLevels: JSON.parse(session.recent_levels) as number[],
     questionsAsked: session.questions_asked,
   };
   const nextState = applyAnswer(priorState, correct);
@@ -184,7 +183,6 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   await updateSessionScoring(env, sessionId, {
     current_level_index: nextState.currentLevelIndex,
     step: nextState.step,
-    recent_levels: JSON.stringify(nextState.recentLevels),
     questions_asked: nextState.questionsAsked,
   });
 

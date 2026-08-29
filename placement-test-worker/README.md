@@ -6,17 +6,26 @@ in the main repo for the full design.
 
 ## Testing Setup
 
-**Important:** This project's test suite (`npm test` inside `placement-test-worker/`)
-uses `src/test-utils/fakeD1.ts`, an in-memory SQLite shim, instead of
-`@cloudflare/vitest-pool-workers` or Miniflare. This is because the sandboxed
-environment where this project was built could not run the native Cloudflare
-`workerd` runtime (`wrangler dev` crashed with "The Workers runtime crashed
-unexpectedly" on every attempt).
+This project's test suite (`npm test` inside `placement-test-worker/`) uses
+`src/test-utils/fakeD1.ts`, an in-memory SQLite shim, instead of
+`@cloudflare/vitest-pool-workers` or Miniflare. That choice dates from a
+sandboxed build environment where `workerd` would not start; it is kept because
+the shim runs the real schema in milliseconds with no native runtime to install.
 
-The in-memory shim tests are still meaningful — they exercise real SQL against
-the real schema — but we recommend that whoever deploys this for real **also do
-one manual pass with `wrangler dev` in a normal (non-sandboxed) environment
-before going live** to confirm real D1 and `workerd` behavior matches the shim's.
+**`wrangler dev` works fine outside that sandbox** — `npm run dev` starts real
+`workerd` against a local D1, and `npm run db:migrate:local` sets that database
+up.
+
+**The shim has been validated against real D1.** Every kids scoring boundary
+(0, 7, 8, 14, 15, 21, 22, 29, 30, 36, 37, 44 correct of 44) was run through a
+live `wrangler dev` worker and matched the shim's placement exactly, as did the
+adults band walk-through. The earlier note asking a deployer to repeat that pass
+by hand has been removed; it is done.
+
+`npm run smoke` in the repo root goes further, driving the built site in a real
+browser against a real worker — see `tests/e2e/`. CI runs it on every PR, and it
+exists because the unit suites and the build cannot see runtime faults inside
+Astro client scripts; one such fault reached `main` with both green.
 
 **Recommendation (future improvement, not required for launch):** the admin
 session cookie currently has to use `SameSite=None; Secure` because the Worker
@@ -32,9 +41,15 @@ architecturally cleaner — a `SameSite=Lax`/`Strict` cookie would work, and the
 1. `npm install`
 2. `npx wrangler d1 create placement-test` — copy the printed `database_id`
    into `wrangler.toml`.
-3. `npm run db:migrate:remote` — creates tables and loads the real 89-question
-   bank (see "Question bank" below). Do **not** run `0003_seed_admin.sql`
-   (it isn't a real migration); instead bootstrap the admin account directly:
+3. `npm run db:migrate:remote` — runs `wrangler d1 migrations apply`, which
+   creates the tables and loads the question bank (see "Question bank" below).
+   It applies only migrations the database has not seen, tracked in a
+   `d1_migrations` table. **A database previously migrated by the old per-file
+   `d1 execute` chain has no such table**, so the first run would try to replay
+   from `0001`; seed it with the already-applied filenames first.
+
+   Then bootstrap the admin account directly — there is no seed migration for
+   it, since the hash must not be committed:
    ```
    node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 10))" 'your-real-password'
    npx wrangler d1 execute placement-test --remote --command "INSERT INTO admin_users (id, username, password_hash) VALUES ('admin-1','staff','<PASTE_HASH>')"
