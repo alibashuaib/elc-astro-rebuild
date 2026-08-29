@@ -343,6 +343,23 @@ describe('text-type question grading', () => {
     expect(after).toBeLessThan(before);
   });
 
+  // Regression test for the gap 0016_fix_kids_letter_case_sensitivity.sql
+  // closed: 0012_case_insensitive_grading.sql's id list covered only 9 of
+  // the 12 "write the capital/small letter" items, silently leaving
+  // kids-A2-3/A2-4/A2-5 graded case-insensitively despite explicitly
+  // testing letter case. Asserts all 12 as a group so a future migration
+  // can't reintroduce the same gap by missing one id off a list.
+  it('marks every "write the capital/small letter" item case-sensitive', async () => {
+    const env = makeTextEnv();
+    const { results } = await env.DB.prepare(
+      `SELECT id, case_sensitive FROM questions WHERE track = 'kids' AND prompt LIKE 'Write the % letter for%'`
+    ).all<{ id: string; case_sensitive: number }>();
+    expect(results.length).toBe(12);
+    for (const row of results) {
+      expect(row.case_sensitive, `${row.id} should be case-sensitive`).toBe(1);
+    }
+  });
+
   it('rejects a text-type answer submitted without answerText', async () => {
     const env = makeTextEnv();
     const startRes = await handleStartSession(
