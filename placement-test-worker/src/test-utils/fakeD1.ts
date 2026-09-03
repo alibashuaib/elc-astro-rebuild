@@ -18,7 +18,7 @@ import Database from 'better-sqlite3';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
-const MIGRATIONS_DIR = path.join(__dirname, '../../migrations');
+const MIGRATIONS_DIR = path.resolve(process.cwd(), 'migrations');
 
 /**
  * Every migration in migrations/, applied in filename order.

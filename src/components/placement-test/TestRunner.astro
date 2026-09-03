@@ -188,8 +188,15 @@ const { t } = Astro.props;
       lastPassageId = '';
     }
 
-    if (step.imageUrl) {
-      imageEl.src = step.imageUrl;
+    // Older deployed question rows may still reference the retired flat SVGs.
+    // Resolve those URLs client-side as well as via the forward DB migration so
+    // the kids always see the new frameless 3D PNG artwork immediately.
+    const imageUrl = step.imageUrl?.replace(
+      /\/images\/placement-test\/(apple|book|car|pen|tree|sofa|curtain|picture|tv|lamps)\.svg$/i,
+      '/images/placement-test/$1-3d.png'
+    );
+    if (imageUrl) {
+      imageEl.src = imageUrl;
       imageStageEl.hidden = false;
     } else {
       imageStageEl.hidden = true;
@@ -198,7 +205,7 @@ const { t } = Astro.props;
     const countingPrefix = /^Count in order:\s*1,\s*2,\s*3,\s*4,\s*5,\s*6,\s*7\.\s*/i;
     const isCountingQuestion = countingPrefix.test(step.prompt);
     const isPictureMatch = /^Match the picture to the word:/i.test(step.prompt);
-    const isRoomPicture = /\/(sofa|curtain|picture|tv|lamps)\.svg$/i.test(step.imageUrl ?? '');
+    const isRoomPicture = /\/(sofa|curtain|picture|tv|lamps)(?:-3d)?\.(?:svg|png)$/i.test(imageUrl ?? '');
     const actionWordPrefix = /^Word bank:\s*climbing,\s*flying,\s*playing,\s*riding,\s*throwing\.\s*/i;
     const isActionWordQuestion = actionWordPrefix.test(step.prompt);
     const letterMatch = step.prompt.match(/^Write the (capital|small) letter for "([A-Za-z])"\.$/i);
@@ -206,7 +213,7 @@ const { t } = Astro.props;
     pictureWordBankEl.hidden = !isPictureMatch;
     roomWordBankEl.hidden = !isRoomPicture;
     actionWordBankEl.hidden = !isActionWordQuestion;
-    imageStageEl.classList.toggle('is-match-picture', isPictureMatch || isRoomPicture);
+    imageStageEl.classList.toggle('is-match-picture', isPictureMatch || isRoomPicture || isActionWordQuestion);
     promptEl.textContent = isCountingQuestion
       ? step.prompt.replace(countingPrefix, '')
       : isPictureMatch
@@ -319,12 +326,16 @@ const { t } = Astro.props;
     // True/false reading-comprehension items are still plain 2-option mcq rows
     // in the DB (grading is identical to any other mcq), but they read better
     // as a distinct True/False choice than as a vertical 4-option-style list.
-    const isTrueFalse = options.length === 2 && options[0] === 'True' && options[1] === 'False';
+    const trueIndex = options.indexOf('True');
+    const falseIndex = options.indexOf('False');
+    const isTrueFalse = options.length === 2 && trueIndex !== -1 && falseIndex !== -1;
 
     if (isTrueFalse) {
       optionsEl.classList.add('pt-options-tf');
-      const trueBtn = makeTrueFalseButton('true', 0, step);
-      const falseBtn = makeTrueFalseButton('false', 1, step);
+      // Always present the controls in the same visual order while submitting
+      // their real database indices (some questions store [False, True]).
+      const trueBtn = makeTrueFalseButton('true', trueIndex, step);
+      const falseBtn = makeTrueFalseButton('false', falseIndex, step);
       optionsEl.appendChild(trueBtn);
       optionsEl.appendChild(falseBtn);
       return;
@@ -892,17 +903,20 @@ const { t } = Astro.props;
   .pt-picture-word-bank :global(button:nth-child(3)) { background: #35a86f; box-shadow: 0 4px 0 #23774e; }
 
   .pt-picture-word-bank :global(button:nth-child(4)) { background: #9461cf; box-shadow: 0 4px 0 #653a99; }
-#pt-options :global(.pt-image-stage.is-match-picture) {
+  .pt-image-stage.is-match-picture {
     min-height: 15rem;
     padding: 0;
     border: 0;
     background: transparent;
     box-shadow: none;
-  }#pt-options :global(.pt-image-stage.is-match-picture::after) { display: none; }#pt-options :global(.pt-image-stage.is-match-picture .pt-image) {
+  }
+  .pt-image-stage.is-match-picture::after { display: none; }
+  .pt-image-stage.is-match-picture .pt-image {
     width: min(100%, 17rem);
     max-height: 17rem;
     border-radius: 0;
-  }#pt-options :global(.pt-image-stage.is-match-picture .pt-image-spark) { display: none; }
+  }
+  .pt-image-stage.is-match-picture .pt-image-spark { display: none; }
   .card.is-kids {
     border-color: rgb(246 173 67 / 0.55);
     background:
@@ -916,22 +930,31 @@ const { t } = Astro.props;
   }
   .is-kids .pt-options {
     gap: 1rem;
-  }#pt-options :global(.is-kids .pt-option-btn) {
+  }
+  .is-kids #pt-options :global(.pt-option-btn) {
     min-height: 5.25rem;
     padding: 1rem 1.15rem;
     border-radius: 1.35rem;
-    border: 2px solid rgb(64 160 205 / 0.35);
-    background: linear-gradient(135deg, #fff, rgb(64 160 205 / 0.09));
-    box-shadow: 0 8px 0 rgb(64 160 205 / 0.16), 0 14px 28px rgb(49 43 40 / 0.08);
+    border: 2px solid color-mix(in srgb, #40a0cd 42%, var(--color-border));
+    color: var(--color-ink);
+    background: linear-gradient(135deg, var(--color-bg-raised), color-mix(in srgb, #40a0cd 10%, var(--color-bg-raised)));
+    box-shadow: 0 8px 0 color-mix(in srgb, #40a0cd 18%, transparent), 0 14px 28px rgb(0 0 0 / 0.14);
     font-size: clamp(1.05rem, 3vw, 1.25rem);
-  }#pt-options :global(.is-kids .pt-option-btn:nth-child(2n)) {
-    border-color: rgb(246 173 67 / 0.5);
-    background: linear-gradient(135deg, #fff, rgb(246 173 67 / 0.13));
-    box-shadow: 0 8px 0 rgb(246 173 67 / 0.18), 0 14px 28px rgb(49 43 40 / 0.08);
-  }#pt-options :global(.is-kids .pt-option-btn:active:not(:disabled)) {
+  }
+  .is-kids #pt-options :global(.pt-option-btn::after) {
+    border-color: var(--color-border-strong);
+    box-shadow: inset 0 0 0 4px var(--color-bg-raised);
+  }
+  .is-kids #pt-options :global(.pt-option-btn:nth-child(2n)) {
+    border-color: color-mix(in srgb, #f6ad43 48%, var(--color-border));
+    background: linear-gradient(135deg, var(--color-bg-raised), color-mix(in srgb, #f6ad43 12%, var(--color-bg-raised)));
+    box-shadow: 0 8px 0 color-mix(in srgb, #f6ad43 18%, transparent), 0 14px 28px rgb(0 0 0 / 0.14);
+  }
+  .is-kids #pt-options :global(.pt-option-btn:active:not(:disabled)) {
     transform: translateY(5px);
     box-shadow: 0 3px 0 rgb(64 160 205 / 0.16), 0 8px 18px rgb(49 43 40 / 0.08);
-  }#pt-options :global(.is-kids .pt-option-key) {
+  }
+  .is-kids #pt-options :global(.pt-option-key) {
     width: 2.65rem;
     height: 2.65rem;
     border: 0;
@@ -939,24 +962,28 @@ const { t } = Astro.props;
     background: #3488b5;
     font-size: 0;
     box-shadow: 0 5px 12px rgb(52 136 181 / 0.25);
-  }#pt-options :global(.is-kids .pt-option-key::after) {
+  }
+  .is-kids #pt-options :global(.pt-option-key::after) {
     content: 'A';
     font-size: 1rem;
-  }#pt-options :global(.is-kids .pt-option-btn:nth-child(2) .pt-option-key::after) { content: 'B'; }#pt-options :global(.is-kids .pt-option-btn:nth-child(3) .pt-option-key::after) { content: 'C'; }#pt-options :global(.is-kids .pt-option-btn:nth-child(4) .pt-option-key::after) { content: 'D'; }#pt-options :global(.is-kids .pt-text-input) {
+  }
+  .is-kids #pt-options :global(.pt-option-btn:nth-child(2) .pt-option-key::after) { content: 'B'; }
+  .is-kids #pt-options :global(.pt-option-btn:nth-child(3) .pt-option-key::after) { content: 'C'; }
+  .is-kids #pt-options :global(.pt-option-btn:nth-child(4) .pt-option-key::after) { content: 'D'; }
+  .is-kids #pt-options :global(.pt-text-input) {
     min-height: 4.25rem;
     border-width: 2px;
     border-color: rgb(64 160 205 / 0.5);
     border-radius: 1.2rem;
     font-size: 1.2rem;
     text-align: center;
-  }#pt-options :global(.is-kids .pt-text-submit) {
+  }
+  .is-kids #pt-options :global(.pt-text-submit) {
     min-height: 4.25rem;
     border-radius: 1.2rem;
     font-size: 1rem;
     box-shadow: 0 6px 0 rgb(126 15 36 / 0.22);
   }
-  .pt-option-btn.pt-selected-incorrect::after {
-
   #pt-options :global(.pt-option-btn.pt-selected-incorrect::after) {
     content: '×';
     display: grid;
@@ -1104,6 +1131,38 @@ const { t } = Astro.props;
   #pt-options :global(.pt-tf-btn:disabled) {
     opacity: 0.6;
     cursor: default;
+  }
+  .is-kids #pt-options :global(.pt-tf-btn) {
+    min-height: 5.25rem;
+    border: 2px solid rgb(255 255 255 / 0.82);
+    border-radius: 1.35rem;
+    color: #fff;
+    font-size: clamp(1.05rem, 3vw, 1.25rem);
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.22), 0 8px 0 rgb(0 0 0 / 0.18), 0 15px 26px rgb(49 43 40 / 0.12);
+    transition: translate var(--motion-fast) var(--ease), filter var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
+  }
+  .is-kids #pt-options :global(.pt-tf-true) {
+    background: linear-gradient(145deg, #53c888, #278c59);
+  }
+  .is-kids #pt-options :global(.pt-tf-false) {
+    background: linear-gradient(145deg, #ff7d84, #d9404e);
+  }
+  .is-kids #pt-options :global(.pt-tf-icon) {
+    width: 2.65rem;
+    height: 2.65rem;
+    color: currentColor;
+    background: rgb(255 255 255 / 0.2);
+    box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.24), 0 5px 10px rgb(0 0 0 / 0.13);
+    font-size: 1.25rem;
+  }
+  .is-kids #pt-options :global(.pt-tf-btn:hover:not(:disabled)) {
+    border-color: rgb(255 255 255 / 0.95);
+    translate: 0 -3px;
+    filter: brightness(1.04);
+  }
+  .is-kids #pt-options :global(.pt-tf-btn:active:not(:disabled)) {
+    translate: 0 5px;
+    box-shadow: inset 0 3px 0 rgb(255 255 255 / 0.2), 0 3px 0 rgb(0 0 0 / 0.17), 0 8px 16px rgb(49 43 40 / 0.1);
   }
   @media (max-width: 520px) {
     .runner-heading { display: grid; }
