@@ -120,6 +120,10 @@
     --color-header-bg: rgb(24 24 26 / .85);
     --color-primary-text: #f56478;
     --color-crimson-text: #f56478;
+    --color-coral-soft: #3a2b22;
+    --color-mint-soft: #303236;
+    --color-yellow-soft: #392f20;
+    --color-blue-soft: #35262b;
   }
 }
 :root[data-theme="dark"] {
@@ -136,4 +140,8 @@
   --color-header-bg: rgb(24 24 26 / .85);
   --color-primary-text: #f56478;
   --color-crimson-text: #f56478;
+  --color-coral-soft: #3a2b22;
+  --color-mint-soft: #303236;
+  --color-yellow-soft: #392f20;
+  --color-blue-soft: #35262b;
 }

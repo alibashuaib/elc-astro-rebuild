@@ -380,6 +380,42 @@ describe('text-type question grading', () => {
     );
     expect(res.status).toBe(400);
   });
+
+  it.each([
+    ['kids-A1-1', 'A', 'a'],
+    ['kids-A1-7', 'a', 'A'],
+    ['kids-A2-6', '2', '1'],
+    ['kids-A2-7', '3', '4'],
+    ['kids-B1-1', '5', '4'],
+    ['kids-B1-2', '6', '7'],
+  ])('grades button answer text for %s correctly', async (questionId, correctAnswer, wrongAnswer) => {
+    const q = await env.DB.prepare(`SELECT type, expected_answer, case_sensitive FROM questions WHERE id = ?`)
+      .bind(questionId)
+      .first<{ type: string; expected_answer: string; case_sensitive: number }>();
+
+    expect(q).toMatchObject({ type: 'text', expected_answer: correctAnswer });
+
+    async function grade(answerText: string, phone: string) {
+      const start = await handleStartSession(
+        new Request('http://x/api/session', {
+          method: 'POST',
+          body: JSON.stringify({ name: 'Kid', phone, dob: '2018-01-01', locale: 'en', track: 'kids' }),
+        }),
+        env as any
+      );
+      const sessionId = ((await start.json()) as any).sessionId as string;
+      await env.DB.prepare(`UPDATE test_sessions SET current_question_id = ? WHERE id = ?`).bind(questionId, sessionId).run();
+      const response = await handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId, answerText }) }),
+        env as any,
+        sessionId
+      );
+      return (await response.json()) as any;
+    }
+
+    expect((await grade(correctAnswer, `correct-${questionId}`)).correct).toBe(true);
+    expect((await grade(wrongAnswer, `wrong-${questionId}`)).correct).toBe(false);
+  });
 });
 
 describe('kids placement level reflects the whole run, not its tail', () => {

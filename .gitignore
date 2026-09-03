@@ -6,6 +6,7 @@ dist/
 .DS_Store
 .lighthouseci/
 .superpowers/
+graphify-out/
 
 # Playwright smoke-test output
 /test-results/

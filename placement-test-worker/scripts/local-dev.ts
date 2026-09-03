@@ -19,6 +19,10 @@ const migrations = [
   '0011_skip_question.sql',
   '0012_case_insensitive_grading.sql',
   '0013_room_vocab_images.sql',
+  '0014_track_current_question.sql',
+  '0015_drop_recent_levels.sql',
+  '0017_kids_3d_illustrations.sql',
+  '0018_kids_3d_action_illustrations.sql',
 ].map((file) => path.join(workerRoot, 'migrations', file));
 
 const env = {
