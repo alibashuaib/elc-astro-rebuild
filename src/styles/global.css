@@ -198,18 +198,21 @@ img, svg { max-width: 100%; height: auto; display: block; }
 }
 .btn-outline:hover {
   border-color: var(--color-primary);
+  color: var(--color-primary-text);
+  background: var(--color-surface-soft);
   text-decoration: none;
 }
 
 .btn-soft {
-  color: var(--color-navy);
-  background: #fff;
+  color: var(--color-ink);
+  background: var(--color-bg-raised);
   border-color: var(--color-border);
   box-shadow: var(--shadow-sm);
 }
 .btn-soft:hover {
-  color: var(--color-primary);
-  border-color: #e8bcc5;
+  color: var(--color-primary-text);
+  background: var(--color-surface-soft);
+  border-color: color-mix(in srgb, var(--color-primary) 42%, var(--color-border));
   text-decoration: none;
   transform: translateY(-2px);
 }

@@ -17,7 +17,7 @@ const rtlA1 = '\u2066A1\u2069';
 const rtlC2 = '\u2066C2\u2069';
 
 const copy = isArabic ? {
-  badge: 'معتمد من المؤسسة العامة للتدريب التقني والمهني · منذ 2010',
+  badge: 'معتمد من المؤسسة العامة للتدريب التقني والمهني',
   titleStart: 'الإنجليزية التي تفتح لك',
   titleAccent: 'آفاقًا أوسع.',
   lead: `مسارات تعليمية واضحة من ${rtlA1} إلى ${rtlC2}، يقودها مدرّبون معتمدون للأطفال والكبار وفرق العمل.`,
@@ -33,7 +33,7 @@ const copy = isArabic ? {
   whyTitle: 'تعليم حديث، بنتائج يمكنك ملاحظتها.',
   whyText: 'تجربة تعليمية مصممة حول مستوى المتعلم وهدفه، وليست منهجًا واحدًا للجميع.',
   features: [
-    { icon: 'certificate' as const, title: 'اعتماد موثوق', text: 'معتمدون من TVTC بمعايير تدريب قابلة للتحقق.' },
+    { icon: 'certificate' as const, title: 'اعتماد موثوق', text: 'معتمدون من المؤسسة العامة للتدريب التقني والمهني بمعايير تدريب قابلة للتحقق.' },
     { icon: 'instructor' as const, title: 'خبرة إنسانية', text: 'مدرّبون مؤهلون يعرفون أسماء طلابهم وأهدافهم.' },
     { icon: 'pathway' as const, title: 'تقدّم منظم', text: 'مراحل واضحة تساعدك على معرفة مستواك وخطوتك التالية.' },
     { icon: 'details' as const, title: 'تفاصيل واضحة', text: 'المدة والسعر ومخرجات التعلم واضحة قبل التسجيل.' },
@@ -66,7 +66,7 @@ const copy = isArabic ? {
   ctaText: 'اختبار تحديد المستوى يساعدنا على توجيهك إلى البرنامج الأنسب دون تخمين.',
   ctaButton: 'ابدأ باختبار تحديد المستوى',
 } : {
-  badge: 'TVTC accredited · Learning since 2010',
+  badge: 'Accredited by the Technical and Vocational Training Corporation',
   titleStart: 'English that opens',
   titleAccent: 'bigger possibilities.',
   lead: 'Clear learning pathways from A1 to C2, led by credentialed instructors for children, adults, and teams.',
@@ -151,7 +151,7 @@ const basePath = `/${locale}`;
           <p><strong>15,000+</strong> {isArabic ? 'متعلّم بدأ رحلته معنا' : 'learners started here'}</p>
         </div>
       </div>
-      <div class="floating-card floating-top"><Icon name="certificate" size={20} /><span><strong>TVTC</strong>{isArabic ? 'اعتماد موثوق' : 'Accredited'}</span></div>
+      <div class="floating-card floating-top"><Icon name="certificate" size={20} /><span><strong>{isArabic ? '+15 عامًا' : '15+ years'}</strong>{isArabic ? 'من التدريب' : 'of training'}</span></div>
       <div class="floating-card floating-bottom"><span class="mini-chart" aria-hidden="true">↗</span><span><strong dir="ltr">A1 → C2</strong>{isArabic ? 'تقدّم خطوة بخطوة' : 'Step-by-step progress'}</span></div>
     </div>
   </div>
@@ -339,7 +339,7 @@ const basePath = `/${locale}`;
   .course-number { min-width: 1.9rem; justify-content: center; }
   .course-card h3 { max-width: 16ch; margin-bottom: .5rem; font-size: clamp(1.2rem, 2vw, 1.42rem); line-height: 1.25; }
   :global(:lang(ar)) .course-card h3 { line-height: 1.45; }
-  .course-card p { max-width: 34ch; margin: 0; color: rgb(25 39 69 / .74); font-size: .82rem; line-height: 1.58; }
+  .course-card p { max-width: 34ch; margin: 0; color: color-mix(in srgb, var(--course-ink) 78%, transparent); font-size: .82rem; line-height: 1.58; }
   .course-link { display: flex; align-items: center; justify-content: space-between; padding-top: .75rem; border-top: 1px solid rgb(25 39 69 / .16); font-size: .72rem; font-weight: 850; }
   .course-link b { display: grid; width: 1.85rem; height: 1.85rem; place-items: center; border-radius: 50%; color: #fff; background: var(--course-ink); font-size: .95rem; box-shadow: 0 7px 16px rgb(25 39 69 / .16); transition: transform var(--motion-fast) var(--ease); }
   .course-card:hover .course-link b { transform: translate(2px, -2px); }
@@ -357,6 +357,38 @@ const basePath = `/${locale}`;
   .cta-pattern { position: absolute; z-index: 0; width: 25rem; height: 25rem; inset-inline-end: -8rem; top: -8rem; border: 3rem solid rgb(255 255 255 / .08); border-radius: 50%; box-shadow: 0 0 0 3rem rgb(255 255 255 / .05), 0 0 0 6rem rgb(255 255 255 / .03); }
   .btn-light { flex-shrink: 0; background: #fff; color: var(--color-primary); }
   .btn-light:hover { color: var(--color-primary); background: #fff4e8; text-decoration: none; }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .hero { background: linear-gradient(145deg, #18181a 0%, #202024 48%, #292321 100%); }
+    :global(:root:not([data-theme='light'])) .eyebrow,
+    :global(:root:not([data-theme='light'])) .visual-card,
+    :global(:root:not([data-theme='light'])) .floating-card,
+    :global(:root:not([data-theme='light'])) .stat { border-color: var(--color-border); background: color-mix(in srgb, var(--color-bg-raised) 92%, transparent); box-shadow: var(--shadow-md); }
+    :global(:root:not([data-theme='light'])) .visual-card { box-shadow: 0 35px 90px rgb(0 0 0 / .38), inset 0 1px 0 rgb(255 255 255 / .06); }
+    :global(:root:not([data-theme='light'])) .avatar-stack i { border-color: var(--color-bg-raised); }
+    :global(:root:not([data-theme='light'])) .tone-coral { --course-bg-start: #382329; --course-bg-end: #2b1d22; --course-ink: #ff9aaa; --course-glow: #5a2733; }
+    :global(:root:not([data-theme='light'])) .tone-blue { --course-bg-start: #292d38; --course-bg-end: #20232b; --course-ink: #b8caef; --course-glow: #3a4357; }
+    :global(:root:not([data-theme='light'])) .tone-mint { --course-bg-start: #302a27; --course-bg-end: #252220; --course-ink: #e0c5aa; --course-glow: #4a3a2c; }
+    :global(:root:not([data-theme='light'])) .tone-yellow { --course-bg-start: #392f20; --course-bg-end: #2b261d; --course-ink: #ffd58e; --course-glow: #594422; }
+    :global(:root:not([data-theme='light'])) .course-icon,
+    :global(:root:not([data-theme='light'])) .course-number,
+    :global(:root:not([data-theme='light'])) .course-meta { border-color: rgb(255 255 255 / .12); background: rgb(255 255 255 / .08); }
+    :global(:root:not([data-theme='light'])) .course-card:hover .course-icon { background: rgb(255 255 255 / .14); }
+  }
+  :global(:root[data-theme='dark']) .hero { background: linear-gradient(145deg, #18181a 0%, #202024 48%, #292321 100%); }
+  :global(:root[data-theme='dark']) .eyebrow,
+  :global(:root[data-theme='dark']) .visual-card,
+  :global(:root[data-theme='dark']) .floating-card,
+  :global(:root[data-theme='dark']) .stat { border-color: var(--color-border); background: color-mix(in srgb, var(--color-bg-raised) 92%, transparent); box-shadow: var(--shadow-md); }
+  :global(:root[data-theme='dark']) .visual-card { box-shadow: 0 35px 90px rgb(0 0 0 / .38), inset 0 1px 0 rgb(255 255 255 / .06); }
+  :global(:root[data-theme='dark']) .avatar-stack i { border-color: var(--color-bg-raised); }
+  :global(:root[data-theme='dark']) .tone-coral { --course-bg-start: #382329; --course-bg-end: #2b1d22; --course-ink: #ff9aaa; --course-glow: #5a2733; }
+  :global(:root[data-theme='dark']) .tone-blue { --course-bg-start: #292d38; --course-bg-end: #20232b; --course-ink: #b8caef; --course-glow: #3a4357; }
+  :global(:root[data-theme='dark']) .tone-mint { --course-bg-start: #302a27; --course-bg-end: #252220; --course-ink: #e0c5aa; --course-glow: #4a3a2c; }
+  :global(:root[data-theme='dark']) .tone-yellow { --course-bg-start: #392f20; --course-bg-end: #2b261d; --course-ink: #ffd58e; --course-glow: #594422; }
+  :global(:root[data-theme='dark']) .course-icon,
+  :global(:root[data-theme='dark']) .course-number,
+  :global(:root[data-theme='dark']) .course-meta { border-color: rgb(255 255 255 / .12); background: rgb(255 255 255 / .08); }
+  :global(:root[data-theme='dark']) .course-card:hover .course-icon { background: rgb(255 255 255 / .14); }
   @media (max-width: 980px) {
     .hero-grid { grid-template-columns: 1fr; }
     .hero-copy { max-width: 47rem; }

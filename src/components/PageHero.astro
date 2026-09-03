@@ -42,4 +42,18 @@ const { title, subtitle, kicker = 'ELC' } = Astro.props;
     margin: 0;
     line-height: 1.7;
   }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .page-hero {
+      background: linear-gradient(140deg, #202024 0%, #2b2422 100%);
+    }
+    :global(:root:not([data-theme='light'])) .page-hero::before {
+      background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / .08) 1px, transparent 0);
+    }
+  }
+  :global(:root[data-theme='dark']) .page-hero {
+    background: linear-gradient(140deg, #202024 0%, #2b2422 100%);
+  }
+  :global(:root[data-theme='dark']) .page-hero::before {
+    background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / .08) 1px, transparent 0);
+  }
 </style>
