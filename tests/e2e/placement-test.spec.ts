@@ -228,3 +228,11 @@ test('contact map fills its card after loading on desktop and mobile', async ({ 
   await page.setViewportSize({ width: 390, height: 844 });
   await expectMapToFillCard();
 });
+
+test('contact directions button opens the ELC Google Maps location', async ({ page }) => {
+  await page.goto('/en/contact/');
+  await expect(page.getByRole('link', { name: /Open directions/ })).toHaveAttribute(
+    'href',
+    'https://maps.app.goo.gl/U8Q3QDT1AKAVbaWv6'
+  );
+});
