@@ -314,19 +314,17 @@ const basePath = `/${locale}`;
   .partner-label { color: var(--color-ink-muted); font-size: 0.72rem; font-weight: 650; text-align: center; }
   @media (prefers-color-scheme: dark) {
     :global(:root:not([data-theme='light'])) .partner-item img {
-      padding: .55rem .75rem;
-      border-radius: .75rem;
-      background: #fff;
-      box-shadow: 0 8px 22px rgb(0 0 0 / .22);
-      filter: none;
+      filter: grayscale(1) brightness(0) invert(1) opacity(.78);
+    }
+    :global(:root:not([data-theme='light'])) .partner-item:hover img {
+      filter: grayscale(1) brightness(0) invert(1) opacity(1);
     }
   }
   :global(:root[data-theme='dark']) .partner-item img {
-    padding: .55rem .75rem;
-    border-radius: .75rem;
-    background: #fff;
-    box-shadow: 0 8px 22px rgb(0 0 0 / .22);
-    filter: none;
+    filter: grayscale(1) brightness(0) invert(1) opacity(.78);
+  }
+  :global(:root[data-theme='dark']) .partner-item:hover img {
+    filter: grayscale(1) brightness(0) invert(1) opacity(1);
   }
   @media (max-width: 720px) { .partners-strip { justify-content: center; } }
   .courses-section { background: var(--zone-ink-bg); color: #fff; }
