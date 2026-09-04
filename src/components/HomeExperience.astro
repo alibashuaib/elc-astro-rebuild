@@ -247,7 +247,7 @@ const basePath = `/${locale}`;
   .eyebrow { padding: .55rem .85rem; border: 1px solid rgb(182 23 51 / .17); border-radius: 999px; background: rgb(255 255 255 / .72); box-shadow: 0 8px 30px rgb(66 54 49 / .08); }
   .eyebrow-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-coral); box-shadow: 0 0 0 4px rgb(242 148 32 / .14); }
   h1 { margin: 1.5rem 0; max-width: 12ch; color: var(--color-navy); font-size: clamp(3.35rem, 6.6vw, 6.85rem); line-height: .96; letter-spacing: -.065em; }
-  h1 span { color: var(--color-primary); }
+  h1 span { color: var(--color-primary-text); }
   :global(:lang(ar)) h1 { max-width: 15ch; font-size: clamp(3rem, 5vw, 5.25rem); line-height: 1.22; letter-spacing: -.035em; }
   .hero-lead { max-width: 55ch; margin-bottom: 1.8rem; color: var(--color-ink-muted); font-size: clamp(1.08rem, 1.6vw, 1.3rem); line-height: 1.75; }
   .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
@@ -284,7 +284,7 @@ const basePath = `/${locale}`;
   .stat::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--color-primary), var(--color-coral)); transform-origin: left; }
   :global(:dir(rtl)) .stat::before { transform-origin: right; }
   .stat:hover { transform: translateY(-4px); box-shadow: 0 20px 45px rgb(62 48 42 / .12); }
-  .stat :global(strong) { color: var(--color-primary); font-size: clamp(2rem, 3.2vw, 3rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
+  .stat :global(strong) { color: var(--color-primary-text); font-size: clamp(2rem, 3.2vw, 3rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
   .stat span { color: var(--color-ink-muted); font-size: .78rem; font-weight: 700; }
   .section { padding-block: clamp(5rem, 9vw, 8rem); }
   .why-section, .courses-section, .final-cta { content-visibility: auto; contain-intrinsic-size: auto 850px; }

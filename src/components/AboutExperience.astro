@@ -268,7 +268,7 @@ const basePath = `/${locale}`;
   .stat::after { content: ''; position: absolute; width: 5rem; height: 5rem; inset-inline-end: -2.5rem; bottom: -2.5rem; border-radius: 50%; background: var(--color-coral-soft); transition: transform var(--motion-base) var(--ease); }
   .stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
   .stat:hover::after { transform: scale(1.2); }
-  .stat :global(strong) { position: relative; z-index: 1; color: var(--color-primary); font-size: clamp(2rem, 3.6vw, 3.2rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
+  .stat :global(strong) { position: relative; z-index: 1; color: var(--color-primary-text); font-size: clamp(2rem, 3.6vw, 3.2rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
   .stat span { position: relative; z-index: 1; color: var(--color-ink-muted); font-size: .8rem; font-weight: 700; }
   .stat-line { display: none; }
   .why-section { background: var(--zone-ink-bg); color: #fff; }
@@ -295,9 +295,9 @@ const basePath = `/${locale}`;
   details { border-bottom: 1px solid var(--color-border); }
   summary { display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 1rem; padding-block: 1.5rem; color: var(--color-navy); font-size: 1.05rem; font-weight: 750; cursor: pointer; list-style: none; }
   summary::-webkit-details-marker { display: none; }
-  summary::after { content: '+'; grid-column: 3; color: var(--color-primary); font-size: 1.4rem; font-weight: 500; transition: transform var(--motion-fast) var(--ease); }
+  summary::after { content: '+'; grid-column: 3; color: var(--color-primary-text); font-size: 1.4rem; font-weight: 500; transition: transform var(--motion-fast) var(--ease); }
   details[open] summary::after { transform: rotate(45deg); }
-  summary span { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border: 1px solid rgb(182 23 51 / .14); border-radius: .75rem; color: var(--color-primary); background: var(--color-blue-soft); font-size: .76rem; font-weight: 850; transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); }
+  summary span { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border: 1px solid rgb(182 23 51 / .14); border-radius: .75rem; color: var(--color-primary-text); background: var(--color-blue-soft); font-size: .76rem; font-weight: 850; transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); }
   details[open] summary span { color: #fff; background: var(--color-primary); }
   details p { max-width: 65ch; margin: -.45rem 0 1.5rem 3.5rem; color: var(--color-ink-muted); line-height: 1.8; }
   :global(:dir(rtl)) details p { margin-right: 3.5rem; margin-left: 0; }
