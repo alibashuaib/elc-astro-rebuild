@@ -95,7 +95,7 @@ const { t } = Astro.props;
   const answerErrorText = runner.dataset.answerError ?? '';
   const answerSubmitText = runner.dataset.answerSubmit ?? 'Submit';
   const answerPlaceholderText = runner.dataset.answerPlaceholder ?? 'Type your answer here';
-  const numberInstructionText = runner.dataset.numberInstruction ?? 'Drag a number into the empty space.';
+  const numberInstructionText = runner.dataset.numberInstruction ?? 'Drag each number into the correct empty space.';
   const numberChoicesText = runner.dataset.numberChoices ?? 'Number choices';
   const numberBlankText = runner.dataset.numberBlank ?? 'Empty number space';
   const readingPassageLabel = runner.dataset.readingPassage ?? 'Reading passage';
@@ -222,7 +222,8 @@ const { t } = Astro.props;
     }
     const countingPrefix = /^Count in order:\s*1,\s*2,\s*3,\s*4,\s*5,\s*6,\s*7\.\s*/i;
     const countingMatch = step.prompt.match(/What number comes right (after|before) ([1-7])\?$/i);
-    const isCountingQuestion = countingPrefix.test(step.prompt) && Boolean(countingMatch);
+    const isCombinedCountingQuestion = /^Complete the number sequence from 1 to 7\.$/i.test(step.prompt);
+    const isCountingQuestion = isCombinedCountingQuestion || (countingPrefix.test(step.prompt) && Boolean(countingMatch));
     const isPictureMatch = /^Match the picture to the word:/i.test(step.prompt);
     const isRoomPicture = /\/(sofa|curtain|picture|tv|lamps)(?:-3d)?\.(?:svg|png)$/i.test(imageUrl ?? '');
     const actionWordPrefix = /^Word bank:\s*climbing,\s*flying,\s*playing,\s*riding,\s*throwing\.\s*/i;
@@ -278,19 +279,24 @@ const { t } = Astro.props;
     if (isCountingQuestion) {
       const direction = countingMatch?.[1].toLowerCase();
       const anchor = Number(countingMatch?.[2]);
-      const missingNumber = direction === 'after' ? anchor + 1 : anchor - 1;
+      const legacyMissingNumber = direction === 'after' ? anchor + 1 : anchor - 1;
+      const missingNumbers = isCombinedCountingQuestion
+        ? shuffle([1, 2, 3, 4, 5, 6, 7]).slice(0, 3).sort((a, b) => a - b)
+        : [legacyMissingNumber];
       numberSequenceEl.innerHTML = '';
       numberBankEl.innerHTML = '';
       numberBankEl.setAttribute('aria-label', numberChoicesText);
 
-      let blank: HTMLButtonElement | null = null;
+      const blanks: HTMLButtonElement[] = [];
       for (let number = 1; number <= 7; number += 1) {
-        if (number === missingNumber) {
-          blank = document.createElement('button');
+        if (missingNumbers.includes(number)) {
+          const blank = document.createElement('button');
           blank.type = 'button';
           blank.className = 'pt-number-slot pt-number-blank';
-          blank.setAttribute('aria-label', numberBlankText);
+          blank.dataset.expected = String(number);
+          blank.setAttribute('aria-label', `${numberBlankText} ${blanks.length + 1}`);
           numberSequenceEl.appendChild(blank);
+          blanks.push(blank);
         } else {
           const fixed = document.createElement('span');
           fixed.className = 'pt-number-slot pt-number-fixed';
@@ -300,9 +306,11 @@ const { t } = Astro.props;
         }
       }
 
-      if (!blank) return;
-      const distractors = shuffle([1, 2, 3, 4, 5, 6, 7].filter((number) => number !== missingNumber)).slice(0, 2);
-      const choices = shuffle([missingNumber, ...distractors]);
+      if (!blanks.length) return;
+      const distractors = isCombinedCountingQuestion
+        ? []
+        : shuffle([1, 2, 3, 4, 5, 6, 7].filter((number) => number !== legacyMissingNumber)).slice(0, 2);
+      const choices = shuffle([...missingNumbers, ...distractors]);
       const numberButtons = choices.map((number) => {
         const button = document.createElement('button');
         button.type = 'button';
@@ -310,18 +318,50 @@ const { t } = Astro.props;
         button.textContent = String(number);
         button.dataset.value = String(number);
         button.draggable = true;
+        button.setAttribute('aria-pressed', 'false');
         numberBankEl.appendChild(button);
         return button;
       });
 
-      const submitNumber = (button: HTMLButtonElement) => {
-        if (!blank || button.disabled) return;
+      let selectedButton: HTMLButtonElement | null = null;
+      const selectButton = (button: HTMLButtonElement | null) => {
+        numberButtons.forEach((candidate) => {
+          const selected = candidate === button;
+          candidate.classList.toggle('is-selected', selected);
+          candidate.setAttribute('aria-pressed', String(selected));
+        });
+        selectedButton = button;
+      };
+      const clearBlank = (blank: HTMLButtonElement) => {
+        const currentValue = blank.dataset.value;
+        if (!currentValue) return;
+        const currentButton = numberButtons.find((button) => button.dataset.value === currentValue);
+        if (currentButton) {
+          currentButton.hidden = false;
+          currentButton.disabled = false;
+        }
+        blank.textContent = '';
+        delete blank.dataset.value;
+        blank.classList.remove('pt-number-filled');
+      };
+      const placeNumber = (button: HTMLButtonElement, blank: HTMLButtonElement) => {
+        if (button.disabled) return;
+        clearBlank(blank);
         blank.textContent = button.dataset.value ?? '';
+        blank.dataset.value = button.dataset.value ?? '';
         blank.classList.add('pt-number-filled');
-        handleSubmit(step, { answerText: button.dataset.value ?? '' }, [...numberButtons, blank], blank);
+        button.hidden = true;
+        button.disabled = true;
+        selectButton(null);
+        if (blanks.every((candidate) => candidate.dataset.value)) {
+          const completedSequence = Array.from(numberSequenceEl.children)
+            .map((slot) => slot.textContent ?? '')
+            .join(',');
+          handleSubmit(step, { answerText: completedSequence }, [...numberButtons, ...blanks], blank);
+        }
       };
       numberButtons.forEach((button) => {
-        button.onclick = () => submitNumber(button);
+        button.onclick = () => selectButton(selectedButton === button ? null : button);
         button.addEventListener('dragstart', (event) => {
           event.dataTransfer?.setData('text/plain', button.dataset.value ?? '');
           if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
@@ -329,18 +369,21 @@ const { t } = Astro.props;
         });
         button.addEventListener('dragend', () => button.classList.remove('is-dragging'));
       });
-      blank.addEventListener('dragover', (event) => {
-        event.preventDefault();
-        if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
-        blank?.classList.add('is-drag-over');
-      });
-      blank.addEventListener('dragleave', () => blank?.classList.remove('is-drag-over'));
-      blank.addEventListener('drop', (event) => {
-        event.preventDefault();
-        blank?.classList.remove('is-drag-over');
-        const value = event.dataTransfer?.getData('text/plain');
-        const button = numberButtons.find((candidate) => candidate.dataset.value === value);
-        if (button) submitNumber(button);
+      blanks.forEach((blank) => {
+        blank.onclick = () => selectedButton ? placeNumber(selectedButton, blank) : clearBlank(blank);
+        blank.addEventListener('dragover', (event) => {
+          event.preventDefault();
+          if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+          blank.classList.add('is-drag-over');
+        });
+        blank.addEventListener('dragleave', () => blank.classList.remove('is-drag-over'));
+        blank.addEventListener('drop', (event) => {
+          event.preventDefault();
+          blank.classList.remove('is-drag-over');
+          const value = event.dataTransfer?.getData('text/plain');
+          const button = numberButtons.find((candidate) => candidate.dataset.value === value);
+          if (button) placeNumber(button, blank);
+        });
       });
       return;
     }
@@ -938,6 +981,12 @@ const { t } = Astro.props;
     background: #3488b5;
     box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #24668b, 0 10px 14px rgb(36 102 139 / 0.2);
     touch-action: manipulation;
+  }
+  .pt-number-bank :global(.pt-number-choice[hidden]) { display: none; }
+  .pt-number-bank :global(.pt-number-choice.is-selected) {
+    outline: 4px solid #7e0f24;
+    outline-offset: 4px;
+    translate: 0 -5px;
   }
   .pt-number-bank :global(.pt-number-choice:nth-child(2)) { background: #e9535d; box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #a92f38, 0 10px 14px rgb(169 47 56 / 0.2); }
   .pt-number-bank :global(.pt-number-choice:nth-child(3)) { background: #35a86f; box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #23774e, 0 10px 14px rgb(35 119 78 / 0.2); }

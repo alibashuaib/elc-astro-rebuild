@@ -34,7 +34,7 @@ test('kids placement test starts, renders a question and grades an answer', asyn
 
   const runner = page.locator('#placement-test-runner');
   await expect(runner).toBeVisible();
-  await expect(page.locator('#pt-progress')).toContainText('1 / 38');
+  await expect(page.locator('#pt-progress')).toContainText('1 / 35');
   const letterChoices = page.locator('.pt-letter-choice');
   await expect(letterChoices).toHaveCount(2);
   const letters = await letterChoices.allTextContents();
@@ -60,7 +60,7 @@ test('kids placement test starts, renders a question and grades an answer', asyn
   // accepted, which is what the answer guard has to allow under shuffling.
   await expect
     .poll(async () => (await page.locator('#pt-progress').textContent()) ?? '', { timeout: 10_000 })
-    .not.toContain('1 / 38');
+    .not.toContain('1 / 35');
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });
@@ -83,9 +83,9 @@ test('kids counting question accepts a dragged number in the empty slot', async 
         track: 'kids',
         questionId: 'kids-A2-6',
         type: 'text',
-        prompt: 'Count in order: 1, 2, 3, 4, 5, 6, 7. What number comes right after 1?',
+        prompt: 'Complete the number sequence from 1 to 7.',
         questionNumber: 7,
-        total: 38,
+        total: 35,
         skipAvailable: true,
       }),
     });
@@ -107,19 +107,24 @@ test('kids counting question accepts a dragged number in the empty slot', async 
   await startKidsTest(page);
 
   const sequence = page.locator('#pt-number-sequence');
-  const blank = sequence.locator('.pt-number-blank');
-  const correctNumber = page.locator('#pt-number-bank .pt-number-choice').filter({ hasText: /^2$/ });
+  const blanks = sequence.locator('.pt-number-blank');
   await expect(sequence.locator('.pt-number-slot')).toHaveCount(7);
-  await expect(blank).toHaveCount(1);
+  await expect(blanks).toHaveCount(3);
   await expect(page.locator('#pt-number-bank .pt-number-choice')).toHaveCount(3);
-  await expect(correctNumber).toHaveAttribute('draggable', 'true');
+  const missingNumbers = await blanks.evaluateAll((nodes) => nodes.map((node) =>
+    Array.from(node.parentElement?.children ?? []).indexOf(node) + 1
+  ));
 
   const answerRequest = page.waitForRequest('**/api/session/smoke-counting/answer');
-  await correctNumber.dragTo(blank);
+  for (let index = 0; index < missingNumbers.length; index++) {
+    const number = missingNumbers[index];
+    const choice = page.locator('#pt-number-bank .pt-number-choice').filter({ hasText: new RegExp(`^${number}$`) });
+    await expect(choice).toHaveAttribute('draggable', 'true');
+    await choice.dragTo(blanks.nth(index));
+  }
   const request = await answerRequest;
-  expect(request.postDataJSON()).toMatchObject({ questionId: 'kids-A2-6', answerText: '2' });
-  await expect(blank).toHaveText('2');
-  await expect(blank).toHaveClass(/pt-selected-correct/);
+  expect(request.postDataJSON()).toMatchObject({ questionId: 'kids-A2-6', answerText: '1,2,3,4,5,6,7' });
+  await expect(blanks.last()).toHaveClass(/pt-selected-correct/);
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });

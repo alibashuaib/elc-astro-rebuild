@@ -385,7 +385,7 @@ describe('text-type question grading', () => {
   it.each([
     ['kids-A1-1', 'A', 'a'],
     ['kids-A1-7', 'a', 'A'],
-    ['kids-A2-6', '2', '1'],
+    ['kids-A2-6', '1,2,3,4,5,6,7', '1,3,2,4,5,6,7'],
     ['kids-A2-7', '3', '4'],
     ['kids-B1-1', '5', '4'],
     ['kids-B1-2', '6', '7'],
@@ -456,30 +456,30 @@ describe('kids placement level reflects the whole run, not its tail', () => {
   }
 
   it.each([
-    [38, 'Super Minds 3A'],
-    [32, 'Super Minds 3A'],
-    [31, 'Super Minds 2B'],
-    [26, 'Super Minds 2B'],
-    [25, 'Super Minds 2A'],
-    [19, 'Super Minds 2A'],
-    [18, 'Super Minds 1B'],
-    [13, 'Super Minds 1B'],
-    [12, 'Super Minds 1A'],
-    [7, 'Super Minds 1A'],
-    [6, 'Pre-Starters'],
+    [35, 'Super Minds 3A'],
+    [30, 'Super Minds 3A'],
+    [29, 'Super Minds 2B'],
+    [24, 'Super Minds 2B'],
+    [23, 'Super Minds 2A'],
+    [18, 'Super Minds 2A'],
+    [17, 'Super Minds 1B'],
+    [12, 'Super Minds 1B'],
+    [11, 'Super Minds 1A'],
+    [6, 'Super Minds 1A'],
+    [5, 'Pre-Starters'],
     [0, 'Pre-Starters'],
-  ])('places a kid who gets %i of 38 right at %s', async (correct, expected) => {
+  ])('places a kid who gets %i of 35 right at %s', async (correct, expected) => {
     const { levelName, answered } = await runKidsSession(correct);
-    expect(answered).toBe(38); // three prompts are omitted from each letter block
+    expect(answered).toBe(35); // sampled letter blocks and one combined number activity
     expect(levelName).toBe(expected);
   });
 
   it.each([
-    [38, 'Movers'],
-    [32, 'Movers'],
-    [31, 'Starters'],
-    [7, 'Starters'],
-  ])('reports the Cambridge YLE level for a kid who gets %i of 38 right', async (correct, expected) => {
+    [35, 'Movers'],
+    [30, 'Movers'],
+    [29, 'Starters'],
+    [6, 'Starters'],
+  ])('reports the Cambridge YLE level for a kid who gets %i of 35 right', async (correct, expected) => {
     expect((await runKidsSession(correct)).yle).toBe(expected);
   });
 
@@ -539,8 +539,10 @@ describe('kids question order is randomized within each exercise block', () => {
       expect(new Set(smallSample).size).toBe(3);
       expect(capitalIds.has(data.questionId)).toBe(false);
       expect(smallIds.has(data.questionId)).toBe(false);
+      expect(data.questionId).toBe('kids-A2-6');
+      expect(data.prompt).toBe('Complete the number sequence from 1 to 7.');
       expect(data.questionNumber).toBe(7);
-      expect(data.total).toBe(38);
+      expect(data.total).toBe(35);
       capitalSamples.add([...capitalSample].sort().join(','));
       smallSamples.add([...smallSample].sort().join(','));
     }
@@ -576,9 +578,10 @@ describe('kids question order is randomized within each exercise block', () => {
       data = await res.json();
       answered++;
     }
-    expect(answered).toBe(38); // three prompts are sampled from each letter block
+    expect(answered).toBe(35); // sampled letter blocks plus one number activity
     expect(answeredIds.filter((id) => KIDS_CAPITAL_QUESTION_IDS.includes(id as typeof KIDS_CAPITAL_QUESTION_IDS[number]))).toHaveLength(3);
     expect(answeredIds.filter((id) => KIDS_SMALL_QUESTION_IDS.includes(id as typeof KIDS_SMALL_QUESTION_IDS[number]))).toHaveLength(3);
+    expect(answeredIds.filter((id) => ['kids-A2-6', 'kids-A2-7', 'kids-B1-1', 'kids-B1-2'].includes(id))).toEqual(['kids-A2-6']);
     expect(data.levelName).toBe('Pre-Starters'); // all skipped
   });
 
