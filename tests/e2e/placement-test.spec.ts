@@ -236,3 +236,20 @@ test('contact directions button opens the ELC Google Maps location', async ({ pa
     'https://maps.app.goo.gl/U8Q3QDT1AKAVbaWv6'
   );
 });
+
+test('contact cards use dark surfaces and readable accent labels in dark mode', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('elc-theme', 'dark'));
+  await page.goto('/en/contact/');
+  const cards = page.locator('.contact-card');
+  await expect(cards).toHaveCount(3);
+
+  const themeValues = await cards.evaluateAll((elements) => elements.map((element) => ({
+    soft: getComputedStyle(element).getPropertyValue('--contact-soft').trim(),
+    label: getComputedStyle(element.querySelector('.contact-label')!).color,
+  })));
+  expect(themeValues).toEqual([
+    { soft: '#35262b', label: 'rgb(255, 130, 147)' },
+    { soft: '#1d3326', label: 'rgb(99, 223, 144)' },
+    { soft: '#38291f', label: 'rgb(255, 179, 110)' },
+  ]);
+});
