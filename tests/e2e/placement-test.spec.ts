@@ -165,3 +165,41 @@ test('the registration form limits mobile numbers to a Saudi mobile number', asy
   await phone.fill('0512345678');
   expect(await phone.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
 });
+
+test('interactive controls retain readable contrast when hovered in dark mode', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('elc-theme', 'dark'));
+
+  const channel = (value: number) => {
+    const normalized = value / 255;
+    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+  };
+  const luminance = ([red, green, blue]: number[]) =>
+    0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue);
+  const parseRgb = (value: string) => (value.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
+
+  for (const path of ['/en/', '/en/courses/']) {
+    await page.goto(path);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    const controls = page.locator(
+      'a.btn:visible, button.btn:visible, .main-nav a:visible, .theme-toggle:visible, .search-toggle:visible, .filter-chip:visible'
+    );
+    expect(await controls.count()).toBeGreaterThan(1);
+
+    for (let index = 0; index < await controls.count(); index++) {
+      const control = controls.nth(index);
+      await control.hover();
+      const { color, backgroundColor, label } = await control.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          color: style.color,
+          backgroundColor: style.backgroundColor,
+          label: (element.textContent ?? '').trim() || element.getAttribute('aria-label') || element.className,
+        };
+      });
+      const foreground = luminance(parseRgb(color));
+      const background = luminance(parseRgb(backgroundColor));
+      const ratio = (Math.max(foreground, background) + 0.05) / (Math.min(foreground, background) + 0.05);
+      expect(ratio, `${path} ${label}: ${color} on ${backgroundColor}`).toBeGreaterThanOrEqual(4.5);
+    }
+  }
+});
