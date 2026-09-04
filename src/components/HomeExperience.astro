@@ -214,7 +214,8 @@ const basePath = `/${locale}`;
     <div class="partners-strip">
       {copy.partners.map((partner) => (
         <div class="partner-item">
-          <img src={partner.logo} alt={partner.name} loading="lazy" width="160" height="64" />
+          <img class="partner-logo-light" src={partner.logo} alt={partner.name} loading="lazy" width="160" height="64" />
+          <img class="partner-logo-dark" src={partner.logo.replace('.png', '-dark.png')} alt={partner.name} loading="lazy" width="160" height="64" />
           <span class="partner-label">{partner.label}</span>
         </div>
       ))}
@@ -310,21 +311,34 @@ const basePath = `/${locale}`;
   .partners-strip { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: clamp(1.5rem, 4vw, 3rem); }
   .partner-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
   .partner-item img { height: clamp(2.1rem, 4vw, 2.75rem); width: auto; max-width: 9rem; object-fit: contain; filter: grayscale(1) opacity(0.55); transition: filter var(--motion-base) var(--ease), transform var(--motion-base) var(--ease); }
+  .partner-logo-dark { display: none; }
   .partner-item:hover img { filter: grayscale(0) opacity(1); transform: translateY(-2px); }
   .partner-label { color: var(--color-ink-muted); font-size: 0.72rem; font-weight: 650; text-align: center; }
   @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .partner-item img {
-      filter: grayscale(1) brightness(0) invert(1) opacity(.78);
+    :global(:root:not([data-theme='light'])) .partner-logo-light {
+      display: none;
     }
-    :global(:root:not([data-theme='light'])) .partner-item:hover img {
-      filter: grayscale(1) brightness(0) invert(1) opacity(1);
+    :global(:root:not([data-theme='light'])) .partner-logo-dark {
+      display: block;
+      filter: none;
+      opacity: .85;
+    }
+    :global(:root:not([data-theme='light'])) .partner-item:hover .partner-logo-dark {
+      filter: none;
+      opacity: 1;
     }
   }
-  :global(:root[data-theme='dark']) .partner-item img {
-    filter: grayscale(1) brightness(0) invert(1) opacity(.78);
+  :global(:root[data-theme='dark']) .partner-logo-light {
+    display: none;
   }
-  :global(:root[data-theme='dark']) .partner-item:hover img {
-    filter: grayscale(1) brightness(0) invert(1) opacity(1);
+  :global(:root[data-theme='dark']) .partner-logo-dark {
+    display: block;
+    filter: none;
+    opacity: .85;
+  }
+  :global(:root[data-theme='dark']) .partner-item:hover .partner-logo-dark {
+    filter: none;
+    opacity: 1;
   }
   @media (max-width: 720px) { .partners-strip { justify-content: center; } }
   .courses-section { background: var(--zone-ink-bg); color: #fff; }
