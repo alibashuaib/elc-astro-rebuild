@@ -203,3 +203,28 @@ test('interactive controls retain readable contrast when hovered in dark mode', 
     }
   }
 });
+
+test('contact map fills its card after loading on desktop and mobile', async ({ page }) => {
+  await page.route('https://www.google.com/maps/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Map</title>' })
+  );
+
+  const expectMapToFillCard = async () => {
+    await page.goto('/en/contact/');
+    const wrap = page.locator('[data-map-wrap]');
+    await wrap.getByRole('button', { name: 'View interactive map' }).click();
+    const frame = wrap.locator('iframe.map-embed');
+    await expect(frame).toBeVisible();
+    const [wrapBox, frameBox] = await Promise.all([wrap.boundingBox(), frame.boundingBox()]);
+    expect(wrapBox).not.toBeNull();
+    expect(frameBox).not.toBeNull();
+    // The wrapper's 1px border on each edge accounts for the 2px difference.
+    expect(Math.abs(frameBox!.width - wrapBox!.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(frameBox!.height - wrapBox!.height)).toBeLessThanOrEqual(2);
+  };
+
+  await page.setViewportSize({ width: 1280, height: 850 });
+  await expectMapToFillCard();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expectMapToFillCard();
+});
