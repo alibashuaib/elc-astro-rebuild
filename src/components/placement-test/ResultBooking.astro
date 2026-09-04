@@ -62,12 +62,16 @@ const { t, locale, whatsappNumber } = Astro.props;
     yle?: string;
   }
 
-  // "A1 · Movers · Super Minds 3A", dropping whichever parts this track and
-  // level don't have (adults have no YLE; Pre-Starters sits below Starters).
-  // Deduplicated because the adults band path reports the same string as both
-  // level and levelName, which otherwise renders as "Hint A · Hint A".
+  // Kids receive several equivalent labels from the worker (CEFR, Cambridge
+  // YLE, and the ELC course placement). Showing all three looks like conflicting
+  // scores, so present only the actionable Super Minds course level. Adults
+  // retain their CEFR + ELC band detail.
   function formatLevel(detail: DoneDetail): string {
-    const parts = [detail.level, detail.yle, detail.levelName].filter(Boolean) as string[];
+    const isKidsLevel = Boolean(detail.yle)
+      || detail.levelName === 'Pre-Starters'
+      || detail.levelName?.startsWith('Super Minds ');
+    if (isKidsLevel) return detail.levelName ?? detail.yle ?? detail.level;
+    const parts = [detail.level, detail.levelName].filter(Boolean) as string[];
     return [...new Set(parts)].join(' · ');
   }
 

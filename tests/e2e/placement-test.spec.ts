@@ -100,7 +100,7 @@ test('kids counting question accepts a dragged number in the empty slot', async 
         'access-control-allow-headers': 'content-type',
         'access-control-allow-methods': 'POST, OPTIONS',
       },
-      body: JSON.stringify({ done: true, correct: true, level: 'A1', levelName: 'Super Minds 1' }),
+      body: JSON.stringify({ done: true, correct: true, level: '-A1', levelName: 'Super Minds 2B', yle: 'Starters' }),
     });
   });
 
@@ -125,6 +125,7 @@ test('kids counting question accepts a dragged number in the empty slot', async 
   const request = await answerRequest;
   expect(request.postDataJSON()).toMatchObject({ questionId: 'kids-A2-6', answerText: '1,2,3,4,5,6,7' });
   await expect(blanks.last()).toHaveClass(/pt-selected-correct/);
+  await expect(page.locator('#pt-level')).toHaveText('Super Minds 2B');
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });
