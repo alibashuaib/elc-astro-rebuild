@@ -25,7 +25,7 @@ export const KIDS_CEILING_INDEX = 5;
 /**
  * Minimum share of correct answers for each rung, highest first. Even sixths.
  * Shares (not counts) so the bank can grow without retuning -- against the
- * current 41-question session these land at 35 / 28 / 21 / 14 / 7 correct.
+ * current 38-question session these land at 32 / 26 / 19 / 13 / 7 correct.
  */
 export const KIDS_BANDS: ReadonlyArray<{ minShare: number; index: number }> = [
   { minShare: 5 / 6, index: 5 }, // Super Minds 3A

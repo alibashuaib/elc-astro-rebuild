@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
 import { handleStartSession, handleAnswer } from './session';
 import { ADULT_BANDS } from '../bands';
-import { KIDS_CAPITAL_QUESTION_IDS } from '../db';
+import { KIDS_CAPITAL_QUESTION_IDS, KIDS_SMALL_QUESTION_IDS } from '../db';
 
 function makeEnv() {
   return {
@@ -456,30 +456,30 @@ describe('kids placement level reflects the whole run, not its tail', () => {
   }
 
   it.each([
-    [41, 'Super Minds 3A'],
-    [35, 'Super Minds 3A'],
-    [34, 'Super Minds 2B'],
-    [28, 'Super Minds 2B'],
-    [27, 'Super Minds 2A'],
-    [21, 'Super Minds 2A'],
-    [20, 'Super Minds 1B'],
-    [14, 'Super Minds 1B'],
-    [13, 'Super Minds 1A'],
+    [38, 'Super Minds 3A'],
+    [32, 'Super Minds 3A'],
+    [31, 'Super Minds 2B'],
+    [26, 'Super Minds 2B'],
+    [25, 'Super Minds 2A'],
+    [19, 'Super Minds 2A'],
+    [18, 'Super Minds 1B'],
+    [13, 'Super Minds 1B'],
+    [12, 'Super Minds 1A'],
     [7, 'Super Minds 1A'],
     [6, 'Pre-Starters'],
     [0, 'Pre-Starters'],
-  ])('places a kid who gets %i of 41 right at %s', async (correct, expected) => {
+  ])('places a kid who gets %i of 38 right at %s', async (correct, expected) => {
     const { levelName, answered } = await runKidsSession(correct);
-    expect(answered).toBe(41); // three random capital-letter prompts are omitted
+    expect(answered).toBe(38); // three prompts are omitted from each letter block
     expect(levelName).toBe(expected);
   });
 
   it.each([
-    [41, 'Movers'],
-    [35, 'Movers'],
-    [34, 'Starters'],
+    [38, 'Movers'],
+    [32, 'Movers'],
+    [31, 'Starters'],
     [7, 'Starters'],
-  ])('reports the Cambridge YLE level for a kid who gets %i of 41 right', async (correct, expected) => {
+  ])('reports the Cambridge YLE level for a kid who gets %i of 38 right', async (correct, expected) => {
     expect((await runKidsSession(correct)).yle).toBe(expected);
   });
 
@@ -489,9 +489,11 @@ describe('kids placement level reflects the whole run, not its tail', () => {
 });
 
 describe('kids question order is randomized within each exercise block', () => {
-  it('serves a varying sample of three capital-letter questions per session', async () => {
+  it('serves varying samples of three questions from each letter block per session', async () => {
     const capitalIds = new Set<string>(KIDS_CAPITAL_QUESTION_IDS);
-    const samples = new Set<string>();
+    const smallIds = new Set<string>(KIDS_SMALL_QUESTION_IDS);
+    const capitalSamples = new Set<string>();
+    const smallSamples = new Set<string>();
     for (let attempt = 0; attempt < 10; attempt++) {
       const attemptEnv = makeEnv();
       const res = await handleStartSession(
@@ -509,10 +511,10 @@ describe('kids question order is randomized within each exercise block', () => {
       );
       let data = (await res.json()) as any;
       const sessionId = data.sessionId;
-      const sample: string[] = [];
+      const capitalSample: string[] = [];
       for (let question = 0; question < 3; question++) {
         expect(capitalIds.has(data.questionId)).toBe(true);
-        sample.push(data.questionId);
+        capitalSample.push(data.questionId);
         const answer = await handleAnswer(
           new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, skip: true }) }),
           attemptEnv as any,
@@ -520,13 +522,30 @@ describe('kids question order is randomized within each exercise block', () => {
         );
         data = await answer.json();
       }
-      expect(new Set(sample).size).toBe(3);
+      expect(new Set(capitalSample).size).toBe(3);
+      expect(smallIds.has(data.questionId)).toBe(true);
+
+      const smallSample: string[] = [];
+      for (let question = 0; question < 3; question++) {
+        expect(smallIds.has(data.questionId)).toBe(true);
+        smallSample.push(data.questionId);
+        const answer = await handleAnswer(
+          new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, skip: true }) }),
+          attemptEnv as any,
+          sessionId
+        );
+        data = await answer.json();
+      }
+      expect(new Set(smallSample).size).toBe(3);
       expect(capitalIds.has(data.questionId)).toBe(false);
-      expect(data.questionNumber).toBe(4);
-      expect(data.total).toBe(41);
-      samples.add([...sample].sort().join(','));
+      expect(smallIds.has(data.questionId)).toBe(false);
+      expect(data.questionNumber).toBe(7);
+      expect(data.total).toBe(38);
+      capitalSamples.add([...capitalSample].sort().join(','));
+      smallSamples.add([...smallSample].sort().join(','));
     }
-    expect(samples.size).toBeGreaterThan(1);
+    expect(capitalSamples.size).toBeGreaterThan(1);
+    expect(smallSamples.size).toBeGreaterThan(1);
   });
 
   // The replay guard used to re-derive the pending question by calling
@@ -557,8 +576,9 @@ describe('kids question order is randomized within each exercise block', () => {
       data = await res.json();
       answered++;
     }
-    expect(answered).toBe(41); // three capital-letter prompts are sampled out
+    expect(answered).toBe(38); // three prompts are sampled from each letter block
     expect(answeredIds.filter((id) => KIDS_CAPITAL_QUESTION_IDS.includes(id as typeof KIDS_CAPITAL_QUESTION_IDS[number]))).toHaveLength(3);
+    expect(answeredIds.filter((id) => KIDS_SMALL_QUESTION_IDS.includes(id as typeof KIDS_SMALL_QUESTION_IDS[number]))).toHaveLength(3);
     expect(data.levelName).toBe('Pre-Starters'); // all skipped
   });
 

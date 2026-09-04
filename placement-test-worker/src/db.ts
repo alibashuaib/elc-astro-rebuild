@@ -8,7 +8,15 @@ export const KIDS_CAPITAL_QUESTION_IDS = [
   'kids-A1-5',
   'kids-A1-6',
 ] as const;
-export const KIDS_CAPITAL_QUESTION_LIMIT = 3;
+export const KIDS_SMALL_QUESTION_IDS = [
+  'kids-A1-7',
+  'kids-A2-1',
+  'kids-A2-2',
+  'kids-A2-3',
+  'kids-A2-4',
+  'kids-A2-5',
+] as const;
+export const KIDS_LETTER_QUESTION_LIMIT = 3;
 
 function newId(): string {
   return crypto.randomUUID();
@@ -89,11 +97,18 @@ export async function pickNextQuestion(
   excludeIds: string[]
 ): Promise<QuestionRow | null> {
   const answeredCapitalCount = excludeIds.filter((id) => KIDS_CAPITAL_QUESTION_IDS.includes(id as typeof KIDS_CAPITAL_QUESTION_IDS[number])).length;
-  // Keep all six capital-letter prompts in the bank, but serve a random three
-  // per kids session. Once three have been answered, excluding the whole block
-  // advances the existing block-order query to the small-letter questions.
-  const effectiveExcludeIds = track === 'kids' && answeredCapitalCount >= KIDS_CAPITAL_QUESTION_LIMIT
-    ? [...new Set([...excludeIds, ...KIDS_CAPITAL_QUESTION_IDS])]
+  const answeredSmallCount = excludeIds.filter((id) => KIDS_SMALL_QUESTION_IDS.includes(id as typeof KIDS_SMALL_QUESTION_IDS[number])).length;
+  // Keep both six-question letter blocks in the bank, but serve a random three
+  // from each per kids session. Excluding a whole block after its third answer
+  // advances the existing block-order query to the next exercise.
+  const sampledBlockExclusions = track === 'kids'
+    ? [
+        ...(answeredCapitalCount >= KIDS_LETTER_QUESTION_LIMIT ? KIDS_CAPITAL_QUESTION_IDS : []),
+        ...(answeredSmallCount >= KIDS_LETTER_QUESTION_LIMIT ? KIDS_SMALL_QUESTION_IDS : []),
+      ]
+    : [];
+  const effectiveExcludeIds = sampledBlockExclusions.length
+    ? [...new Set([...excludeIds, ...sampledBlockExclusions])]
     : excludeIds;
   const placeholders = effectiveExcludeIds.length ? effectiveExcludeIds.map(() => '?').join(',') : null;
   const where = placeholders
@@ -157,8 +172,8 @@ export async function listAnsweredQuestionIds(env: Env, sessionId: string): Prom
   return rows.results?.map((r) => r.question_id) ?? [];
 }
 
-// Total number of questions this session will serve. Kids omit three of the
-// six active capital-letter prompts on every run; adults serve their active
+// Total number of questions this session will serve. Kids omit three prompts
+// from each six-question letter block on every run; adults serve their active
 // bank unchanged (their displayed total is capped separately in session.ts).
 export async function countSessionQuestions(env: Env, track: Track): Promise<number> {
   const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM questions WHERE track = ? AND active = 1`)
@@ -166,12 +181,18 @@ export async function countSessionQuestions(env: Env, track: Track): Promise<num
     .first<{ n: number }>();
   const total = row?.n ?? 0;
   if (track !== 'kids') return total;
-  const placeholders = KIDS_CAPITAL_QUESTION_IDS.map(() => '?').join(',');
-  const capitalRow = await env.DB
-    .prepare(`SELECT COUNT(*) AS n FROM questions WHERE active = 1 AND id IN (${placeholders})`)
-    .bind(...KIDS_CAPITAL_QUESTION_IDS)
-    .first<{ n: number }>();
-  return total - Math.max(0, (capitalRow?.n ?? 0) - KIDS_CAPITAL_QUESTION_LIMIT);
+  const capitalPlaceholders = KIDS_CAPITAL_QUESTION_IDS.map(() => '?').join(',');
+  const smallPlaceholders = KIDS_SMALL_QUESTION_IDS.map(() => '?').join(',');
+  const letterRow = await env.DB
+    .prepare(`SELECT
+      SUM(CASE WHEN id IN (${capitalPlaceholders}) THEN 1 ELSE 0 END) AS capitalCount,
+      SUM(CASE WHEN id IN (${smallPlaceholders}) THEN 1 ELSE 0 END) AS smallCount
+      FROM questions WHERE active = 1`)
+    .bind(...KIDS_CAPITAL_QUESTION_IDS, ...KIDS_SMALL_QUESTION_IDS)
+    .first<{ capitalCount: number; smallCount: number }>();
+  const omittedCapital = Math.max(0, (letterRow?.capitalCount ?? 0) - KIDS_LETTER_QUESTION_LIMIT);
+  const omittedSmall = Math.max(0, (letterRow?.smallCount ?? 0) - KIDS_LETTER_QUESTION_LIMIT);
+  return total - omittedCapital - omittedSmall;
 }
 
 // Number of correct responses this session has recorded for questions whose

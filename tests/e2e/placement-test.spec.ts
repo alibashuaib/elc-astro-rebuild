@@ -34,7 +34,7 @@ test('kids placement test starts, renders a question and grades an answer', asyn
 
   const runner = page.locator('#placement-test-runner');
   await expect(runner).toBeVisible();
-  await expect(page.locator('#pt-progress')).toContainText('1 / 41');
+  await expect(page.locator('#pt-progress')).toContainText('1 / 38');
   const letterChoices = page.locator('.pt-letter-choice');
   await expect(letterChoices).toHaveCount(2);
   const letters = await letterChoices.allTextContents();
@@ -60,7 +60,7 @@ test('kids placement test starts, renders a question and grades an answer', asyn
   // accepted, which is what the answer guard has to allow under shuffling.
   await expect
     .poll(async () => (await page.locator('#pt-progress').textContent()) ?? '', { timeout: 10_000 })
-    .not.toContain('1 / 41');
+    .not.toContain('1 / 38');
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });
@@ -84,8 +84,8 @@ test('kids counting question accepts a dragged number in the empty slot', async 
         questionId: 'kids-A2-6',
         type: 'text',
         prompt: 'Count in order: 1, 2, 3, 4, 5, 6, 7. What number comes right after 1?',
-        questionNumber: 10,
-        total: 41,
+        questionNumber: 7,
+        total: 38,
         skipAvailable: true,
       }),
     });
