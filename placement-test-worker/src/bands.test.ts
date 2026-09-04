@@ -16,8 +16,8 @@ describe('bands', () => {
     ]);
   });
 
-  it('PASS_THRESHOLD is 60%', () => {
-    expect(PASS_THRESHOLD).toBe(0.6);
+  it('PASS_THRESHOLD is 50%', () => {
+    expect(PASS_THRESHOLD).toBe(0.5);
   });
 
   it('bandCount returns the inclusive size of a band', () => {
@@ -42,10 +42,10 @@ describe('bands', () => {
     expect(isLastBand(ADULT_BANDS.at(-1)!)).toBe(true);
   });
 
-  it('evaluateBand: exact-threshold pass at 60%', () => {
-    const band = { name: 'Fun A', start: 1, end: 5 };
-    const result = evaluateBand(band, 3); // 3/5 = 0.6
-    expect(result).toEqual({ name: 'Fun A', correct: 3, total: 5, pct: 0.6, passed: true });
+  it('evaluateBand: exact-threshold pass at 50%', () => {
+    const band = { name: 'Fun B', start: 6, end: 9 };
+    const result = evaluateBand(band, 2); // 2/4 = 0.5
+    expect(result).toEqual({ name: 'Fun B', correct: 2, total: 4, pct: 0.5, passed: true });
   });
 
   it('evaluateBand: just below threshold fails', () => {
@@ -73,14 +73,15 @@ describe('bands', () => {
 });
 
 describe('band progress while the test is still running', () => {
-  const funA = ADULT_BANDS[0]; // sequence 1-5, needs 3 of 5 for 60%
+  const funA = ADULT_BANDS[0]; // sequence 1-5, needs 3 of 5 (half rounded up)
   const lintE = ADULT_BANDS.find((b) => b.name === 'Lint E')!; // 3 questions
   const hintA = ADULT_BANDS.at(-1)!; // 8 questions
 
   it('knows how many correct answers a band needs', () => {
-    expect(requiredCorrect(funA)).toBe(3); // 3/5 = 60% exactly
-    expect(requiredCorrect(lintE)).toBe(2); // 1/3 = 33%, 2/3 = 67%
-    expect(requiredCorrect(hintA)).toBe(5); // 4/8 = 50%, 5/8 = 63%
+    expect(ADULT_BANDS.map(requiredCorrect)).toEqual([3, 2, 3, 2, 3, 2, 4]);
+    expect(requiredCorrect(funA)).toBe(3); // 2/5 is below half
+    expect(requiredCorrect(lintE)).toBe(2); // 1/3 is below half
+    expect(requiredCorrect(hintA)).toBe(4); // exactly 4/8
   });
 
   it('says passing is still reachable while enough questions remain', () => {

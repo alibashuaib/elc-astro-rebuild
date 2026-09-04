@@ -185,7 +185,7 @@ describe('adults band placement (bands.ts, real question content)', () => {
     const funA = ADULT_BANDS[0]; // { name: 'Fun A', start: 1, end: 5 }
     let rounds = 0;
     while (!data.done) {
-      const wantWrong = rounds < 4; // 1 correct out of 5 = 20%, below 60% -> Fun A fails
+      const wantWrong = rounds < 4; // three wrong answers make the 50% band unreachable
       const correctIndex = await correctIndexFor(env, data.questionId);
       const selectedIndex = wantWrong ? (correctIndex + 1) % 4 : correctIndex;
       const res = await handleAnswer(
@@ -238,6 +238,27 @@ describe('adults band placement (bands.ts, real question content)', () => {
     }
     expect(data.done).toBe(false); // Fun A passed 5/5 -- session continues into Fun B, doesn't stop
     expect(data.questionNumber).toBe(bandSize(funA) + 1);
+  });
+
+  it('passes an adult band with exactly 50% correct', async () => {
+    const env = makeRealAdultsEnv();
+    let data = await startAdultSession(env, '+966500000013');
+    const sessionId = data.sessionId;
+
+    // Clear Fun A, then answer exactly 2 of the 4 Fun B questions correctly.
+    for (let sequence = 1; sequence <= 9; sequence++) {
+      const correctIndex = await correctIndexFor(env, data.questionId);
+      const selectedIndex = sequence <= 7 ? correctIndex : (correctIndex === 0 ? 1 : 0);
+      const res = await handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, selectedIndex }) }),
+        env as any,
+        sessionId
+      );
+      data = await res.json();
+    }
+
+    expect(data.done).toBe(false);
+    expect(data.questionNumber).toBe(10); // continued into Lint A
   });
 
   function bandSize(band: { start: number; end: number }): number {
@@ -656,7 +677,7 @@ describe('adults get one skip per band', () => {
     let data = await startAdults(env2);
     const sessionId = data.sessionId;
 
-    // Clear Fun A, then skip Fun B (4 questions, needs 3) into the ground.
+    // Clear Fun A, then skip Fun B (4 questions, needs 2) into the ground.
     while (!data.done && data.skipAvailable !== false) {
       const res = await answer(env2, sessionId, data.questionId, await keyFor(env2, data.questionId));
       data = await res.json();
