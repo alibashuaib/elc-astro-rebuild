@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { KIDS_CEILING_INDEX, kidsLevelIndex, kidsLevel, kidsPlaceableRungs, kidsHiddenRungs } from './kids';
+import { KIDS_CEILING_INDEX, KIDS_YLE_BY_INDEX, kidsLevelIndex, kidsLevel, kidsYleLevel, kidsPlaceableRungs, kidsHiddenRungs } from './kids';
 import { STAGE_NAMES_BY_TRACK, LEVELS_BY_TRACK } from './scoring';
 
 const TOTAL = 35; // sampled letter blocks plus one consolidated number activity
@@ -115,5 +115,14 @@ describe('kids placement level', () => {
   it('keeps CEFR storage codes defined for hidden course rungs', () => {
     expect(LEVELS_BY_TRACK.kids[6]).toBe('A1');
     expect(LEVELS_BY_TRACK.kids[8]).toBe('A2');
+  });
+
+  it('retains Cambridge YLE levels for reporting', () => {
+    expect(kidsYleLevel(0, TOTAL)).toBeUndefined();
+    expect(kidsYleLevel(6, TOTAL)).toBe('Starters');
+    expect(kidsYleLevel(24, TOTAL)).toBe('Starters');
+    expect(kidsYleLevel(30, TOTAL)).toBe('Movers');
+    expect(KIDS_YLE_BY_INDEX[6]).toBe('Movers');
+    expect(KIDS_YLE_BY_INDEX[8]).toBe('Flyers');
   });
 });

@@ -452,7 +452,7 @@ describe('kids placement level reflects the whole run, not its tail', () => {
       data = await res.json();
       answered++;
     }
-    return { level: data.level, levelName: data.levelName, answered };
+    return { level: data.level, levelName: data.levelName, yle: data.yle, answered };
   }
 
   it.each([
@@ -472,6 +472,19 @@ describe('kids placement level reflects the whole run, not its tail', () => {
     const { levelName, answered } = await runKidsSession(correct);
     expect(answered).toBe(35); // sampled letter blocks and one combined number activity
     expect(levelName).toBe(expected);
+  });
+
+  it.each([
+    [35, 'Movers'],
+    [30, 'Movers'],
+    [29, 'Starters'],
+    [6, 'Starters'],
+  ])('retains Cambridge YLE level for a kid who gets %i of 35 right', async (correct, expected) => {
+    expect((await runKidsSession(correct)).yle).toBe(expected);
+  });
+
+  it('omits the Cambridge YLE level below Starters', async () => {
+    expect((await runKidsSession(0)).yle).toBeUndefined();
   });
 
 });

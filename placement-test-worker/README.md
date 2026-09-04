@@ -114,7 +114,8 @@ schema extended with image asset support.
   track actually spans A1-C2 in ELC's real curriculum:
   - **adults:** A0, A1, A2, B1, B2, C1 (no C2)
   - **kids:** -A1, A1, A1+, A2, A2+, B1 (only reaches B1, with an extra
-    sub-level between A1 and A2, matching the Super Minds 1-6 course ladder)
+    sub-level between A1 and A2, matching the Super Minds 1-6 course ladder;
+    Cambridge YLE values are retained for reporting but hidden from students)
 
   Same bucket assignment/order as 0003/0005 (position-based, see below) --
   only the label per bucket changes, not which questions are in which

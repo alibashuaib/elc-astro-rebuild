@@ -58,11 +58,12 @@ const { t, locale, whatsappNumber } = Astro.props;
     sessionId: string;
     level: string;
     levelName?: string;
+    /** Retained for reporting, but intentionally hidden from student results. */
+    yle?: string;
   }
 
-  // Kids receive a storage-oriented CEFR code plus the actionable Super Minds
-  // course placement. Show only the course placement; adults retain their
-  // CEFR + ELC band detail.
+  // Kids also carry CEFR and Cambridge YLE values for reporting. Show only the
+  // actionable Super Minds course placement; adults retain CEFR + band detail.
   function formatLevel(detail: DoneDetail): string {
     const isKidsLevel = detail.levelName === 'Pre-Starters'
       || detail.levelName?.startsWith('Super Minds ');

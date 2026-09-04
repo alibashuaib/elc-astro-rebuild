@@ -53,6 +53,20 @@ export function kidsLevel(correct: number, total: number): string {
   return LEVELS_BY_TRACK.kids[kidsLevelIndex(correct, total)];
 }
 
+/**
+ * Cambridge Young Learners exam level per rung. This is retained for reporting
+ * and future use, but the student result screen currently shows only the
+ * actionable Super Minds course placement.
+ */
+export const KIDS_YLE_BY_INDEX: ReadonlyArray<string | undefined> = [
+  undefined, // Pre-Starters
+  'Starters', 'Starters', // Super Minds 1A, 1B
+  'Starters', 'Starters', // Super Minds 2A, 2B
+  'Movers', // Super Minds 3A -- placement ceiling
+  'Movers', // Super Minds 4A
+  'Flyers', 'Flyers', // Super Minds 5A, 6A
+];
+
 /** Rungs the placement test can award, bottom to ceiling. */
 export function kidsPlaceableRungs(): string[] {
   return STAGE_NAMES_BY_TRACK.kids.slice(0, KIDS_CEILING_INDEX + 1);
@@ -65,4 +79,9 @@ export function kidsPlaceableRungs(): string[] {
  */
 export function kidsHiddenRungs(): string[] {
   return STAGE_NAMES_BY_TRACK.kids.slice(KIDS_CEILING_INDEX + 1);
+}
+
+/** Cambridge YLE exam level for a kids placement, or undefined below Starters. */
+export function kidsYleLevel(correct: number, total: number): string | undefined {
+  return KIDS_YLE_BY_INDEX[kidsLevelIndex(correct, total)];
 }

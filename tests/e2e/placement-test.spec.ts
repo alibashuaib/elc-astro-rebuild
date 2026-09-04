@@ -102,7 +102,7 @@ test('kids counting question accepts a dragged number in the empty slot', async 
         'access-control-allow-headers': 'content-type',
         'access-control-allow-methods': 'POST, OPTIONS',
       },
-      body: JSON.stringify({ done: true, correct: true, level: '-A1', levelName: 'Super Minds 2B' }),
+      body: JSON.stringify({ done: true, correct: true, level: '-A1', levelName: 'Super Minds 2B', yle: 'Starters' }),
     });
   });
 
