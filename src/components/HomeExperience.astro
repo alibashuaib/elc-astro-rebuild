@@ -55,7 +55,7 @@ const copy = isArabic ? {
   partnersTitle: 'شراكات أكاديمية وتدريبية موثوقة.',
   partnersText: 'نبني شراكات استراتيجية مع مؤسسات أكاديمية وتدريبية محلية وعالمية لتعزيز الجودة وتوسيع فرص التعلم.',
   partners: [
-    { name: 'المؤسسة العامة للتدريب التقني والمهني', label: 'المؤسسة العامة للتدريب التقني والمهني', logo: '/images/partners/tvtc.png' },
+    { name: 'المؤسسة العامة للتدريب التقني والمهني', label: 'المؤسسة العامة للتدريب التقني والمهني', logo: '/images/partners/tvtc-mark.png' },
     { name: 'ناشيونال جيوغرافيك ليرنينغ', label: 'ناشيونال جيوغرافيك ليرنينغ', logo: '/images/partners/national-geographic-learning.png' },
     { name: 'آيلتس', label: 'آيلتس', logo: '/images/partners/ielts.png' },
     { name: 'المجلس الثقافي البريطاني', label: 'المجلس الثقافي البريطاني', logo: '/images/partners/british-council.png' },
@@ -104,7 +104,7 @@ const copy = isArabic ? {
   partnersTitle: 'Trusted academic and training partnerships.',
   partnersText: 'Building strategic partnerships with local and international academic and training institutions to strengthen quality and expand learning opportunities.',
   partners: [
-    { name: 'Technical and Vocational Training Corporation', label: 'TVTC', logo: '/images/partners/tvtc.png' },
+    { name: 'Technical and Vocational Training Corporation', label: 'TVTC', logo: '/images/partners/tvtc-mark.png' },
     { name: 'National Geographic Learning', label: 'National Geographic Learning', logo: '/images/partners/national-geographic-learning.png' },
     { name: 'IELTS', label: 'IELTS', logo: '/images/partners/ielts.png' },
     { name: 'British Council', label: 'British Council', logo: '/images/partners/british-council.png' },
@@ -214,8 +214,10 @@ const basePath = `/${locale}`;
     <div class="partners-strip">
       {copy.partners.map((partner) => (
         <div class="partner-item">
-          <img class="partner-logo-light" src={partner.logo} alt={partner.name} loading="lazy" width="160" height="64" />
-          <img class="partner-logo-dark" src={partner.logo.replace('.png', '-dark.png')} alt={partner.name} loading="lazy" width="160" height="64" />
+          <span class="partner-logo-frame">
+            <img class="partner-logo-light" src={partner.logo} alt={partner.name} loading="lazy" width="160" height="64" />
+            <img class="partner-logo-dark" src={partner.logo.replace('.png', '-dark.png')} alt={partner.name} loading="lazy" width="160" height="64" />
+          </span>
           <span class="partner-label">{partner.label}</span>
         </div>
       ))}
@@ -310,6 +312,7 @@ const basePath = `/${locale}`;
   .partners-section .split-heading { margin-bottom: 2rem; }
   .partners-strip { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: clamp(1.5rem, 4vw, 3rem); }
   .partner-item { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+  .partner-logo-frame { display: grid; height: clamp(2.1rem, 4vw, 2.75rem); place-items: center; }
   .partner-item img { height: clamp(2.1rem, 4vw, 2.75rem); width: auto; max-width: 9rem; object-fit: contain; filter: grayscale(1) opacity(0.55); transition: filter var(--motion-base) var(--ease), transform var(--motion-base) var(--ease); }
   .partner-logo-dark { display: none; }
   .partner-item:hover img { filter: grayscale(0) opacity(1); transform: translateY(-2px); }
