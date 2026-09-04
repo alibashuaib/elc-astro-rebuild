@@ -1,5 +1,15 @@
 import type { Env, StudentInput, QuestionRow, PassageRow, SessionRow, Track } from './types';
 
+export const KIDS_CAPITAL_QUESTION_IDS = [
+  'kids-A1-1',
+  'kids-A1-2',
+  'kids-A1-3',
+  'kids-A1-4',
+  'kids-A1-5',
+  'kids-A1-6',
+] as const;
+export const KIDS_CAPITAL_QUESTION_LIMIT = 3;
+
 function newId(): string {
   return crypto.randomUUID();
 }
@@ -78,7 +88,14 @@ export async function pickNextQuestion(
   track: Track,
   excludeIds: string[]
 ): Promise<QuestionRow | null> {
-  const placeholders = excludeIds.length ? excludeIds.map(() => '?').join(',') : null;
+  const answeredCapitalCount = excludeIds.filter((id) => KIDS_CAPITAL_QUESTION_IDS.includes(id as typeof KIDS_CAPITAL_QUESTION_IDS[number])).length;
+  // Keep all six capital-letter prompts in the bank, but serve a random three
+  // per kids session. Once three have been answered, excluding the whole block
+  // advances the existing block-order query to the small-letter questions.
+  const effectiveExcludeIds = track === 'kids' && answeredCapitalCount >= KIDS_CAPITAL_QUESTION_LIMIT
+    ? [...new Set([...excludeIds, ...KIDS_CAPITAL_QUESTION_IDS])]
+    : excludeIds;
+  const placeholders = effectiveExcludeIds.length ? effectiveExcludeIds.map(() => '?').join(',') : null;
   const where = placeholders
     ? `track = ? AND active = 1 AND id NOT IN (${placeholders})`
     : `track = ? AND active = 1`;
@@ -94,7 +111,7 @@ export async function pickNextQuestion(
   END ASC, RANDOM()`;
   const order = track === 'kids' ? kidsOrder : 'sequence ASC';
   const sql = `SELECT * FROM questions WHERE ${where} ORDER BY ${order} LIMIT 1`;
-  const binds = placeholders ? [track, ...excludeIds] : [track];
+  const binds = placeholders ? [track, ...effectiveExcludeIds] : [track];
   const row = await env.DB.prepare(sql).bind(...binds).first<QuestionRow>();
   return row ?? null;
 }
@@ -140,15 +157,21 @@ export async function listAnsweredQuestionIds(env: Env, sessionId: string): Prom
   return rows.results?.map((r) => r.question_id) ?? [];
 }
 
-// Total size of a track's active question bank -- used by the frontend to
-// render "question N of total" progress, since the walk-through is a fixed
-// sequential pass over this same set (see pickNextQuestion) rather than an
-// adaptive test with a variable question count.
-export async function countActiveQuestions(env: Env, track: Track): Promise<number> {
+// Total number of questions this session will serve. Kids omit three of the
+// six active capital-letter prompts on every run; adults serve their active
+// bank unchanged (their displayed total is capped separately in session.ts).
+export async function countSessionQuestions(env: Env, track: Track): Promise<number> {
   const row = await env.DB.prepare(`SELECT COUNT(*) AS n FROM questions WHERE track = ? AND active = 1`)
     .bind(track)
     .first<{ n: number }>();
-  return row?.n ?? 0;
+  const total = row?.n ?? 0;
+  if (track !== 'kids') return total;
+  const placeholders = KIDS_CAPITAL_QUESTION_IDS.map(() => '?').join(',');
+  const capitalRow = await env.DB
+    .prepare(`SELECT COUNT(*) AS n FROM questions WHERE active = 1 AND id IN (${placeholders})`)
+    .bind(...KIDS_CAPITAL_QUESTION_IDS)
+    .first<{ n: number }>();
+  return total - Math.max(0, (capitalRow?.n ?? 0) - KIDS_CAPITAL_QUESTION_LIMIT);
 }
 
 // Number of correct responses this session has recorded for questions whose

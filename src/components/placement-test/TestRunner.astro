@@ -15,8 +15,6 @@ const { t } = Astro.props;
   data-answer-error={t('placementTest.answerError')}
   data-answer-submit={t('placementTest.answerSubmit')}
   data-answer-placeholder={t('placementTest.answerPlaceholder')}
-  data-capital-letters={t('placementTest.capitalLetters')}
-  data-small-letters={t('placementTest.smallLetters')}
   data-number-instruction={t('placementTest.numberInstruction')}
   data-number-choices={t('placementTest.numberChoices')}
   data-number-blank={t('placementTest.numberBlank')}
@@ -97,8 +95,6 @@ const { t } = Astro.props;
   const answerErrorText = runner.dataset.answerError ?? '';
   const answerSubmitText = runner.dataset.answerSubmit ?? 'Submit';
   const answerPlaceholderText = runner.dataset.answerPlaceholder ?? 'Type your answer here';
-  const capitalLettersText = runner.dataset.capitalLetters ?? 'Capital letters';
-  const smallLettersText = runner.dataset.smallLetters ?? 'Small letters';
   const numberInstructionText = runner.dataset.numberInstruction ?? 'Drag a number into the empty space.';
   const numberChoicesText = runner.dataset.numberChoices ?? 'Number choices';
   const numberBlankText = runner.dataset.numberBlank ?? 'Empty number space';
@@ -122,15 +118,6 @@ const { t } = Astro.props;
       [result[i], result[j]] = [result[j], result[i]];
     }
     return result;
-  }
-
-  function letterChoices(sourceLetter: string) {
-    const source = sourceLetter.toUpperCase();
-    const distractors = shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter((letter) => letter !== source)).slice(0, 4);
-    return {
-      capitals: shuffle([source, ...distractors.slice(0, 2)]),
-      smalls: shuffle([source.toLowerCase(), ...distractors.slice(2).map((letter) => letter.toLowerCase())]),
-    };
   }
 
   function setProgress(questionNumber: number, total: number) {
@@ -360,33 +347,16 @@ const { t } = Astro.props;
 
     if (letterMatch) {
       const sourceLetter = letterMatch[2];
-      const choices = letterChoices(sourceLetter);
+      const choices = [sourceLetter.toUpperCase(), sourceLetter.toLowerCase()];
       const letterOptions = document.createElement('div');
       letterOptions.className = 'pt-letter-options';
-      const buttons: HTMLButtonElement[] = [];
-      ([
-        [capitalLettersText, choices.capitals, 'capital'],
-        [smallLettersText, choices.smalls, 'small'],
-      ] as const).forEach(([label, letters, kind]) => {
-        const group = document.createElement('section');
-        group.className = `pt-letter-group pt-letter-group-${kind}`;
-        const heading = document.createElement('p');
-        heading.className = 'pt-letter-group-label';
-        heading.textContent = label;
-        const grid = document.createElement('div');
-        grid.className = 'pt-letter-grid';
-        letters.forEach((choice) => {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'pt-letter-choice';
-          button.textContent = choice;
-          button.setAttribute('aria-label', `${label}: ${choice}`);
-          grid.appendChild(button);
-          buttons.push(button);
-        });
-        group.appendChild(heading);
-        group.appendChild(grid);
-        letterOptions.appendChild(group);
+      const buttons = choices.map((choice) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'pt-letter-choice';
+        button.textContent = choice;
+        letterOptions.appendChild(button);
+        return button;
       });
       buttons.forEach((button) => {
         button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, buttons, button);
@@ -775,53 +745,26 @@ const { t } = Astro.props;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    width: min(100%, 40rem);
+    width: min(100%, 30rem);
     margin-inline: auto;
   }
-  #pt-options :global(.pt-letter-group) {
-    display: grid;
-    gap: 0.75rem;
-    padding: 1rem;
-    border: 2px solid color-mix(in srgb, #4d96ff 38%, var(--color-border));
-    border-radius: 1.5rem;
-    background: color-mix(in srgb, #4d96ff 9%, var(--color-bg-raised));
-  }
-  #pt-options :global(.pt-letter-group-small) {
-    border-color: color-mix(in srgb, #e9535d 38%, var(--color-border));
-    background: color-mix(in srgb, #e9535d 9%, var(--color-bg-raised));
-  }
-  #pt-options :global(.pt-letter-group-label) {
-    margin: 0;
-    color: var(--color-ink-muted);
-    font-size: 0.8rem;
-    font-weight: 850;
-    letter-spacing: 0.04em;
-    text-align: center;
-    text-transform: uppercase;
-  }
-  #pt-options :global(.pt-letter-grid) {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.65rem;
-  }
   #pt-options :global(.pt-letter-choice) {
-    min-width: 0;
-    min-height: clamp(5rem, 15vw, 7rem);
+    min-height: clamp(7rem, 22vw, 10rem);
     border: 3px solid rgb(255 255 255 / 0.9);
-    border-radius: 1.35rem;
+    border-radius: 1.75rem;
     color: #fff;
     background: linear-gradient(145deg, #69b8ff, #347fd1);
-    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.25), 0 7px 0 #2262a8, 0 14px 24px rgb(34 98 168 / 0.18);
+    box-shadow: inset 0 5px 0 rgb(255 255 255 / 0.25), 0 9px 0 #2262a8, 0 17px 28px rgb(34 98 168 / 0.2);
     font-family: var(--font-sans);
-    font-size: clamp(2.25rem, 7vw, 3.75rem);
+    font-size: clamp(3rem, 12vw, 5.25rem);
     font-weight: 900;
     line-height: 1;
     cursor: pointer;
     transition: translate var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
   }
-  #pt-options :global(.pt-letter-group-small .pt-letter-choice) {
+  #pt-options :global(.pt-letter-choice:nth-child(2)) {
     background: linear-gradient(145deg, #ff8d91, #e34c59);
-    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.25), 0 7px 0 #a92f3a, 0 14px 24px rgb(169 47 58 / 0.18);
+    box-shadow: inset 0 5px 0 rgb(255 255 255 / 0.25), 0 9px 0 #a92f3a, 0 17px 28px rgb(169 47 58 / 0.2);
   }
   #pt-options :global(.pt-letter-choice:hover:not(:disabled)) { translate: 0 -4px; }
   #pt-options :global(.pt-letter-choice:active:not(:disabled)) { translate: 0 5px; box-shadow: 0 3px 0 #2262a8; }
@@ -1004,10 +947,6 @@ const { t } = Astro.props;
   .pt-number-bank :global(.pt-number-choice:focus-visible),
   .pt-number-sequence :global(.pt-number-blank:focus-visible) { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 3px; }
   .pt-number-bank :global(.pt-number-choice:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect)) { opacity: 0.42; cursor: default; }
-
-  @media (max-width: 620px) {
-    #pt-options :global(.pt-letter-options) { grid-template-columns: 1fr; }
-  }
 
   .pt-picture-word-bank {
     position: sticky;

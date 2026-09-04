@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
 import { handleStartSession, handleAnswer } from './session';
 import { ADULT_BANDS } from '../bands';
+import { KIDS_CAPITAL_QUESTION_IDS } from '../db';
 
 function makeEnv() {
   return {
@@ -455,30 +456,30 @@ describe('kids placement level reflects the whole run, not its tail', () => {
   }
 
   it.each([
-    [44, 'Super Minds 3A'],
-    [37, 'Super Minds 3A'],
-    [36, 'Super Minds 2B'],
-    [30, 'Super Minds 2B'],
-    [29, 'Super Minds 2A'],
-    [22, 'Super Minds 2A'],
-    [21, 'Super Minds 1B'],
-    [15, 'Super Minds 1B'],
-    [14, 'Super Minds 1A'],
-    [8, 'Super Minds 1A'],
-    [7, 'Pre-Starters'],
+    [41, 'Super Minds 3A'],
+    [35, 'Super Minds 3A'],
+    [34, 'Super Minds 2B'],
+    [28, 'Super Minds 2B'],
+    [27, 'Super Minds 2A'],
+    [21, 'Super Minds 2A'],
+    [20, 'Super Minds 1B'],
+    [14, 'Super Minds 1B'],
+    [13, 'Super Minds 1A'],
+    [7, 'Super Minds 1A'],
+    [6, 'Pre-Starters'],
     [0, 'Pre-Starters'],
-  ])('places a kid who gets %i of 44 right at %s', async (correct, expected) => {
+  ])('places a kid who gets %i of 41 right at %s', async (correct, expected) => {
     const { levelName, answered } = await runKidsSession(correct);
-    expect(answered).toBe(44); // the whole bank is always served
+    expect(answered).toBe(41); // three random capital-letter prompts are omitted
     expect(levelName).toBe(expected);
   });
 
   it.each([
-    [44, 'Movers'],
-    [37, 'Movers'],
-    [36, 'Starters'],
-    [8, 'Starters'],
-  ])('reports the Cambridge YLE level for a kid who gets %i of 44 right', async (correct, expected) => {
+    [41, 'Movers'],
+    [35, 'Movers'],
+    [34, 'Starters'],
+    [7, 'Starters'],
+  ])('reports the Cambridge YLE level for a kid who gets %i of 41 right', async (correct, expected) => {
     expect((await runKidsSession(correct)).yle).toBe(expected);
   });
 
@@ -488,8 +489,9 @@ describe('kids placement level reflects the whole run, not its tail', () => {
 });
 
 describe('kids question order is randomized within each exercise block', () => {
-  it('varies which capital-letter item comes first across sessions', async () => {
-    const firstQuestionIds = new Set<string>();
+  it('serves a varying sample of three capital-letter questions per session', async () => {
+    const capitalIds = new Set<string>(KIDS_CAPITAL_QUESTION_IDS);
+    const samples = new Set<string>();
     for (let attempt = 0; attempt < 10; attempt++) {
       const attemptEnv = makeEnv();
       const res = await handleStartSession(
@@ -505,12 +507,26 @@ describe('kids question order is randomized within each exercise block', () => {
         }),
         attemptEnv as any
       );
-      const data = (await res.json()) as any;
-      // Still inside the first block, whichever item within it came up.
-      expect(['kids-A1-1', 'kids-A1-2', 'kids-A1-3', 'kids-A1-4', 'kids-A1-5', 'kids-A1-6']).toContain(data.questionId);
-      firstQuestionIds.add(data.questionId);
+      let data = (await res.json()) as any;
+      const sessionId = data.sessionId;
+      const sample: string[] = [];
+      for (let question = 0; question < 3; question++) {
+        expect(capitalIds.has(data.questionId)).toBe(true);
+        sample.push(data.questionId);
+        const answer = await handleAnswer(
+          new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, skip: true }) }),
+          attemptEnv as any,
+          sessionId
+        );
+        data = await answer.json();
+      }
+      expect(new Set(sample).size).toBe(3);
+      expect(capitalIds.has(data.questionId)).toBe(false);
+      expect(data.questionNumber).toBe(4);
+      expect(data.total).toBe(41);
+      samples.add([...sample].sort().join(','));
     }
-    expect(firstQuestionIds.size).toBeGreaterThan(1);
+    expect(samples.size).toBeGreaterThan(1);
   });
 
   // The replay guard used to re-derive the pending question by calling
@@ -529,7 +545,9 @@ describe('kids question order is randomized within each exercise block', () => {
     let data = (await start.json()) as any;
     const sessionId = data.sessionId;
     let answered = 0;
+    const answeredIds: string[] = [];
     while (!data.done && answered < 200) {
+      answeredIds.push(data.questionId);
       const res = await handleAnswer(
         new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, skip: true }) }),
         env2 as any,
@@ -539,7 +557,8 @@ describe('kids question order is randomized within each exercise block', () => {
       data = await res.json();
       answered++;
     }
-    expect(answered).toBe(44); // the whole bank, no answer rejected mid-run
+    expect(answered).toBe(41); // three capital-letter prompts are sampled out
+    expect(answeredIds.filter((id) => KIDS_CAPITAL_QUESTION_IDS.includes(id as typeof KIDS_CAPITAL_QUESTION_IDS[number]))).toHaveLength(3);
     expect(data.levelName).toBe('Pre-Starters'); // all skipped
   });
 

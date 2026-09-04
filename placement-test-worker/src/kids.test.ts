@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { KIDS_CEILING_INDEX, KIDS_YLE_BY_INDEX, kidsLevelIndex, kidsLevel, kidsYleLevel, kidsPlaceableRungs, kidsHiddenRungs } from './kids';
 import { STAGE_NAMES_BY_TRACK, LEVELS_BY_TRACK } from './scoring';
 
-const TOTAL = 44; // the active kids bank, for readable correct-count cases
+const TOTAL = 41; // three of the six capital-letter prompts are sampled per session
 
 function levelName(correct: number, total = TOTAL) {
   return STAGE_NAMES_BY_TRACK.kids[kidsLevelIndex(correct, total)];
@@ -10,8 +10,8 @@ function levelName(correct: number, total = TOTAL) {
 
 describe('kids placement level', () => {
   it('places a full score at the Super Minds 3A ceiling', () => {
-    expect(levelName(44)).toBe('Super Minds 3A');
-    expect(kidsLevelIndex(44, TOTAL)).toBe(KIDS_CEILING_INDEX);
+    expect(levelName(41)).toBe('Super Minds 3A');
+    expect(kidsLevelIndex(41, TOTAL)).toBe(KIDS_CEILING_INDEX);
   });
 
   it('keeps the upper Super Minds books defined above the ceiling', () => {
@@ -51,19 +51,19 @@ describe('kids placement level', () => {
   // Even sixths of the score range across the six reachable rungs, with the
   // "B" half of each book sitting between the "A" halves.
   it.each([
-    [44, 'Super Minds 3A'],
-    [37, 'Super Minds 3A'],
-    [36, 'Super Minds 2B'],
-    [30, 'Super Minds 2B'],
-    [29, 'Super Minds 2A'],
-    [22, 'Super Minds 2A'],
-    [21, 'Super Minds 1B'],
-    [15, 'Super Minds 1B'],
-    [14, 'Super Minds 1A'],
-    [8, 'Super Minds 1A'],
-    [7, 'Pre-Starters'],
+    [41, 'Super Minds 3A'],
+    [35, 'Super Minds 3A'],
+    [34, 'Super Minds 2B'],
+    [28, 'Super Minds 2B'],
+    [27, 'Super Minds 2A'],
+    [21, 'Super Minds 2A'],
+    [20, 'Super Minds 1B'],
+    [14, 'Super Minds 1B'],
+    [13, 'Super Minds 1A'],
+    [7, 'Super Minds 1A'],
+    [6, 'Pre-Starters'],
     [0, 'Pre-Starters'],
-  ])('places %i/44 correct at %s', (correct, expected) => {
+  ])('places %i/41 correct at %s', (correct, expected) => {
     expect(levelName(correct)).toBe(expected);
   });
 
@@ -92,10 +92,10 @@ describe('kids placement level', () => {
   // Starters (pre-A1), book 3 is Movers (A1).
   it('reports Cambridge-aligned CEFR codes, not the adults ladder', () => {
     expect(kidsLevel(0, TOTAL)).toBe('-A1'); // Pre-Starters
-    expect(kidsLevel(8, TOTAL)).toBe('-A1'); // Super Minds 1A
-    expect(kidsLevel(22, TOTAL)).toBe('-A1'); // Super Minds 2A
-    expect(kidsLevel(30, TOTAL)).toBe('-A1'); // Super Minds 2B -- still book 2
-    expect(kidsLevel(44, TOTAL)).toBe('A1'); // Super Minds 3A
+    expect(kidsLevel(7, TOTAL)).toBe('-A1'); // Super Minds 1A
+    expect(kidsLevel(21, TOTAL)).toBe('-A1'); // Super Minds 2A
+    expect(kidsLevel(28, TOTAL)).toBe('-A1'); // Super Minds 2B -- still book 2
+    expect(kidsLevel(41, TOTAL)).toBe('A1'); // Super Minds 3A
   });
 
   it('aligns the hidden rungs to Movers and Flyers too', () => {
@@ -107,17 +107,17 @@ describe('kids placement level', () => {
   });
 
   it('reports the Cambridge YLE exam level for each rung', () => {
-    expect(kidsYleLevel(8, TOTAL)).toBe('Starters'); // Super Minds 1A
-    expect(kidsYleLevel(15, TOTAL)).toBe('Starters'); // Super Minds 1B
-    expect(kidsYleLevel(22, TOTAL)).toBe('Starters'); // Super Minds 2A
-    expect(kidsYleLevel(30, TOTAL)).toBe('Starters'); // Super Minds 2B
-    expect(kidsYleLevel(44, TOTAL)).toBe('Movers'); // Super Minds 3A
+    expect(kidsYleLevel(7, TOTAL)).toBe('Starters'); // Super Minds 1A
+    expect(kidsYleLevel(14, TOTAL)).toBe('Starters'); // Super Minds 1B
+    expect(kidsYleLevel(21, TOTAL)).toBe('Starters'); // Super Minds 2A
+    expect(kidsYleLevel(28, TOTAL)).toBe('Starters'); // Super Minds 2B
+    expect(kidsYleLevel(41, TOTAL)).toBe('Movers'); // Super Minds 3A
   });
 
   it('has no YLE level below Starters', () => {
     // Pre-Starters sits beneath the lowest YLE exam, so it maps to nothing.
     expect(kidsYleLevel(0, TOTAL)).toBeUndefined();
-    expect(kidsYleLevel(7, TOTAL)).toBeUndefined();
+    expect(kidsYleLevel(6, TOTAL)).toBeUndefined();
   });
 
   it('never reports a YLE level that contradicts the CEFR code', () => {
