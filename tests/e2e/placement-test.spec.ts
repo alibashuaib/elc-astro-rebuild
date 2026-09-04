@@ -68,11 +68,12 @@ test('kids placement test starts, renders a question and grades an answer', asyn
 test('kids counting question accepts a dragged number in the empty slot', async ({ page }) => {
   const errors = failOnConsoleErrors(page);
   await page.route('**/api/session', async (route) => {
+    const pageOrigin = new URL(page.url()).origin;
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
       headers: {
-        'access-control-allow-origin': 'http://127.0.0.1:4321',
+        'access-control-allow-origin': pageOrigin,
         'access-control-allow-credentials': 'true',
         'access-control-allow-headers': 'content-type',
         'access-control-allow-methods': 'POST, OPTIONS',
@@ -91,11 +92,12 @@ test('kids counting question accepts a dragged number in the empty slot', async 
     });
   });
   await page.route('**/api/session/smoke-counting/answer', async (route) => {
+    const pageOrigin = new URL(page.url()).origin;
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
       headers: {
-        'access-control-allow-origin': 'http://127.0.0.1:4321',
+        'access-control-allow-origin': pageOrigin,
         'access-control-allow-credentials': 'true',
         'access-control-allow-headers': 'content-type',
         'access-control-allow-methods': 'POST, OPTIONS',
