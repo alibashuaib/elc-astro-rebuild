@@ -15,6 +15,11 @@ const { t } = Astro.props;
   data-answer-error={t('placementTest.answerError')}
   data-answer-submit={t('placementTest.answerSubmit')}
   data-answer-placeholder={t('placementTest.answerPlaceholder')}
+  data-capital-letters={t('placementTest.capitalLetters')}
+  data-small-letters={t('placementTest.smallLetters')}
+  data-number-instruction={t('placementTest.numberInstruction')}
+  data-number-choices={t('placementTest.numberChoices')}
+  data-number-blank={t('placementTest.numberBlank')}
   data-reading-passage={t('placementTest.readingPassage')}
   data-correct={t('placementTest.correct')}
   data-incorrect={t('placementTest.incorrect')}
@@ -43,8 +48,9 @@ const { t } = Astro.props;
     <span class="pt-image-spark pt-image-spark-two" aria-hidden="true">●</span>
     <img id="pt-image" class="pt-image" alt="" />
   </div>
-  <div id="pt-counting-strip" class="pt-counting-strip" aria-label="Count in order from 1 to 7" hidden>
-    <button type="button">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button><button type="button">6</button><button type="button">7</button>
+  <div id="pt-counting-strip" class="pt-counting-strip" hidden>
+    <div id="pt-number-sequence" class="pt-number-sequence" aria-label="Count in order from 1 to 7"></div>
+    <div id="pt-number-bank" class="pt-number-bank"></div>
   </div>
   <div id="pt-picture-word-bank" class="pt-picture-word-bank" aria-label="Choose from these words" hidden>
     <button type="button">Book</button><button type="button">Pen</button><button type="button">Car</button><button type="button">Tree</button><button type="button">Apple</button>
@@ -77,6 +83,8 @@ const { t } = Astro.props;
   const imageStageEl = document.getElementById('pt-image-stage') as HTMLElement;
   const imageEl = document.getElementById('pt-image') as HTMLImageElement;
   const countingStripEl = document.getElementById('pt-counting-strip') as HTMLElement;
+  const numberSequenceEl = document.getElementById('pt-number-sequence') as HTMLElement;
+  const numberBankEl = document.getElementById('pt-number-bank') as HTMLElement;
   const pictureWordBankEl = document.getElementById('pt-picture-word-bank') as HTMLElement;
   const roomWordBankEl = document.getElementById('pt-room-word-bank') as HTMLElement;
   const actionWordBankEl = document.getElementById('pt-action-word-bank') as HTMLElement;
@@ -89,6 +97,11 @@ const { t } = Astro.props;
   const answerErrorText = runner.dataset.answerError ?? '';
   const answerSubmitText = runner.dataset.answerSubmit ?? 'Submit';
   const answerPlaceholderText = runner.dataset.answerPlaceholder ?? 'Type your answer here';
+  const capitalLettersText = runner.dataset.capitalLetters ?? 'Capital letters';
+  const smallLettersText = runner.dataset.smallLetters ?? 'Small letters';
+  const numberInstructionText = runner.dataset.numberInstruction ?? 'Drag a number into the empty space.';
+  const numberChoicesText = runner.dataset.numberChoices ?? 'Number choices';
+  const numberBlankText = runner.dataset.numberBlank ?? 'Empty number space';
   const readingPassageLabel = runner.dataset.readingPassage ?? 'Reading passage';
   const correctText = runner.dataset.correct ?? 'Correct!';
   const incorrectText = runner.dataset.incorrect ?? 'Incorrect';
@@ -101,6 +114,24 @@ const { t } = Astro.props;
   const FEEDBACK_DELAY_MS = 1100;
   let sessionId = '';
   let lastPassageId = '';
+
+  function shuffle<T>(values: T[]): T[] {
+    const result = [...values];
+    for (let i = result.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
+
+  function letterChoices(sourceLetter: string) {
+    const source = sourceLetter.toUpperCase();
+    const distractors = shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter((letter) => letter !== source)).slice(0, 4);
+    return {
+      capitals: shuffle([source, ...distractors.slice(0, 2)]),
+      smalls: shuffle([source.toLowerCase(), ...distractors.slice(2).map((letter) => letter.toLowerCase())]),
+    };
+  }
 
   function setProgress(questionNumber: number, total: number) {
     progressEl.textContent = total > 0 ? `${questionLabel} ${questionNumber} / ${total}` : `${questionLabel} ${questionNumber}`;
@@ -203,7 +234,8 @@ const { t } = Astro.props;
       imageEl.removeAttribute('src');
     }
     const countingPrefix = /^Count in order:\s*1,\s*2,\s*3,\s*4,\s*5,\s*6,\s*7\.\s*/i;
-    const isCountingQuestion = countingPrefix.test(step.prompt);
+    const countingMatch = step.prompt.match(/What number comes right (after|before) ([1-7])\?$/i);
+    const isCountingQuestion = countingPrefix.test(step.prompt) && Boolean(countingMatch);
     const isPictureMatch = /^Match the picture to the word:/i.test(step.prompt);
     const isRoomPicture = /\/(sofa|curtain|picture|tv|lamps)(?:-3d)?\.(?:svg|png)$/i.test(imageUrl ?? '');
     const actionWordPrefix = /^Word bank:\s*climbing,\s*flying,\s*playing,\s*riding,\s*throwing\.\s*/i;
@@ -215,7 +247,7 @@ const { t } = Astro.props;
     actionWordBankEl.hidden = !isActionWordQuestion;
     imageStageEl.classList.toggle('is-match-picture', isPictureMatch || isRoomPicture || isActionWordQuestion);
     promptEl.textContent = isCountingQuestion
-      ? step.prompt.replace(countingPrefix, '')
+      ? numberInstructionText
       : isPictureMatch
         ? 'Which word matches this picture?'
         : letterMatch
@@ -257,27 +289,104 @@ const { t } = Astro.props;
     }
 
     if (isCountingQuestion) {
-      const numberButtons = Array.from(countingStripEl.querySelectorAll('button')) as HTMLButtonElement[];
+      const direction = countingMatch?.[1].toLowerCase();
+      const anchor = Number(countingMatch?.[2]);
+      const missingNumber = direction === 'after' ? anchor + 1 : anchor - 1;
+      numberSequenceEl.innerHTML = '';
+      numberBankEl.innerHTML = '';
+      numberBankEl.setAttribute('aria-label', numberChoicesText);
+
+      let blank: HTMLButtonElement | null = null;
+      for (let number = 1; number <= 7; number += 1) {
+        if (number === missingNumber) {
+          blank = document.createElement('button');
+          blank.type = 'button';
+          blank.className = 'pt-number-slot pt-number-blank';
+          blank.setAttribute('aria-label', numberBlankText);
+          numberSequenceEl.appendChild(blank);
+        } else {
+          const fixed = document.createElement('span');
+          fixed.className = 'pt-number-slot pt-number-fixed';
+          fixed.textContent = String(number);
+          fixed.setAttribute('aria-hidden', 'true');
+          numberSequenceEl.appendChild(fixed);
+        }
+      }
+
+      if (!blank) return;
+      const distractors = shuffle([1, 2, 3, 4, 5, 6, 7].filter((number) => number !== missingNumber)).slice(0, 2);
+      const choices = shuffle([missingNumber, ...distractors]);
+      const numberButtons = choices.map((number) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'pt-number-choice';
+        button.textContent = String(number);
+        button.dataset.value = String(number);
+        button.draggable = true;
+        numberBankEl.appendChild(button);
+        return button;
+      });
+
+      const submitNumber = (button: HTMLButtonElement) => {
+        if (!blank || button.disabled) return;
+        blank.textContent = button.dataset.value ?? '';
+        blank.classList.add('pt-number-filled');
+        handleSubmit(step, { answerText: button.dataset.value ?? '' }, [...numberButtons, blank], blank);
+      };
       numberButtons.forEach((button) => {
-        button.disabled = false;
-        button.classList.remove('pt-selected-correct', 'pt-selected-incorrect');
-        button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, numberButtons, button);
+        button.onclick = () => submitNumber(button);
+        button.addEventListener('dragstart', (event) => {
+          event.dataTransfer?.setData('text/plain', button.dataset.value ?? '');
+          if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+          button.classList.add('is-dragging');
+        });
+        button.addEventListener('dragend', () => button.classList.remove('is-dragging'));
+      });
+      blank.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+        blank?.classList.add('is-drag-over');
+      });
+      blank.addEventListener('dragleave', () => blank?.classList.remove('is-drag-over'));
+      blank.addEventListener('drop', (event) => {
+        event.preventDefault();
+        blank?.classList.remove('is-drag-over');
+        const value = event.dataTransfer?.getData('text/plain');
+        const button = numberButtons.find((candidate) => candidate.dataset.value === value);
+        if (button) submitNumber(button);
       });
       return;
     }
 
     if (letterMatch) {
       const sourceLetter = letterMatch[2];
-      const choices = [sourceLetter.toUpperCase(), sourceLetter.toLowerCase()];
+      const choices = letterChoices(sourceLetter);
       const letterOptions = document.createElement('div');
       letterOptions.className = 'pt-letter-options';
-      const buttons = choices.map((choice) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'pt-letter-choice';
-        button.textContent = choice;
-        letterOptions.appendChild(button);
-        return button;
+      const buttons: HTMLButtonElement[] = [];
+      ([
+        [capitalLettersText, choices.capitals, 'capital'],
+        [smallLettersText, choices.smalls, 'small'],
+      ] as const).forEach(([label, letters, kind]) => {
+        const group = document.createElement('section');
+        group.className = `pt-letter-group pt-letter-group-${kind}`;
+        const heading = document.createElement('p');
+        heading.className = 'pt-letter-group-label';
+        heading.textContent = label;
+        const grid = document.createElement('div');
+        grid.className = 'pt-letter-grid';
+        letters.forEach((choice) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'pt-letter-choice';
+          button.textContent = choice;
+          button.setAttribute('aria-label', `${label}: ${choice}`);
+          grid.appendChild(button);
+          buttons.push(button);
+        });
+        group.appendChild(heading);
+        group.appendChild(grid);
+        letterOptions.appendChild(group);
       });
       buttons.forEach((button) => {
         button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, buttons, button);
@@ -666,26 +775,53 @@ const { t } = Astro.props;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    width: min(100%, 30rem);
+    width: min(100%, 40rem);
     margin-inline: auto;
   }
+  #pt-options :global(.pt-letter-group) {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 2px solid color-mix(in srgb, #4d96ff 38%, var(--color-border));
+    border-radius: 1.5rem;
+    background: color-mix(in srgb, #4d96ff 9%, var(--color-bg-raised));
+  }
+  #pt-options :global(.pt-letter-group-small) {
+    border-color: color-mix(in srgb, #e9535d 38%, var(--color-border));
+    background: color-mix(in srgb, #e9535d 9%, var(--color-bg-raised));
+  }
+  #pt-options :global(.pt-letter-group-label) {
+    margin: 0;
+    color: var(--color-ink-muted);
+    font-size: 0.8rem;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  #pt-options :global(.pt-letter-grid) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
   #pt-options :global(.pt-letter-choice) {
-    min-height: clamp(7rem, 22vw, 10rem);
+    min-width: 0;
+    min-height: clamp(5rem, 15vw, 7rem);
     border: 3px solid rgb(255 255 255 / 0.9);
-    border-radius: 1.75rem;
+    border-radius: 1.35rem;
     color: #fff;
     background: linear-gradient(145deg, #69b8ff, #347fd1);
-    box-shadow: inset 0 5px 0 rgb(255 255 255 / 0.25), 0 9px 0 #2262a8, 0 17px 28px rgb(34 98 168 / 0.2);
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.25), 0 7px 0 #2262a8, 0 14px 24px rgb(34 98 168 / 0.18);
     font-family: var(--font-sans);
-    font-size: clamp(3rem, 12vw, 5.25rem);
+    font-size: clamp(2.25rem, 7vw, 3.75rem);
     font-weight: 900;
     line-height: 1;
     cursor: pointer;
     transition: translate var(--motion-fast) var(--ease), box-shadow var(--motion-fast) var(--ease);
   }
-  #pt-options :global(.pt-letter-choice:nth-child(2)) {
+  #pt-options :global(.pt-letter-group-small .pt-letter-choice) {
     background: linear-gradient(145deg, #ff8d91, #e34c59);
-    box-shadow: inset 0 5px 0 rgb(255 255 255 / 0.25), 0 9px 0 #a92f3a, 0 17px 28px rgb(169 47 58 / 0.2);
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.25), 0 7px 0 #a92f3a, 0 14px 24px rgb(169 47 58 / 0.18);
   }
   #pt-options :global(.pt-letter-choice:hover:not(:disabled)) { translate: 0 -4px; }
   #pt-options :global(.pt-letter-choice:active:not(:disabled)) { translate: 0 5px; box-shadow: 0 3px 0 #2262a8; }
@@ -795,11 +931,9 @@ const { t } = Astro.props;
   }
   .pt-counting-strip {
     justify-self: center;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: clamp(0.4rem, 2vw, 0.75rem);
-    width: min(100%, 34rem);
+    display: grid;
+    gap: 1rem;
+    width: min(100%, 40rem);
     padding: 1rem;
     border: 2px solid rgb(246 173 67 / 0.5);
     border-radius: 1.75rem;
@@ -809,7 +943,21 @@ const { t } = Astro.props;
 
   .pt-counting-strip[hidden] { display: none; }
 
-  .pt-counting-strip :global(button) {
+  .pt-number-sequence,
+  .pt-number-bank {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(0.4rem, 2vw, 0.75rem);
+  }
+
+  .pt-number-bank {
+    padding-top: 1rem;
+    border-top: 2px dashed rgb(185 107 16 / 0.28);
+  }
+
+  .pt-counting-strip :global(.pt-number-slot),
+  .pt-counting-strip :global(.pt-number-choice) {
     display: grid;
     width: clamp(2.65rem, 9vw, 3.6rem);
     height: clamp(2.65rem, 9vw, 3.6rem);
@@ -822,38 +970,43 @@ const { t } = Astro.props;
     font-family: var(--font-mono);
     font-size: clamp(1.15rem, 4vw, 1.55rem);
     font-weight: 900;
-    cursor: pointer;
     transition: translate var(--motion-fast) var(--ease), filter var(--motion-fast) var(--ease);
   }
 
-  .pt-counting-strip :global(button:hover:not(:disabled)) { translate: 0 -5px; filter: brightness(1.06); }
+  .pt-number-sequence :global(.pt-number-slot:nth-child(2)),
+  .pt-number-sequence :global(.pt-number-slot:nth-child(6)) { background: #ff6b6b; box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #c53e3e, 0 10px 14px rgb(197 62 62 / 0.2); }
+  .pt-number-sequence :global(.pt-number-slot:nth-child(3)),
+  .pt-number-sequence :global(.pt-number-slot:nth-child(7)) { background: #35ad71; box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #207c4d, 0 10px 14px rgb(32 124 77 / 0.2); }
+  .pt-number-sequence :global(.pt-number-slot:nth-child(4)) { background: #9b67db; box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #6c3ca6, 0 10px 14px rgb(108 60 166 / 0.2); }
+  .pt-number-sequence :global(.pt-number-slot:nth-child(5)) { background: #f39a28; box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #b96b10, 0 10px 14px rgb(185 107 16 / 0.2); }
 
-  .pt-counting-strip :global(button:active:not(:disabled)) { translate: 0 3px; }
-
-  .pt-counting-strip :global(button:focus-visible) { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 3px; }
-
-  .pt-counting-strip :global(button:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect)) { opacity: 0.42; cursor: default; }
-
-  .pt-counting-strip :global(button:nth-child(2)),
-  .pt-counting-strip :global(button:nth-child(6)) {
-    background: #ff6b6b;
-    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #c53e3e, 0 10px 14px rgb(197 62 62 / 0.2);
+  .pt-counting-strip :global(.pt-number-blank) {
+    border: 3px dashed #b96b10;
+    color: var(--color-ink);
+    background: rgb(255 255 255 / 0.72);
+    box-shadow: inset 0 0 0 4px rgb(246 173 67 / 0.12);
   }
+  .pt-counting-strip :global(.pt-number-blank::before) { content: '?'; opacity: 0.45; }
+  .pt-counting-strip :global(.pt-number-blank.pt-number-filled::before) { content: none; }
+  .pt-counting-strip :global(.pt-number-blank.is-drag-over) { scale: 1.08; border-color: #3488b5; background: #fff; }
 
-  .pt-counting-strip :global(button:nth-child(3)),
-  .pt-counting-strip :global(button:nth-child(7)) {
-    background: #35ad71;
-    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #207c4d, 0 10px 14px rgb(32 124 77 / 0.2);
+  .pt-number-bank :global(.pt-number-choice) {
+    cursor: grab;
+    background: #3488b5;
+    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #24668b, 0 10px 14px rgb(36 102 139 / 0.2);
+    touch-action: manipulation;
   }
+  .pt-number-bank :global(.pt-number-choice:nth-child(2)) { background: #e9535d; box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #a92f38, 0 10px 14px rgb(169 47 56 / 0.2); }
+  .pt-number-bank :global(.pt-number-choice:nth-child(3)) { background: #35a86f; box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #23774e, 0 10px 14px rgb(35 119 78 / 0.2); }
+  .pt-number-bank :global(.pt-number-choice:hover:not(:disabled)) { translate: 0 -5px; filter: brightness(1.06); }
+  .pt-number-bank :global(.pt-number-choice:active:not(:disabled)) { cursor: grabbing; translate: 0 3px; }
+  .pt-number-bank :global(.pt-number-choice.is-dragging) { opacity: 0.45; }
+  .pt-number-bank :global(.pt-number-choice:focus-visible),
+  .pt-number-sequence :global(.pt-number-blank:focus-visible) { outline: 4px solid rgb(52 136 181 / 0.24); outline-offset: 3px; }
+  .pt-number-bank :global(.pt-number-choice:disabled:not(.pt-selected-correct):not(.pt-selected-incorrect)) { opacity: 0.42; cursor: default; }
 
-  .pt-counting-strip :global(button:nth-child(4)) {
-    background: #9b67db;
-    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #6c3ca6, 0 10px 14px rgb(108 60 166 / 0.2);
-  }
-
-  .pt-counting-strip :global(button:nth-child(5)) {
-    background: #f39a28;
-    box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #b96b10, 0 10px 14px rgb(185 107 16 / 0.2);
+  @media (max-width: 620px) {
+    #pt-options :global(.pt-letter-options) { grid-template-columns: 1fr; }
   }
 
   .pt-picture-word-bank {

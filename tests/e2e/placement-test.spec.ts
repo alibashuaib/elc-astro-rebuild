@@ -35,6 +35,22 @@ test('kids placement test starts, renders a question and grades an answer', asyn
   const runner = page.locator('#placement-test-runner');
   await expect(runner).toBeVisible();
   await expect(page.locator('#pt-progress')).toContainText('1 / 44');
+  const capitalChoices = page.locator('.pt-letter-group-capital .pt-letter-choice');
+  const smallChoices = page.locator('.pt-letter-group-small .pt-letter-choice');
+  await expect(capitalChoices).toHaveCount(3);
+  await expect(smallChoices).toHaveCount(3);
+  const capitals = await capitalChoices.allTextContents();
+  const smalls = await smallChoices.allTextContents();
+  expect(capitals).toHaveLength(3);
+  expect(smalls).toHaveLength(3);
+  expect(new Set(capitals).size).toBe(3);
+  expect(new Set(smalls).size).toBe(3);
+  expect(capitals.every((letter) => /^[A-Z]$/.test(letter))).toBe(true);
+  expect(smalls.every((letter) => /^[a-z]$/.test(letter))).toBe(true);
+  const sourceLetter = ((await page.locator('#pt-prompt').textContent()) ?? '').match(/“([A-Za-z])”/)?.[1];
+  expect(sourceLetter).toBeTruthy();
+  expect(capitals).toContain(sourceLetter!.toUpperCase());
+  expect(smalls).toContain(sourceLetter!.toLowerCase());
 
   // Whatever the shuffle served, some control must be clickable -- a letter
   // card, an option button, the counting strip, or a word bank.
@@ -55,6 +71,65 @@ test('kids placement test starts, renders a question and grades an answer', asyn
   await expect
     .poll(async () => (await page.locator('#pt-progress').textContent()) ?? '', { timeout: 10_000 })
     .not.toContain('1 / 44');
+
+  expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+});
+
+test('kids counting question accepts a dragged number in the empty slot', async ({ page }) => {
+  const errors = failOnConsoleErrors(page);
+  await page.route('**/api/session', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: {
+        'access-control-allow-origin': 'http://127.0.0.1:4321',
+        'access-control-allow-credentials': 'true',
+        'access-control-allow-headers': 'content-type',
+        'access-control-allow-methods': 'POST, OPTIONS',
+      },
+      body: JSON.stringify({
+        done: false,
+        sessionId: 'smoke-counting',
+        track: 'kids',
+        questionId: 'kids-A2-6',
+        type: 'text',
+        prompt: 'Count in order: 1, 2, 3, 4, 5, 6, 7. What number comes right after 1?',
+        questionNumber: 13,
+        total: 44,
+        skipAvailable: true,
+      }),
+    });
+  });
+  await page.route('**/api/session/smoke-counting/answer', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      headers: {
+        'access-control-allow-origin': 'http://127.0.0.1:4321',
+        'access-control-allow-credentials': 'true',
+        'access-control-allow-headers': 'content-type',
+        'access-control-allow-methods': 'POST, OPTIONS',
+      },
+      body: JSON.stringify({ done: true, correct: true, level: 'A1', levelName: 'Super Minds 1' }),
+    });
+  });
+
+  await startKidsTest(page);
+
+  const sequence = page.locator('#pt-number-sequence');
+  const blank = sequence.locator('.pt-number-blank');
+  const correctNumber = page.locator('#pt-number-bank .pt-number-choice').filter({ hasText: /^2$/ });
+  await expect(sequence.locator('.pt-number-slot')).toHaveCount(7);
+  await expect(blank).toHaveCount(1);
+  await expect(page.locator('#pt-number-bank .pt-number-choice')).toHaveCount(3);
+  await expect(correctNumber).toHaveAttribute('draggable', 'true');
+
+  const answerRequest = page.waitForRequest('**/api/session/smoke-counting/answer');
+  await correctNumber.dragTo(blank);
+  const request = await answerRequest;
+  expect(request.postDataJSON()).toMatchObject({ questionId: 'kids-A2-6', answerText: '2' });
+  await expect(blank).toHaveText('2');
+  await expect(blank).toHaveClass(/pt-selected-correct/);
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });
