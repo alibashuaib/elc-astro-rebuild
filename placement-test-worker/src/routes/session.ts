@@ -106,6 +106,11 @@ export async function handleStartSession(req: Request, env: Env): Promise<Respon
   if (!body.name || !body.phone || !body.dob || !body.locale) {
     return json({ error: 'name, phone, dob, and locale are required' }, 400);
   }
+  // The browser uses the 10-digit local form. Accept the equivalent Saudi
+  // international form for API clients and existing integrations.
+  if (!/^(?:05\d{8}|\+9665\d{8})$/.test(body.phone)) {
+    return json({ error: 'phone must be a Saudi mobile number (05xxxxxxxx)' }, 400);
+  }
   const requestedTrack = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
   const track = isUnderEleven(body.dob) ? 'kids' : requestedTrack;
   const studentId = await insertStudent(env, body);

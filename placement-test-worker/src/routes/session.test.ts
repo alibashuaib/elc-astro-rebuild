@@ -31,6 +31,16 @@ describe('session routes', () => {
     expect(data.prompt).toBeDefined();
   });
 
+  it('rejects a phone number that is not a Saudi mobile number', async () => {
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify({ name: 'Sam', phone: '0612345678', dob: '1995-01-01', locale: 'en' }),
+    });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+    await expect(res.json()).resolves.toEqual({ error: 'phone must be a Saudi mobile number (05xxxxxxxx)' });
+  });
+
   describe('answer submissions are bound to the question the session is on', () => {
     async function startAdultSession() {
       const res = await handleStartSession(
@@ -435,8 +445,8 @@ describe('text-type question grading', () => {
       return (await response.json()) as any;
     }
 
-    expect((await grade(correctAnswer, `correct-${questionId}`)).correct).toBe(true);
-    expect((await grade(wrongAnswer, `wrong-${questionId}`)).correct).toBe(false);
+    expect((await grade(correctAnswer, '0500000000')).correct).toBe(true);
+    expect((await grade(wrongAnswer, '0500000001')).correct).toBe(false);
   });
 });
 
@@ -523,7 +533,7 @@ describe('kids question order is randomized within each exercise block', () => {
           method: 'POST',
           body: JSON.stringify({
             name: 'Kid',
-            phone: `+9665000001${attempt}`,
+          phone: `05000000${String(attempt).padStart(2, '0')}`,
             dob: '2018-01-01',
             locale: 'en',
             track: 'kids',

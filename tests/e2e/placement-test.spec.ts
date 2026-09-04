@@ -20,7 +20,7 @@ function failOnConsoleErrors(page: Page): string[] {
 async function startKidsTest(page: Page) {
   await page.goto('/en/placement-test/');
   await page.getByLabel('Full name').fill('Smoke Test');
-  await page.getByLabel('WhatsApp number').fill('+966500000000');
+  await page.getByLabel('WhatsApp number').fill('0500000000');
   // Under 11, so the form assigns the kids track on its own.
   await page.getByLabel('Date of birth').fill('2018-01-01');
   await page.getByLabel('Guardian name').fill('Guardian');
@@ -150,4 +150,18 @@ test('the registration form assigns under-11 students to the kids track', async 
   await expect(page.getByLabel('Guardian name')).toBeVisible();
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
+});
+
+test('the registration form limits WhatsApp numbers to a Saudi mobile number', async ({ page }) => {
+  await page.goto('/en/placement-test/');
+  const phone = page.getByLabel('WhatsApp number');
+
+  await phone.fill('051234567890');
+  await expect(phone).toHaveValue('0512345678');
+
+  await phone.fill('0612345678');
+  expect(await phone.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);
+
+  await phone.fill('0512345678');
+  expect(await phone.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
 });
