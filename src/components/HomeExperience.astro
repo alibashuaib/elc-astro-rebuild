@@ -320,8 +320,7 @@ const basePath = `/${locale}`;
     }
     :global(:root:not([data-theme='light'])) .partner-logo-dark {
       display: block;
-      filter: none;
-      opacity: .85;
+      filter: grayscale(1) brightness(0) invert(1) opacity(.72);
     }
     :global(:root:not([data-theme='light'])) .partner-item:hover .partner-logo-dark {
       filter: none;
@@ -333,8 +332,7 @@ const basePath = `/${locale}`;
   }
   :global(:root[data-theme='dark']) .partner-logo-dark {
     display: block;
-    filter: none;
-    opacity: .85;
+    filter: grayscale(1) brightness(0) invert(1) opacity(.72);
   }
   :global(:root[data-theme='dark']) .partner-item:hover .partner-logo-dark {
     filter: none;
