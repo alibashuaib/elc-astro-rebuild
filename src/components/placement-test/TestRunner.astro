@@ -155,7 +155,7 @@ const { t } = Astro.props;
         () => {
           if (next.done) {
             progressFillEl.style.width = '100%';
-            document.dispatchEvent(new CustomEvent('placement:done', { detail: { level: next.level, levelName: next.levelName, yle: next.yle, sessionId } }));
+            document.dispatchEvent(new CustomEvent('placement:done', { detail: { level: next.level, levelName: next.levelName, sessionId } }));
             runner.hidden = true;
           } else {
             renderQuestion(next);
@@ -523,7 +523,7 @@ const { t } = Astro.props;
     document.dispatchEvent(new CustomEvent('placement:started'));
     if (step.done) {
       document.dispatchEvent(
-        new CustomEvent('placement:done', { detail: { level: step.level, levelName: step.levelName, yle: step.yle, sessionId } })
+        new CustomEvent('placement:done', { detail: { level: step.level, levelName: step.levelName, sessionId } })
       );
       runner.hidden = true;
       return;

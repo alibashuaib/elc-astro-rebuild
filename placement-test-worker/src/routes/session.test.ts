@@ -452,7 +452,7 @@ describe('kids placement level reflects the whole run, not its tail', () => {
       data = await res.json();
       answered++;
     }
-    return { level: data.level, levelName: data.levelName, yle: data.yle, answered };
+    return { level: data.level, levelName: data.levelName, answered };
   }
 
   it.each([
@@ -474,18 +474,6 @@ describe('kids placement level reflects the whole run, not its tail', () => {
     expect(levelName).toBe(expected);
   });
 
-  it.each([
-    [35, 'Movers'],
-    [30, 'Movers'],
-    [29, 'Starters'],
-    [6, 'Starters'],
-  ])('reports the Cambridge YLE level for a kid who gets %i of 35 right', async (correct, expected) => {
-    expect((await runKidsSession(correct)).yle).toBe(expected);
-  });
-
-  it('omits the YLE level below Starters', async () => {
-    expect((await runKidsSession(0)).yle).toBeUndefined();
-  });
 });
 
 describe('kids question order is randomized within each exercise block', () => {

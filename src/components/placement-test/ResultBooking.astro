@@ -58,19 +58,15 @@ const { t, locale, whatsappNumber } = Astro.props;
     sessionId: string;
     level: string;
     levelName?: string;
-    /** Cambridge YLE exam level -- kids only, and absent below Starters. */
-    yle?: string;
   }
 
-  // Kids receive several equivalent labels from the worker (CEFR, Cambridge
-  // YLE, and the ELC course placement). Showing all three looks like conflicting
-  // scores, so present only the actionable Super Minds course level. Adults
-  // retain their CEFR + ELC band detail.
+  // Kids receive a storage-oriented CEFR code plus the actionable Super Minds
+  // course placement. Show only the course placement; adults retain their
+  // CEFR + ELC band detail.
   function formatLevel(detail: DoneDetail): string {
-    const isKidsLevel = Boolean(detail.yle)
-      || detail.levelName === 'Pre-Starters'
+    const isKidsLevel = detail.levelName === 'Pre-Starters'
       || detail.levelName?.startsWith('Super Minds ');
-    if (isKidsLevel) return detail.levelName ?? detail.yle ?? detail.level;
+    if (isKidsLevel) return detail.levelName ?? detail.level;
     const parts = [detail.level, detail.levelName].filter(Boolean) as string[];
     return [...new Set(parts)].join(' · ');
   }
