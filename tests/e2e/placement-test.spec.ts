@@ -121,8 +121,16 @@ test('kids counting question accepts a dragged number in the empty slot', async 
   for (let index = 0; index < missingNumbers.length; index++) {
     const number = missingNumbers[index];
     const choice = page.locator('#pt-number-bank .pt-number-choice').filter({ hasText: new RegExp(`^${number}$`) });
+    const blank = blanks.nth(index);
     await expect(choice).toHaveAttribute('draggable', 'true');
-    await choice.dragTo(blanks.nth(index));
+    // Explicit drag events are deterministic in both Linux CI and macOS;
+    // Locator.dragTo can occasionally omit the drop event in headless Chromium.
+    const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
+    await choice.dispatchEvent('dragstart', { dataTransfer });
+    await blank.dispatchEvent('drop', { dataTransfer });
+    await choice.dispatchEvent('dragend', { dataTransfer });
+    await dataTransfer.dispose();
+    await expect(blank).toHaveText(String(number));
   }
   const request = await answerRequest;
   expect(request.postDataJSON()).toMatchObject({ questionId: 'kids-A2-6', answerText: '1,2,3,4,5,6,7' });
