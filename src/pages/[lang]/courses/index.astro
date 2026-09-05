@@ -77,4 +77,8 @@ const breadcrumbs = breadcrumbSchema(trail(locale, ['courses']));
     gap: var(--space-4);
     margin-top: var(--space-5);
   }
+  @media (min-width: 64rem) {
+    .course-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .course-grid > :global(:last-child:nth-child(3n + 1)) { grid-column: 2; }
+  }
 </style>

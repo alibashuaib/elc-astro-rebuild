@@ -29,9 +29,9 @@ const copy = isArabic ? {
   secondaryCta: 'استكشف الدورات',
   proof: [`مسار واضح من ${rtlA1} إلى ${rtlC2}`, 'مدرّبون معتمدون', 'تعلم يناسب هدفك'],
   stats: [
-    { value: '+15,000', label: 'متعلّم وثق بنا' },
+    { value: '١٥ الف', label: 'تم تدريب أكثر من' },
     { value: String(courseCount), label: 'دورات تعليمية' },
-    { value: '2010', label: 'عام التأسيس' },
+    { value: '2010', label: 'تم التاسيس' },
   ],
   whyKicker: 'لماذا معهد صرح المعرفة؟',
   whyTitle: 'تعليم حديث، بنتائج يمكنك ملاحظتها.',
@@ -78,7 +78,7 @@ const copy = isArabic ? {
   secondaryCta: 'Explore courses',
   proof: ['Clear A1–C2 pathway', 'Credentialed instructors', 'Goal-led learning'],
   stats: [
-    { value: '15,000+', label: 'learners taught' },
+    { value: '15K', label: 'learners taught' },
     { value: String(courseCount), label: 'courses available' },
     { value: '2010', label: 'established' },
   ],
@@ -152,7 +152,7 @@ const basePath = `/${locale}`;
         <HeroGraphic locale={locale} tone="paper" />
         <div class="visual-footer">
           <span class="avatar-stack" aria-hidden="true"><i>R</i><i>S</i><i>M</i></span>
-          <p><strong>15,000+</strong> {isArabic ? 'متعلّم بدأ رحلته معنا' : 'learners started here'}</p>
+          <p><strong>{isArabic ? '١٥ الف' : '15K'}</strong> {isArabic ? 'متدرب بدأ رحلته معنا' : 'learners started here'}</p>
         </div>
       </div>
       <div class="floating-card floating-top"><Icon name="certificate" size={20} /><span><strong>{isArabic ? '+15 عامًا' : '15+ years'}</strong>{isArabic ? 'من التدريب' : 'of training'}</span></div>

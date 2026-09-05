@@ -34,9 +34,9 @@ const content = locale === 'ar' ? {
     { icon: 'check' as const, title: 'الالتزام' },
   ],
   stats: [
-    { value: '+15,000', label: 'متعلم' },
+    { value: '١٥ الف', label: 'تم تدريب أكثر من' },
     { value: String(courseCount), label: 'برامج تعليمية' },
-    { value: '2010', label: 'عام التأسيس' },
+    { value: '2010', label: 'تم التاسيس' },
   ],
   whyKicker: 'لماذا معهد صرح المعرفة',
   whyTitle: 'كل ما تحتاجه لتتعلم بثقة',
@@ -83,7 +83,7 @@ const content = locale === 'ar' ? {
     { icon: 'check' as const, title: 'Commitment' },
   ],
   stats: [
-    { value: '15,000+', label: 'learners taught' },
+    { value: '15K', label: 'learners taught' },
     { value: String(courseCount), label: 'learning programs' },
     { value: '2010', label: 'founded' },
   ],
@@ -323,8 +323,8 @@ const basePath = `/${locale}`;
     .purpose-card { min-height: 15rem; }
     .purpose-card h3 { margin-top: 2.5rem; }
     .stats-row { grid-template-columns: repeat(3, 1fr); gap: .75rem; }
-    .stat { padding: 1rem; }
-    .stat :global(strong) { font-size: clamp(1.6rem, 8vw, 2.25rem); }
+    .stat { padding: 1rem .65rem; }
+    .stat :global(strong) { max-width: 100%; font-size: clamp(1.35rem, 5.6vw, 1.8rem); letter-spacing: -.06em; white-space: nowrap; }
     .stat-line { display: none; }
     .reason-grid { grid-template-columns: 1fr; }
     .reason-card, .reason-card:nth-last-child(-n + 2) { grid-column: auto; min-height: 15rem; }
