@@ -14,6 +14,7 @@ const courseSchema = z.object({
   durationWeeks: z.number().optional(),
   hoursPerWeek: z.number().optional(),
   hoursPerMonth: z.string().optional(),
+  hoursPerLevel: z.string().optional(),
   hoursPerDay: z.number().optional(),
   scheduleDays: z.string().optional(),
   classTimes: z.array(z.object({ label: z.string(), start: z.string(), end: z.string(), meridiem: z.string() })).optional(),

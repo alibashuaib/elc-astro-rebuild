@@ -13,9 +13,22 @@ export const getStaticPaths = localePaths;
 const locale = Astro.params.lang as Locale;
 const { title, description, hero, crumb } = meta('courses', locale);
 
-const allCourses = await getCollection('courses', (entry) => {
+const courseOrder = [
+  'kids-general',
+  'adults-general',
+  'womens-general-english',
+  'university-exam-prep',
+  'step-exam-preparation',
+  'ielts-preparation',
+  'business-english',
+];
+const allCourses = (await getCollection('courses', (entry) => {
   return entry.id.startsWith(`${locale}/`) && !entry.data.draft;
-});
+}))
+  // Special Courses remains available as a direct page, but is intentionally
+  // excluded from the curated catalog lineup.
+  .filter((entry) => !entry.id.endsWith('/special-courses'))
+  .sort((a, b) => courseOrder.indexOf(a.id.replace(`${locale}/`, '')) - courseOrder.indexOf(b.id.replace(`${locale}/`, '')));
 const categories = [...new Set(allCourses.map((c) => c.data.category))];
 
 const collectionPageSchema = {

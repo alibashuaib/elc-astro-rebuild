@@ -649,7 +649,7 @@ const { t } = Astro.props;
   }
   .pt-feedback-correct {
     background: rgb(34 139 87 / 0.12);
-    color: #1a7a49;
+    color: var(--color-success-text);
   }
   .pt-feedback-incorrect {
     background: rgb(182 23 51 / 0.1);
@@ -1260,7 +1260,7 @@ const { t } = Astro.props;
   }
   #pt-options :global(.pt-tf-true .pt-tf-icon) {
     background: rgb(34 139 87 / 0.14);
-    color: #1a7a49;
+    color: var(--color-success-text);
   }
   #pt-options :global(.pt-tf-false .pt-tf-icon) {
     background: rgb(182 23 51 / 0.1);
