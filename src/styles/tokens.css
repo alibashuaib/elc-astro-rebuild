@@ -18,6 +18,8 @@
   --color-yellow: #f6ad43;
   --color-yellow-ink: #895411;
   --color-yellow-soft: #fff3dc;
+  --color-success: #1a7a49;
+  --color-success-text: #1a6f48;
   --color-blue-soft: #fae9ed;
 
   --color-bg: #f8f7f5;
@@ -120,6 +122,8 @@
     --color-header-bg: rgb(24 24 26 / .85);
     --color-primary-text: #f56478;
     --color-crimson-text: #f56478;
+    --color-amber-text: #f7b75f;
+    --color-success-text: #72d9a0;
     --color-coral-soft: #3a2b22;
     --color-mint-soft: #303236;
     --color-yellow-soft: #392f20;
@@ -140,6 +144,8 @@
   --color-header-bg: rgb(24 24 26 / .85);
   --color-primary-text: #f56478;
   --color-crimson-text: #f56478;
+  --color-amber-text: #f7b75f;
+  --color-success-text: #72d9a0;
   --color-coral-soft: #3a2b22;
   --color-mint-soft: #303236;
   --color-yellow-soft: #392f20;

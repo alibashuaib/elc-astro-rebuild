@@ -6,7 +6,7 @@ price: 1500
 currency: SAR
 durationWeeks: 4
 hoursPerWeek: 8
-hoursPerMonth: "34"
+hoursPerMonth: "32"
 hoursPerDay: 2
 scheduleDays: Sunday–Wednesday
 classTimes:
@@ -19,7 +19,7 @@ faqs:
   - question: Who is the course for?
     answer: The program is designed for children aged 6 to 13. Boys and girls learn in dedicated sections supported by female trainers.
   - question: How is the program scheduled?
-    answer: Each course runs for one month and totals 34 learning hours. Classes are two hours per day from Sunday to Wednesday; admissions can confirm the current start dates.
+    answer: Each course runs for one month and totals 32 learning hours. Classes are two hours per day from Sunday to Wednesday; admissions can confirm the current start dates.
   - question: How is the learning pathway structured?
     answer: The program has 8 levels delivered across 12 courses and follows the CEFR international language framework.
   - question: Is Cambridge YLE preparation available?
@@ -34,10 +34,8 @@ Students develop vocabulary, sentence building, listening, speaking, reading, an
 ## Program at a glance
 
 - Ages 6–13
-- One month and 34 total learning hours per course
-- Two hours per day, Sunday to Wednesday
+- One month and 32 total learning hours per course
 - 8 CEFR-aligned levels delivered across 12 courses
 - Dedicated sections for boys and girls, supported by female trainers
-- SAR 1,500 per level
 
 Contact ELC to confirm the next intake and placement guidance.

@@ -58,16 +58,17 @@ const { t, locale, whatsappNumber } = Astro.props;
     sessionId: string;
     level: string;
     levelName?: string;
-    /** Cambridge YLE exam level -- kids only, and absent below Starters. */
+    /** Retained for reporting, but intentionally hidden from student results. */
     yle?: string;
   }
 
-  // "A1 · Movers · Super Minds 3A", dropping whichever parts this track and
-  // level don't have (adults have no YLE; Pre-Starters sits below Starters).
-  // Deduplicated because the adults band path reports the same string as both
-  // level and levelName, which otherwise renders as "Hint A · Hint A".
+  // Kids also carry CEFR and Cambridge YLE values for reporting. Show only the
+  // actionable Super Minds course placement; adults retain CEFR + band detail.
   function formatLevel(detail: DoneDetail): string {
-    const parts = [detail.level, detail.yle, detail.levelName].filter(Boolean) as string[];
+    const isKidsLevel = detail.levelName === 'Pre-Starters'
+      || detail.levelName?.startsWith('Super Minds ');
+    if (isKidsLevel) return detail.levelName ?? detail.level;
+    const parts = [detail.level, detail.levelName].filter(Boolean) as string[];
     return [...new Set(parts)].join(' · ');
   }
 
@@ -153,7 +154,7 @@ const { t, locale, whatsappNumber } = Astro.props;
   }
   .result-eyebrow {
     margin: 0 0 0.25rem;
-    color: #1a7a49;
+    color: var(--color-success-text);
     font-size: 0.72rem;
     font-weight: 800;
     letter-spacing: 0.1em;

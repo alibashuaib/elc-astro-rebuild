@@ -36,10 +36,24 @@ const { locale, t } = Astro.props;
       <span>{t('placementTest.formName')}</span>
       <input required name="name" type="text" autocomplete="name" />
     </label>
-    <label>
-      <span>{t('placementTest.formPhone')}</span>
-      <input class="numeric" required name="phone" type="tel" autocomplete="tel" inputmode="tel" />
-    </label>
+      <label>
+        <span>{t('placementTest.formPhone')}</span>
+        <input
+          class="numeric"
+          required
+          name="phone"
+          type="tel"
+          autocomplete="tel"
+          inputmode="numeric"
+          maxlength="10"
+          minlength="10"
+          pattern="05[0-9]{8}"
+          placeholder="05xxxxxxxx"
+          aria-describedby="placement-phone-hint"
+          data-invalid-message={t('placementTest.formPhoneInvalid')}
+        />
+        <small id="placement-phone-hint">{t('placementTest.formPhoneHint')}</small>
+      </label>
     <label>
       <span>{t('placementTest.formDob')}</span>
       <input required name="dob" type="date" />
@@ -60,6 +74,7 @@ const { locale, t } = Astro.props;
   const trackInputs = form.querySelectorAll<HTMLInputElement>('input[name="track"]');
   const guardianField = document.getElementById('guardian-field') as HTMLElement;
   const dobInput = form.querySelector<HTMLInputElement>('input[name="dob"]')!;
+  const phoneInput = form.querySelector<HTMLInputElement>('input[name="phone"]')!;
   const adultsInput = form.querySelector<HTMLInputElement>('input[name="track"][value="adults"]')!;
   const kidsInput = form.querySelector<HTMLInputElement>('input[name="track"][value="kids"]')!;
   const ageRule = document.getElementById('age-track-rule') as HTMLElement;
@@ -100,6 +115,18 @@ const { locale, t } = Astro.props;
   trackInputs.forEach((input) => input.addEventListener('change', updateGuardianField));
   dobInput.addEventListener('input', enforceAgeTrack);
   dobInput.addEventListener('change', enforceAgeTrack);
+
+  const validatePhone = () => {
+    const isValid = /^05\d{8}$/.test(phoneInput.value);
+    phoneInput.setCustomValidity(
+      phoneInput.value && !isValid ? (phoneInput.dataset.invalidMessage ?? '') : ''
+    );
+  };
+  phoneInput.addEventListener('input', () => {
+    phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+    validatePhone();
+  });
+  phoneInput.addEventListener('invalid', validatePhone);
   updateGuardianField();
 
   form.addEventListener('submit', (event) => {
@@ -211,7 +238,7 @@ const { locale, t } = Astro.props;
     margin: 0;
     padding: 0.65rem 0.8rem;
     border-radius: 0.8rem;
-    color: #1a6f48;
+    color: var(--color-success-text);
     background: rgb(53 168 111 / 0.12);
     font-size: 0.82rem;
     font-weight: 700;

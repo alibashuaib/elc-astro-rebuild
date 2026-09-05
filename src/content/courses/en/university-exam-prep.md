@@ -1,9 +1,16 @@
 ---
-title: University & Exam Prep (PUP)
+title: Pre-University Prep (PUP)
 summary: An intensive CEFR-aligned English program for learners aged 16+, especially high school graduates preparing for university, training, or work.
 category: exam-prep
 price: 4700
 currency: SAR
+hoursPerDay: 2.5
+hoursPerLevel: "220"
+classTimes:
+  - label: Morning class
+    start: "10:00"
+    end: "12:30"
+    meridiem: AM
 imageAlt: Students preparing for an English proficiency exam at ELC
 faqs:
   - question: Who is PUP for?
@@ -17,7 +24,7 @@ faqs:
 draft: false
 ---
 
-The Preparation for University Program (PUP) is an intensive English pathway for high school graduates and other learners aged 16 and above. It builds the language skills needed for post-secondary education, training programs, and future work.
+Pre-University Prep (PUP) is an intensive English pathway for high school graduates and other learners aged 16 and above. It builds the language skills needed for post-secondary education, training programs, and future work.
 
 The CEFR-aligned program combines the four main English skills with intensive conversation practice, reading and writing development, correct pronunciation, learning technology, and activities that encourage English use beyond the classroom.
 
@@ -29,6 +36,5 @@ The CEFR-aligned program combines the four main English skills with intensive co
 - Enriching activities, including educational trips and visits when scheduled
 - Additional instructor support when needed
 - Modern learning technology and interactive resources
-- SAR 4,700
 
 Contact ELC for the current schedule and admission requirements.

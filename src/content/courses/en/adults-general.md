@@ -8,7 +8,7 @@ durationWeeks: 4
 hoursPerWeek: 10
 hoursPerMonth: "40"
 hoursPerDay: 2
-scheduleDays: 5 days per week
+scheduleDays: "5"
 classTimes:
   - label: First period
     start: "5:00"
@@ -39,9 +39,7 @@ Student participation is central to the experience. Around 70% of class time is 
 
 - For learners aged 13 and above
 - One month and 40 learning hours per course
-- Two hours per day, five days per week
 - 15 courses across four main CEFR-aligned English levels
 - Additional reading material to support vocabulary, reading, and writing
-- SAR 1,500 per level
 
 Contact ELC to arrange a placement test and confirm the next intake.

@@ -20,6 +20,8 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
   <div class="container header-inner">
     <a href={localizePath(locale, '/')} class="logo" aria-label={locale === 'ar' ? 'الصفحة الرئيسية لمعهد صرح المعرفة' : 'ELC homepage'}>
       <Image src={logoFull} alt={locale === 'ar' ? 'معهد صرح المعرفة' : 'ELC — English Learning Centre'} width={112} densities={[1, 2]} class="logo-full" />
+      <Image src={logoFull} alt="" aria-hidden="true" width={112} densities={[1, 2]} class="logo-full logo-dark-detail logo-dark-tagline" />
+      <Image src={logoFull} alt="" aria-hidden="true" width={112} densities={[1, 2]} class="logo-full logo-dark-detail logo-dark-mark" />
     </a>
 
     <nav class="main-nav" id="main-nav" aria-label={t('nav.menu')}>
@@ -96,6 +98,7 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     padding-block: .85rem;
   }
   .logo {
+    position: relative;
     display: inline-flex;
     align-items: center;
     text-decoration: none;
@@ -105,6 +108,11 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     width: 7rem;
     height: auto;
   }
+  .logo-dark-detail { position: absolute; inset: 0; display: none; filter: brightness(0) invert(1); pointer-events: none; }
+  .logo-dark-tagline { clip-path: inset(67% 36% 21% 16%); }
+  .logo-dark-mark { clip-path: inset(43% 1% 42% 90%); }
+  @media (prefers-color-scheme: dark) { :global(:root:not([data-theme='light'])) .logo-dark-detail { display: block; } }
+  :global(:root[data-theme='dark']) .logo-dark-detail { display: block; }
   .main-nav ul {
     display: flex;
     gap: .35rem;
@@ -120,7 +128,7 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     font-size: .84rem;
     font-weight: 650;
   }
-  .main-nav a:hover, .main-nav a[aria-current='page'] { color: var(--color-primary); background: var(--color-blue-soft); text-decoration: none; }
+  .main-nav a:hover, .main-nav a[aria-current='page'] { color: var(--color-primary-text); background: var(--color-blue-soft); text-decoration: none; }
   .header-actions {
     display: flex;
     align-items: center;
@@ -154,7 +162,7 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     cursor: pointer;
     transition: transform var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
   }
-  .theme-toggle:hover { color: var(--color-primary); border-color: rgb(182 23 51 / .34); transform: translateY(-2px); }
+  .theme-toggle:hover { color: var(--color-primary-text); border-color: rgb(182 23 51 / .34); transform: translateY(-2px); }
   .theme-toggle svg { width: 1.15rem; height: 1.15rem; }
   .theme-toggle .icon-moon { display: none; }
   :root[data-theme="dark"] .theme-toggle .icon-sun { display: none; }

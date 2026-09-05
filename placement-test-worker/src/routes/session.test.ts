@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
 import { handleStartSession, handleAnswer } from './session';
 import { ADULT_BANDS } from '../bands';
+import { KIDS_CAPITAL_QUESTION_IDS, KIDS_SMALL_QUESTION_IDS } from '../db';
 
 function makeEnv() {
   return {
@@ -28,6 +29,16 @@ describe('session routes', () => {
     expect(data.track).toBe('adults');
     expect(data.done).toBe(false);
     expect(data.prompt).toBeDefined();
+  });
+
+  it('rejects a phone number that is not a Saudi mobile number', async () => {
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify({ name: 'Sam', phone: '0612345678', dob: '1995-01-01', locale: 'en' }),
+    });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+    await expect(res.json()).resolves.toEqual({ error: 'phone must be a Saudi mobile number (05xxxxxxxx)' });
   });
 
   describe('answer submissions are bound to the question the session is on', () => {
@@ -184,7 +195,7 @@ describe('adults band placement (bands.ts, real question content)', () => {
     const funA = ADULT_BANDS[0]; // { name: 'Fun A', start: 1, end: 5 }
     let rounds = 0;
     while (!data.done) {
-      const wantWrong = rounds < 4; // 1 correct out of 5 = 20%, below 60% -> Fun A fails
+      const wantWrong = rounds < 4; // three wrong answers make the 50% band unreachable
       const correctIndex = await correctIndexFor(env, data.questionId);
       const selectedIndex = wantWrong ? (correctIndex + 1) % 4 : correctIndex;
       const res = await handleAnswer(
@@ -237,6 +248,27 @@ describe('adults band placement (bands.ts, real question content)', () => {
     }
     expect(data.done).toBe(false); // Fun A passed 5/5 -- session continues into Fun B, doesn't stop
     expect(data.questionNumber).toBe(bandSize(funA) + 1);
+  });
+
+  it('passes an adult band with exactly 50% correct', async () => {
+    const env = makeRealAdultsEnv();
+    let data = await startAdultSession(env, '+966500000013');
+    const sessionId = data.sessionId;
+
+    // Clear Fun A, then answer exactly 2 of the 4 Fun B questions correctly.
+    for (let sequence = 1; sequence <= 9; sequence++) {
+      const correctIndex = await correctIndexFor(env, data.questionId);
+      const selectedIndex = sequence <= 7 ? correctIndex : (correctIndex === 0 ? 1 : 0);
+      const res = await handleAnswer(
+        new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, selectedIndex }) }),
+        env as any,
+        sessionId
+      );
+      data = await res.json();
+    }
+
+    expect(data.done).toBe(false);
+    expect(data.questionNumber).toBe(10); // continued into Lint A
   });
 
   function bandSize(band: { start: number; end: number }): number {
@@ -384,7 +416,7 @@ describe('text-type question grading', () => {
   it.each([
     ['kids-A1-1', 'A', 'a'],
     ['kids-A1-7', 'a', 'A'],
-    ['kids-A2-6', '2', '1'],
+    ['kids-A2-6', '1,2,3,4,5,6,7', '1,3,2,4,5,6,7'],
     ['kids-A2-7', '3', '4'],
     ['kids-B1-1', '5', '4'],
     ['kids-B1-2', '6', '7'],
@@ -413,8 +445,8 @@ describe('text-type question grading', () => {
       return (await response.json()) as any;
     }
 
-    expect((await grade(correctAnswer, `correct-${questionId}`)).correct).toBe(true);
-    expect((await grade(wrongAnswer, `wrong-${questionId}`)).correct).toBe(false);
+    expect((await grade(correctAnswer, '0500000000')).correct).toBe(true);
+    expect((await grade(wrongAnswer, '0500000001')).correct).toBe(false);
   });
 });
 
@@ -455,41 +487,45 @@ describe('kids placement level reflects the whole run, not its tail', () => {
   }
 
   it.each([
-    [44, 'Super Minds 3A'],
-    [37, 'Super Minds 3A'],
-    [36, 'Super Minds 2B'],
-    [30, 'Super Minds 2B'],
-    [29, 'Super Minds 2A'],
-    [22, 'Super Minds 2A'],
-    [21, 'Super Minds 1B'],
-    [15, 'Super Minds 1B'],
-    [14, 'Super Minds 1A'],
-    [8, 'Super Minds 1A'],
-    [7, 'Pre-Starters'],
+    [35, 'Super Minds 3A'],
+    [30, 'Super Minds 3A'],
+    [29, 'Super Minds 2B'],
+    [24, 'Super Minds 2B'],
+    [23, 'Super Minds 2A'],
+    [18, 'Super Minds 2A'],
+    [17, 'Super Minds 1B'],
+    [12, 'Super Minds 1B'],
+    [11, 'Super Minds 1A'],
+    [6, 'Super Minds 1A'],
+    [5, 'Pre-Starters'],
     [0, 'Pre-Starters'],
-  ])('places a kid who gets %i of 44 right at %s', async (correct, expected) => {
+  ])('places a kid who gets %i of 35 right at %s', async (correct, expected) => {
     const { levelName, answered } = await runKidsSession(correct);
-    expect(answered).toBe(44); // the whole bank is always served
+    expect(answered).toBe(35); // sampled letter blocks and one combined number activity
     expect(levelName).toBe(expected);
   });
 
   it.each([
-    [44, 'Movers'],
-    [37, 'Movers'],
-    [36, 'Starters'],
-    [8, 'Starters'],
-  ])('reports the Cambridge YLE level for a kid who gets %i of 44 right', async (correct, expected) => {
+    [35, 'Movers'],
+    [30, 'Movers'],
+    [29, 'Starters'],
+    [6, 'Starters'],
+  ])('retains Cambridge YLE level for a kid who gets %i of 35 right', async (correct, expected) => {
     expect((await runKidsSession(correct)).yle).toBe(expected);
   });
 
-  it('omits the YLE level below Starters', async () => {
+  it('omits the Cambridge YLE level below Starters', async () => {
     expect((await runKidsSession(0)).yle).toBeUndefined();
   });
+
 });
 
 describe('kids question order is randomized within each exercise block', () => {
-  it('varies which capital-letter item comes first across sessions', async () => {
-    const firstQuestionIds = new Set<string>();
+  it('serves varying samples of three questions from each letter block per session', async () => {
+    const capitalIds = new Set<string>(KIDS_CAPITAL_QUESTION_IDS);
+    const smallIds = new Set<string>(KIDS_SMALL_QUESTION_IDS);
+    const capitalSamples = new Set<string>();
+    const smallSamples = new Set<string>();
     for (let attempt = 0; attempt < 10; attempt++) {
       const attemptEnv = makeEnv();
       const res = await handleStartSession(
@@ -497,7 +533,7 @@ describe('kids question order is randomized within each exercise block', () => {
           method: 'POST',
           body: JSON.stringify({
             name: 'Kid',
-            phone: `+9665000001${attempt}`,
+          phone: `05000000${String(attempt).padStart(2, '0')}`,
             dob: '2018-01-01',
             locale: 'en',
             track: 'kids',
@@ -505,12 +541,45 @@ describe('kids question order is randomized within each exercise block', () => {
         }),
         attemptEnv as any
       );
-      const data = (await res.json()) as any;
-      // Still inside the first block, whichever item within it came up.
-      expect(['kids-A1-1', 'kids-A1-2', 'kids-A1-3', 'kids-A1-4', 'kids-A1-5', 'kids-A1-6']).toContain(data.questionId);
-      firstQuestionIds.add(data.questionId);
+      let data = (await res.json()) as any;
+      const sessionId = data.sessionId;
+      const capitalSample: string[] = [];
+      for (let question = 0; question < 3; question++) {
+        expect(capitalIds.has(data.questionId)).toBe(true);
+        capitalSample.push(data.questionId);
+        const answer = await handleAnswer(
+          new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, skip: true }) }),
+          attemptEnv as any,
+          sessionId
+        );
+        data = await answer.json();
+      }
+      expect(new Set(capitalSample).size).toBe(3);
+      expect(smallIds.has(data.questionId)).toBe(true);
+
+      const smallSample: string[] = [];
+      for (let question = 0; question < 3; question++) {
+        expect(smallIds.has(data.questionId)).toBe(true);
+        smallSample.push(data.questionId);
+        const answer = await handleAnswer(
+          new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, skip: true }) }),
+          attemptEnv as any,
+          sessionId
+        );
+        data = await answer.json();
+      }
+      expect(new Set(smallSample).size).toBe(3);
+      expect(capitalIds.has(data.questionId)).toBe(false);
+      expect(smallIds.has(data.questionId)).toBe(false);
+      expect(data.questionId).toBe('kids-A2-6');
+      expect(data.prompt).toBe('Complete the number sequence from 1 to 7.');
+      expect(data.questionNumber).toBe(7);
+      expect(data.total).toBe(35);
+      capitalSamples.add([...capitalSample].sort().join(','));
+      smallSamples.add([...smallSample].sort().join(','));
     }
-    expect(firstQuestionIds.size).toBeGreaterThan(1);
+    expect(capitalSamples.size).toBeGreaterThan(1);
+    expect(smallSamples.size).toBeGreaterThan(1);
   });
 
   // The replay guard used to re-derive the pending question by calling
@@ -529,7 +598,9 @@ describe('kids question order is randomized within each exercise block', () => {
     let data = (await start.json()) as any;
     const sessionId = data.sessionId;
     let answered = 0;
+    const answeredIds: string[] = [];
     while (!data.done && answered < 200) {
+      answeredIds.push(data.questionId);
       const res = await handleAnswer(
         new Request('http://x', { method: 'POST', body: JSON.stringify({ questionId: data.questionId, skip: true }) }),
         env2 as any,
@@ -539,7 +610,10 @@ describe('kids question order is randomized within each exercise block', () => {
       data = await res.json();
       answered++;
     }
-    expect(answered).toBe(44); // the whole bank, no answer rejected mid-run
+    expect(answered).toBe(35); // sampled letter blocks plus one number activity
+    expect(answeredIds.filter((id) => KIDS_CAPITAL_QUESTION_IDS.includes(id as typeof KIDS_CAPITAL_QUESTION_IDS[number]))).toHaveLength(3);
+    expect(answeredIds.filter((id) => KIDS_SMALL_QUESTION_IDS.includes(id as typeof KIDS_SMALL_QUESTION_IDS[number]))).toHaveLength(3);
+    expect(answeredIds.filter((id) => ['kids-A2-6', 'kids-A2-7', 'kids-B1-1', 'kids-B1-2'].includes(id))).toEqual(['kids-A2-6']);
     expect(data.levelName).toBe('Pre-Starters'); // all skipped
   });
 
@@ -613,7 +687,7 @@ describe('adults get one skip per band', () => {
     let data = await startAdults(env2);
     const sessionId = data.sessionId;
 
-    // Clear Fun A, then skip Fun B (4 questions, needs 3) into the ground.
+    // Clear Fun A, then skip Fun B (4 questions, needs 2) into the ground.
     while (!data.done && data.skipAvailable !== false) {
       const res = await answer(env2, sessionId, data.questionId, await keyFor(env2, data.questionId));
       data = await res.json();

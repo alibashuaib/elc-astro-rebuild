@@ -7,14 +7,15 @@ interface Props {
 const { value, class: className } = Astro.props;
 const compactValue = value.replace(/,/g, '');
 const match = compactValue.match(/^(\D*)(\d+(?:\.\d+)?)(\D*)$/);
+const hasNumericTarget = Boolean(match);
 const prefix = match?.[1] ?? '';
 const target = Number(match?.[2] ?? 0);
 const suffix = match?.[3] ?? '';
 ---
 
 <strong
-  class:list={['number-reveal', className]}
-  data-count-up
+  class:list={['number-reveal', className, { 'localized-label': !hasNumericTarget }]}
+  data-count-up={hasNumericTarget ? '' : undefined}
   data-prefix={prefix}
   data-target={target}
   data-suffix={suffix}
@@ -77,6 +78,7 @@ const suffix = match?.[3] ?? '';
 
 <style>
   .number-reveal span { display: inline-block; }
+  .number-reveal.localized-label { font-family: var(--font-display); direction: rtl; unicode-bidi: isolate; }
 
   @media (prefers-reduced-motion: no-preference) {
     .number-reveal span { animation: number-arrive .7s var(--ease) both; }
