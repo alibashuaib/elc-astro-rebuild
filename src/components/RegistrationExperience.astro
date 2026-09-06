@@ -19,6 +19,9 @@ const copy = isArabic ? {
   choose: 'اختر دورة',
   submit: 'متابعة عبر واتساب',
   privacy: 'لا تُخزن هذه البيانات في الموقع؛ تُضاف فقط إلى رسالة واتساب التي ترسلها بنفسك.',
+  phoneHint: 'رقم جوال سعودي: 10 أرقام تبدأ بـ 05.',
+  phoneInvalid: 'يرجى إدخال رقم جوال سعودي صالح (05xxxxxxxx).',
+  emailInvalid: 'يرجى إدخال بريد إلكتروني صالح (مثل name@example.com).',
 } : {
   heading: 'Send your registration request on WhatsApp',
   intro: 'Add your basic contact details and choose a course. We’ll open a ready-to-send WhatsApp message to admissions.',
@@ -29,6 +32,9 @@ const copy = isArabic ? {
   choose: 'Select a course',
   submit: 'Continue on WhatsApp',
   privacy: 'This information is not stored on the website; it is only added to the WhatsApp message you choose to send.',
+  phoneHint: 'Saudi mobile number: 10 digits starting with 05.',
+  phoneInvalid: 'Please enter a valid Saudi mobile number (05xxxxxxxx).',
+  emailInvalid: 'Please enter a valid email address (e.g. name@example.com).',
 };
 ---
 
@@ -47,11 +53,31 @@ const copy = isArabic ? {
     </label>
     <label>
       {copy.email}
-      <input type="email" name="email" autocomplete="email" required />
+      <input
+        type="email"
+        name="email"
+        autocomplete="email"
+        required
+        data-invalid-message={copy.emailInvalid}
+      />
     </label>
     <label>
       {copy.phone}
-      <input class="numeric" type="tel" name="phone" autocomplete="tel" inputmode="tel" required />
+      <input
+        class="numeric"
+        type="tel"
+        name="phone"
+        autocomplete="tel"
+        inputmode="numeric"
+        maxlength="10"
+        minlength="10"
+        pattern="05[0-9]{8}"
+        placeholder="05xxxxxxxx"
+        required
+        aria-describedby="register-phone-hint"
+        data-invalid-message={copy.phoneInvalid}
+      />
+      <small id="register-phone-hint">{copy.phoneHint}</small>
     </label>
     <label>
       {copy.course}
@@ -67,6 +93,32 @@ const copy = isArabic ? {
 
 <script>
   document.querySelectorAll<HTMLFormElement>('[data-registration-form]').forEach((form) => {
+    const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]');
+    if (emailInput) {
+      const validateEmail = () => {
+        emailInput.setCustomValidity(
+          emailInput.validity.typeMismatch ? (emailInput.dataset.invalidMessage ?? '') : ''
+        );
+      };
+      emailInput.addEventListener('input', validateEmail);
+      emailInput.addEventListener('invalid', validateEmail);
+    }
+
+    const phoneInput = form.querySelector<HTMLInputElement>('input[name="phone"]');
+    if (phoneInput) {
+      const validatePhone = () => {
+        const isValid = /^05\d{8}$/.test(phoneInput.value);
+        phoneInput.setCustomValidity(
+          phoneInput.value && !isValid ? (phoneInput.dataset.invalidMessage ?? '') : ''
+        );
+      };
+      phoneInput.addEventListener('input', () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
+        validatePhone();
+      });
+      phoneInput.addEventListener('invalid', validatePhone);
+    }
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const data = new FormData(form);
@@ -96,6 +148,7 @@ const copy = isArabic ? {
   .register-form label { display: flex; flex-direction: column; gap: .45rem; color: var(--color-navy); font-size: .88rem; font-weight: 700; }
   .register-form input, .register-form select { width: 100%; min-height: 3.25rem; padding: .75rem .9rem; border: 1px solid var(--color-border); border-radius: .85rem; color: var(--color-ink); background: var(--color-surface-soft); font: inherit; }
   .register-form input:focus, .register-form select:focus { outline: 3px solid rgb(182 23 51 / .12); border-color: var(--color-primary); }
+  .register-form small { color: var(--color-ink-muted); font-size: .78rem; font-weight: 500; }
   .register-form .btn { justify-content: center; margin-top: .5rem; }
   .privacy-note { margin: 0; color: var(--color-ink-muted); font-size: .75rem; line-height: 1.6; }
   @media (max-width: 760px) { .registration-wrap { grid-template-columns: 1fr; gap: 2rem; } }
