@@ -7,6 +7,7 @@ dist/
 .lighthouseci/
 .superpowers/
 graphify-out/
+.worktrees/
 
 # Playwright smoke-test output
 /test-results/
