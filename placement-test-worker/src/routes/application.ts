@@ -75,5 +75,11 @@ export async function handleAdminGetDocument(_req: Request, env: Env, applicatio
   const headers = new Headers();
   object.writeHttpMetadata(headers);
   headers.set('etag', object.httpEtag);
+  // Force download rather than inline render, and disable MIME sniffing --
+  // the stored content-type came from a client-supplied File.type at upload
+  // time (see handleUploadDocument), so a crafted upload could otherwise be
+  // rendered inline by the browser on the admin panel's own origin.
+  headers.set('content-disposition', `attachment; filename="document-${documentId}"`);
+  headers.set('x-content-type-options', 'nosniff');
   return new Response(object.body, { headers });
 }

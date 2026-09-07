@@ -209,6 +209,8 @@ describe('admin application routes', () => {
     const res = await handleAdminGetDocument(new Request('http://x'), adminEnv as any, applicationId, documentId);
     expect(res.status).toBe(200);
     expect(res.headers.get('content-type')).toBe('image/jpeg');
+    expect(res.headers.get('content-disposition')).toBe(`attachment; filename="document-${documentId}"`);
+    expect(res.headers.get('x-content-type-options')).toBe('nosniff');
     const bytes = new Uint8Array(await res.arrayBuffer());
     expect(Array.from(bytes)).toEqual([9, 9, 9]);
   });
