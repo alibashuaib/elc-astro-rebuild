@@ -85,6 +85,20 @@
     </form>
     <ul id="question-list" class="admin-list"></ul>
   </div>
+
+  <div class="card">
+    <h2>Applications</h2>
+    <label>
+      Filter by status
+      <select id="application-status-filter">
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </label>
+    <ul id="application-list" class="admin-list"></ul>
+  </div>
 </section>
 
 <script>
@@ -114,10 +128,11 @@
   });
 
   async function loadAll() {
-    const [{ slots }, { bookings }, { questions }] = await Promise.all([
+    const [{ slots }, { bookings }, { questions }, { applications }] = await Promise.all([
       api('/api/admin/slots'),
       api('/api/admin/bookings'),
       api('/api/admin/questions'),
+      api(`/api/admin/applications${statusFilter.value ? `?status=${statusFilter.value}` : ''}`),
     ]);
 
     const slotList = document.getElementById('slot-list')!;
@@ -169,6 +184,48 @@
       li.appendChild(toggle);
       questionList.appendChild(li);
     });
+
+    const applicationList = document.getElementById('application-list')!;
+    applicationList.innerHTML = '';
+    applications.forEach((a: any) => {
+      const li = document.createElement('li');
+      const summary = document.createElement('span');
+      summary.textContent = `${a.student_name} (${a.phone}) — ${a.course} — level ${a.estimated_level ?? '—'} — ${a.status}`;
+      li.appendChild(summary);
+
+      a.documents.forEach((doc: any) => {
+        const link = document.createElement('a');
+        link.href = `${BASE}/api/admin/applications/${a.application_id}/documents/${doc.id}`;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.className = 'btn btn-outline';
+        link.textContent = doc.kind;
+        li.appendChild(link);
+      });
+
+      if (a.status === 'pending') {
+        const approve = document.createElement('button');
+        approve.type = 'button';
+        approve.className = 'btn btn-primary';
+        approve.textContent = 'Approve';
+        approve.addEventListener('click', async () => {
+          await api(`/api/admin/applications/${a.application_id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) });
+          loadAll();
+        });
+        const reject = document.createElement('button');
+        reject.type = 'button';
+        reject.className = 'btn btn-outline';
+        reject.textContent = 'Reject';
+        reject.addEventListener('click', async () => {
+          await api(`/api/admin/applications/${a.application_id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) });
+          loadAll();
+        });
+        li.appendChild(approve);
+        li.appendChild(reject);
+      }
+
+      applicationList.appendChild(li);
+    });
   }
 
   document.getElementById('slot-form')!.addEventListener('submit', async (e) => {
@@ -192,6 +249,8 @@
   };
   const trackSelect = document.getElementById('question-track') as HTMLSelectElement;
   const levelSelect = document.getElementById('question-level') as HTMLSelectElement;
+  const statusFilter = document.getElementById('application-status-filter') as HTMLSelectElement;
+  statusFilter.addEventListener('change', loadAll);
   function refreshLevelOptions() {
     const levels = LEVELS_BY_TRACK[trackSelect.value] ?? [];
     levelSelect.innerHTML = levels.map((l) => `<option value="${l}">${l}</option>`).join('');
