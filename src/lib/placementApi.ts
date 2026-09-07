@@ -105,6 +105,9 @@ export async function uploadDocument(
   kind: 'id_copy' | 'photo' | 'other',
   file: File
 ): Promise<{ documentId: string } | { error: string }> {
+  // Direct fetch() call, not the shared request() helper — that helper sets
+  // content-type: application/json, which would override the browser's automatic
+  // multipart/form-data; boundary=... header needed for FormData bodies.
   const form = new FormData();
   form.set('kind', kind);
   form.set('file', file);
