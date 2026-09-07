@@ -34,6 +34,9 @@ const { t, locale, whatsappNumber } = Astro.props;
   <a id="pt-whatsapp" class="btn btn-primary" hidden target="_blank" rel="noopener">
     {t('placementTest.whatsappConfirm')}
   </a>
+  <a id="pt-apply" class="btn btn-outline" hidden href="#">
+    {t('apply.continueButton')}
+  </a>
 </section>
 
 <script>
@@ -43,6 +46,7 @@ const { t, locale, whatsappNumber } = Astro.props;
   const levelEl = document.getElementById('pt-level') as HTMLElement;
   const slotsEl = document.getElementById('pt-slots') as HTMLElement;
   const waLink = document.getElementById('pt-whatsapp') as HTMLAnchorElement;
+  const applyLink = document.getElementById('pt-apply') as HTMLAnchorElement;
   const whatsappNumber = section.dataset.whatsappNumber ?? '';
   // Locale-aware WhatsApp message template (see i18n/ui.ts `placementTest.whatsappMessage`),
   // with {name}/{level}/{time} placeholders filled in per booking below.
@@ -102,6 +106,8 @@ const { t, locale, whatsappNumber } = Astro.props;
         const text = encodeURIComponent(message);
         waLink.href = `https://wa.me/${whatsappNumber}?text=${text}`;
         waLink.hidden = false;
+        applyLink.href = `/${locale}/apply?session=${detail.sessionId}`;
+        applyLink.hidden = false;
       });
       li.appendChild(btn);
       slotsEl.appendChild(li);
