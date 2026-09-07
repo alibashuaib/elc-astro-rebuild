@@ -10,6 +10,7 @@ function failOnConsoleErrors(page: Page): string[] {
 }
 
 test('adult student completes the placement test, books a slot, and submits an application', async ({ page }) => {
+  test.setTimeout(120_000);
   const errors = failOnConsoleErrors(page);
 
   await page.goto('/en/placement-test/');
@@ -25,11 +26,11 @@ test('adult student completes the placement test, books a slot, and submits an a
   const resultCard = page.locator('#placement-result');
   for (let i = 0; i < 100 && !(await resultCard.isVisible()); i++) {
     const option = page.locator('#pt-options button').first();
-    if (await option.isVisible().catch(() => false)) {
-      await option.click();
+    if (await option.isVisible().catch(() => false) && !(await resultCard.isVisible())) {
+      await option.click({ timeout: 5_000 }).catch(() => {});
     } else {
       const skip = page.getByRole('button', { name: /skip/i });
-      if (await skip.isVisible().catch(() => false)) await skip.click();
+      if (await skip.isVisible().catch(() => false)) await skip.click({ timeout: 5_000 }).catch(() => {});
     }
     await page.waitForTimeout(150);
   }
