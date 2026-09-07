@@ -134,6 +134,20 @@ export const pageMeta = {
       crumb: 'اختبار تحديد المستوى',
     },
   },
+  apply: {
+    en: {
+      title: 'Apply — ELC English Courses in Jeddah',
+      description: 'Complete your ELC enrollment application after your placement test result.',
+      crumb: 'Apply',
+      hero: { title: 'Apply', subtitle: 'Confirm your course and finish your enrollment application.' },
+    },
+    ar: {
+      title: 'التقديم — معهد صرح المعرفة',
+      description: 'أكمل طلب التسجيل في معهد صرح المعرفة بعد نتيجة اختبار تحديد المستوى.',
+      crumb: 'التقديم',
+      hero: { title: 'التقديم', subtitle: 'أكّد دورتك وأكمل طلب التسجيل.' },
+    },
+  },
   terms: {
     en: { title: 'Terms & Conditions — ELC', description: "ELC's course terms and conditions.", crumb: 'Terms & Conditions' },
     ar: {
@@ -184,6 +198,7 @@ const PATHS: Record<PageKey, string> = {
   courses: 'courses',
   blog: 'blog',
   placementTest: 'placement-test/',
+  apply: 'apply',
   terms: 'legal/terms',
   privacy: 'legal/privacy',
 };
