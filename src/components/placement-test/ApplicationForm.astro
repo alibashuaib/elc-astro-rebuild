@@ -1,0 +1,165 @@
+---
+// src/components/placement-test/ApplicationForm.astro
+import type { CollectionEntry } from 'astro:content';
+import type { Locale, useTranslations } from '../../i18n/ui';
+
+export interface Props {
+  locale: Locale;
+  t: ReturnType<typeof useTranslations>;
+  sessionId: string | null;
+  courses: CollectionEntry<'courses'>[];
+}
+const { locale, t, sessionId, courses } = Astro.props;
+---
+
+{!sessionId && (
+  <section class="card">
+    <p>{t('apply.missingSession')}</p>
+    <a class="btn btn-primary" href={`/${locale}/placement-test/`}>{t('apply.backToTest')}</a>
+  </section>
+)}
+
+{sessionId && (
+  <form
+    id="application-form"
+    class="card"
+    data-locale={locale}
+    data-session-id={sessionId}
+    data-already-applied-message={t('apply.alreadyApplied')}
+    data-error-message={t('apply.error')}
+  >
+    <header class="card-heading">
+      <h2>{t('apply.heading')}</h2>
+      <p class="card-intro">{t('apply.intro')}</p>
+    </header>
+    <div class="form-grid">
+      <label>
+        <span>{t('apply.course')}</span>
+        <select name="course" required>
+          <option value="">{t('apply.chooseCourse')}</option>
+          {courses.map((course) => <option value={course.data.title}>{course.data.title}</option>)}
+        </select>
+      </label>
+      <label id="guardian-field" hidden>
+        <span>{t('apply.guardianName')}</span>
+        <input name="guardianName" type="text" autocomplete="name" />
+      </label>
+      <label>
+        <span>{t('apply.idNumber')}</span>
+        <input name="idNumber" type="text" required />
+      </label>
+      <label>
+        <span>{t('apply.idCopy')}</span>
+        <input name="idCopy" type="file" accept="image/jpeg,image/png,application/pdf" required />
+      </label>
+      <label>
+        <span>{t('apply.photo')}</span>
+        <input name="photo" type="file" accept="image/jpeg,image/png" required />
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary">{t('apply.submit')}</button>
+    <p id="application-error" class="form-error" role="alert" hidden></p>
+  </form>
+)}
+
+<section id="application-done" class="card" hidden>
+  <h2>{t('apply.submittedHeading')}</h2>
+  <p>{t('apply.submittedIntro')}</p>
+</section>
+
+<script>
+  import { submitApplication, uploadDocument } from '../../lib/placementApi';
+
+  const form = document.getElementById('application-form') as HTMLFormElement | null;
+  if (form) {
+    const errorEl = document.getElementById('application-error') as HTMLElement;
+    const doneEl = document.getElementById('application-done') as HTMLElement;
+    const sessionId = form.dataset.sessionId!;
+    const alreadyAppliedMessage = form.dataset.alreadyAppliedMessage!;
+    const errorMessage = form.dataset.errorMessage!;
+
+    // Kids track sessions need a guardian name; there's no track flag on this
+    // form, so infer it the same way the rest of the funnel would show it --
+    // by asking the worker via the session the student already has. Simpler:
+    // always show the field but only require it when the placement result
+    // (recorded earlier in this browser tab via sessionStorage, see
+    // ResultBooking.astro) was a kids-track session.
+    const guardianField = document.getElementById('guardian-field') as HTMLElement;
+    const guardianInput = guardianField.querySelector('input') as HTMLInputElement;
+    if (sessionStorage.getItem('placement:track') === 'kids') {
+      guardianField.hidden = false;
+      guardianInput.required = true;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorEl.hidden = true;
+      const data = new FormData(form);
+      const course = String(data.get('course') ?? '');
+      const guardianName = String(data.get('guardianName') ?? '') || undefined;
+      const idNumber = String(data.get('idNumber') ?? '');
+      const idCopy = data.get('idCopy') as File;
+      const photo = data.get('photo') as File;
+
+      const result = await submitApplication(sessionId, { course, guardianName, idNumber });
+      if ('error' in result) {
+        errorEl.textContent = result.error === 'already_applied' ? alreadyAppliedMessage : errorMessage;
+        errorEl.hidden = false;
+        return;
+      }
+
+      await Promise.all([
+        uploadDocument(result.applicationId, 'id_copy', idCopy),
+        uploadDocument(result.applicationId, 'photo', photo),
+      ]);
+
+      form.hidden = true;
+      doneEl.hidden = false;
+      doneEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+</script>
+
+<style>
+  .card {
+    display: grid;
+    gap: 1.5rem;
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    border: 1px solid var(--color-border);
+    border-radius: 1.75rem;
+    background: var(--color-bg-raised);
+    box-shadow: var(--shadow-md);
+  }
+  .card-heading h2 { margin: 0 0 0.45rem; color: var(--color-navy); font-size: clamp(1.45rem, 4vw, 2rem); }
+  .card-intro { max-width: 38rem; margin: 0; color: var(--color-ink-muted); font-size: 0.92rem; }
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .card label { display: flex; flex-direction: column; gap: 0.45rem; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; }
+  .card input, .card select {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-bg-raised);
+    font: inherit;
+  }
+  .card input:focus, .card select:focus {
+    outline: 3px solid rgb(182 23 51 / 0.12);
+    border-color: var(--color-primary);
+  }
+  .card .btn { justify-content: center; width: 100%; min-height: 3.5rem; margin-top: 0.25rem; }
+  .form-error {
+    margin: -0.5rem 0 0;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.85rem;
+    color: var(--color-primary-text);
+    background: rgb(182 23 51 / 0.09);
+    font-size: 0.88rem;
+    font-weight: 700;
+    text-align: center;
+  }
+  @media (max-width: 580px) {
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
