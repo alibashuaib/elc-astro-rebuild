@@ -1,7 +1,9 @@
 import type { Env, DocumentKind } from '../types';
 import {
   getSession, getApplicationBySession, getApplicationById, insertApplication, insertApplicationDocument,
+  listApplicationsWithDetails, setApplicationStatus, getApplicationDocument,
 } from '../db';
+import { getSessionAdminId } from '../auth';
 
 const ALLOWED_DOC_TYPES = new Set(['image/jpeg', 'image/png', 'application/pdf']);
 const MAX_DOC_BYTES = 5 * 1024 * 1024;
@@ -49,4 +51,29 @@ export async function handleUploadDocument(req: Request, env: Env, applicationId
   await env.DOCS.put(r2Key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
   const documentId = await insertApplicationDocument(env, applicationId, kind as DocumentKind, r2Key);
   return json({ documentId }, 201);
+}
+
+export async function handleAdminListApplications(req: Request, env: Env): Promise<Response> {
+  const status = new URL(req.url).searchParams.get('status');
+  return json({ applications: await listApplicationsWithDetails(env, status) });
+}
+
+export async function handleAdminSetApplicationStatus(req: Request, env: Env, applicationId: string): Promise<Response> {
+  const { status } = await req.json<{ status: string }>();
+  if (status !== 'approved' && status !== 'rejected') return json({ error: 'invalid_status' }, 400);
+  const adminId = await getSessionAdminId(req, env);
+  if (!adminId) return json({ error: 'unauthorized' }, 401); // defence in depth -- index.ts's requireAdmin already gates this route
+  await setApplicationStatus(env, applicationId, status, adminId);
+  return json({ ok: true });
+}
+
+export async function handleAdminGetDocument(_req: Request, env: Env, applicationId: string, documentId: string): Promise<Response> {
+  const doc = await getApplicationDocument(env, applicationId, documentId);
+  if (!doc) return new Response('not found', { status: 404 });
+  const object = await env.DOCS.get(doc.r2_key);
+  if (!object) return new Response('not found', { status: 404 });
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set('etag', object.httpEtag);
+  return new Response(object.body, { headers });
 }

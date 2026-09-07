@@ -116,6 +116,44 @@ export async function getApplicationDocument(env: Env, applicationId: string, do
   return row ?? null;
 }
 
+export interface ApplicationWithDetails {
+  application_id: string;
+  student_name: string;
+  phone: string;
+  estimated_level: string | null;
+  course: string;
+  guardian_name: string | null;
+  id_number: string;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+  documents: Array<{ id: string; kind: DocumentKind }>;
+}
+
+export async function listApplicationsWithDetails(env: Env, status: string | null): Promise<ApplicationWithDetails[]> {
+  const sql = `SELECT a.id AS application_id, s.name AS student_name, s.phone AS phone, ts.estimated_level AS estimated_level,
+      a.course AS course, a.guardian_name AS guardian_name, a.id_number AS id_number, a.status AS status, a.created_at AS created_at
+    FROM applications a
+    JOIN test_sessions ts ON ts.id = a.session_id
+    JOIN students s ON s.id = ts.student_id
+    ${status ? 'WHERE a.status = ?' : ''}
+    ORDER BY a.created_at DESC`;
+  const stmt = status ? env.DB.prepare(sql).bind(status) : env.DB.prepare(sql);
+  const { results } = await stmt.all<Omit<ApplicationWithDetails, 'documents'>>();
+  const rows = results ?? [];
+  const withDocs: ApplicationWithDetails[] = [];
+  for (const row of rows) {
+    const docs = await listApplicationDocuments(env, row.application_id);
+    withDocs.push({ ...row, documents: docs.map((d) => ({ id: d.id, kind: d.kind })) });
+  }
+  return withDocs;
+}
+
+export async function setApplicationStatus(env: Env, id: string, status: 'approved' | 'rejected', reviewedBy: string): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE applications SET status = ?, reviewed_at = datetime('now'), reviewed_by = ? WHERE id = ?`
+  ).bind(status, reviewedBy, id).run();
+}
+
 // Adults keep the source paper's exact sequence. Kids keep the paper's
 // exercise-block progression, but questions inside repeated blocks are
 // shuffled so letter, number, picture, vocabulary, and reading drills do not
