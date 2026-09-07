@@ -1,4 +1,4 @@
-import type { Env, StudentInput, QuestionRow, PassageRow, SessionRow, Track } from './types';
+import type { Env, StudentInput, QuestionRow, PassageRow, SessionRow, Track, ApplicationRow, ApplicationDocumentRow, DocumentKind } from './types';
 
 function newId(): string {
   return crypto.randomUUID();
@@ -67,6 +67,53 @@ export async function completeSession(env: Env, id: string, estimatedLevel: stri
   await env.DB.prepare(
     `UPDATE test_sessions SET status = 'completed', estimated_level = ?, completed_at = datetime('now') WHERE id = ?`
   ).bind(estimatedLevel, id).run();
+}
+
+export interface ApplicationInput {
+  sessionId: string;
+  course: string;
+  guardianName: string | null;
+  idNumber: string;
+}
+
+export async function insertApplication(env: Env, input: ApplicationInput): Promise<string> {
+  const id = newId();
+  await env.DB.prepare(
+    `INSERT INTO applications (id, session_id, course, guardian_name, id_number) VALUES (?, ?, ?, ?, ?)`
+  ).bind(id, input.sessionId, input.course, input.guardianName, input.idNumber).run();
+  return id;
+}
+
+export async function getApplicationBySession(env: Env, sessionId: string): Promise<ApplicationRow | null> {
+  const row = await env.DB.prepare(`SELECT * FROM applications WHERE session_id = ?`).bind(sessionId).first<ApplicationRow>();
+  return row ?? null;
+}
+
+export async function getApplicationById(env: Env, id: string): Promise<ApplicationRow | null> {
+  const row = await env.DB.prepare(`SELECT * FROM applications WHERE id = ?`).bind(id).first<ApplicationRow>();
+  return row ?? null;
+}
+
+export async function insertApplicationDocument(env: Env, applicationId: string, kind: DocumentKind, r2Key: string): Promise<string> {
+  const id = newId();
+  await env.DB.prepare(
+    `INSERT INTO application_documents (id, application_id, kind, r2_key) VALUES (?, ?, ?, ?)`
+  ).bind(id, applicationId, kind, r2Key).run();
+  return id;
+}
+
+export async function listApplicationDocuments(env: Env, applicationId: string): Promise<ApplicationDocumentRow[]> {
+  const { results } = await env.DB.prepare(`SELECT * FROM application_documents WHERE application_id = ?`)
+    .bind(applicationId)
+    .all<ApplicationDocumentRow>();
+  return results ?? [];
+}
+
+export async function getApplicationDocument(env: Env, applicationId: string, documentId: string): Promise<ApplicationDocumentRow | null> {
+  const row = await env.DB.prepare(`SELECT * FROM application_documents WHERE id = ? AND application_id = ?`)
+    .bind(documentId, applicationId)
+    .first<ApplicationDocumentRow>();
+  return row ?? null;
 }
 
 // Adults keep the source paper's exact sequence. Kids keep the paper's
