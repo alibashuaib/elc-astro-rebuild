@@ -6,61 +6,56 @@ import type { Locale, useTranslations } from '../../i18n/ui';
 export interface Props {
   locale: Locale;
   t: ReturnType<typeof useTranslations>;
-  sessionId: string | null;
   courses: CollectionEntry<'courses'>[];
 }
-const { locale, t, sessionId, courses } = Astro.props;
+const { locale, t, courses } = Astro.props;
 ---
 
-{!sessionId && (
-  <section class="card">
-    <p>{t('apply.missingSession')}</p>
-    <a class="btn btn-primary" href={`/${locale}/placement-test/`}>{t('apply.backToTest')}</a>
-  </section>
-)}
+<section id="application-missing-session" class="card" hidden>
+  <p>{t('apply.missingSession')}</p>
+  <a class="btn btn-primary" href={`/${locale}/placement-test/`}>{t('apply.backToTest')}</a>
+</section>
 
-{sessionId && (
-  <form
-    id="application-form"
-    class="card"
-    data-locale={locale}
-    data-session-id={sessionId}
-    data-already-applied-message={t('apply.alreadyApplied')}
-    data-error-message={t('apply.error')}
-  >
-    <header class="card-heading">
-      <h2>{t('apply.heading')}</h2>
-      <p class="card-intro">{t('apply.intro')}</p>
-    </header>
-    <div class="form-grid">
-      <label>
-        <span>{t('apply.course')}</span>
-        <select name="course" required>
-          <option value="">{t('apply.chooseCourse')}</option>
-          {courses.map((course) => <option value={course.data.title}>{course.data.title}</option>)}
-        </select>
-      </label>
-      <label id="guardian-field" hidden>
-        <span>{t('apply.guardianName')}</span>
-        <input name="guardianName" type="text" autocomplete="name" />
-      </label>
-      <label>
-        <span>{t('apply.idNumber')}</span>
-        <input name="idNumber" type="text" required />
-      </label>
-      <label>
-        <span>{t('apply.idCopy')}</span>
-        <input name="idCopy" type="file" accept="image/jpeg,image/png,application/pdf" required />
-      </label>
-      <label>
-        <span>{t('apply.photo')}</span>
-        <input name="photo" type="file" accept="image/jpeg,image/png" required />
-      </label>
-    </div>
-    <button type="submit" class="btn btn-primary">{t('apply.submit')}</button>
-    <p id="application-error" class="form-error" role="alert" hidden></p>
-  </form>
-)}
+<form
+  id="application-form"
+  class="card"
+  hidden
+  data-locale={locale}
+  data-already-applied-message={t('apply.alreadyApplied')}
+  data-error-message={t('apply.error')}
+>
+  <header class="card-heading">
+    <h2>{t('apply.heading')}</h2>
+    <p class="card-intro">{t('apply.intro')}</p>
+  </header>
+  <div class="form-grid">
+    <label>
+      <span>{t('apply.course')}</span>
+      <select name="course" required>
+        <option value="">{t('apply.chooseCourse')}</option>
+        {courses.map((course) => <option value={course.data.title}>{course.data.title}</option>)}
+      </select>
+    </label>
+    <label id="guardian-field" hidden>
+      <span>{t('apply.guardianName')}</span>
+      <input name="guardianName" type="text" autocomplete="name" />
+    </label>
+    <label>
+      <span>{t('apply.idNumber')}</span>
+      <input name="idNumber" type="text" required />
+    </label>
+    <label>
+      <span>{t('apply.idCopy')}</span>
+      <input name="idCopy" type="file" accept="image/jpeg,image/png,application/pdf" required />
+    </label>
+    <label>
+      <span>{t('apply.photo')}</span>
+      <input name="photo" type="file" accept="image/jpeg,image/png" required />
+    </label>
+  </div>
+  <button type="submit" class="btn btn-primary">{t('apply.submit')}</button>
+  <p id="application-error" class="form-error" role="alert" hidden></p>
+</form>
 
 <section id="application-done" class="card" hidden>
   <h2>{t('apply.submittedHeading')}</h2>
@@ -70,11 +65,17 @@ const { locale, t, sessionId, courses } = Astro.props;
 <script>
   import { submitApplication, uploadDocument } from '../../lib/placementApi';
 
-  const form = document.getElementById('application-form') as HTMLFormElement | null;
-  if (form) {
+  const sessionId = new URLSearchParams(window.location.search).get('session');
+  const missingSessionEl = document.getElementById('application-missing-session') as HTMLElement;
+  const form = document.getElementById('application-form') as HTMLFormElement;
+
+  if (!sessionId) {
+    missingSessionEl.hidden = false;
+  } else {
+    form.hidden = false;
+
     const errorEl = document.getElementById('application-error') as HTMLElement;
     const doneEl = document.getElementById('application-done') as HTMLElement;
-    const sessionId = form.dataset.sessionId!;
     const alreadyAppliedMessage = form.dataset.alreadyAppliedMessage!;
     const errorMessage = form.dataset.errorMessage!;
 
