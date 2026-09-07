@@ -42,17 +42,18 @@ function constantTimeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-export async function verifyAdminSession(req: Request, env: Env): Promise<boolean> {
+export async function getSessionAdminId(req: Request, env: Env): Promise<string | null> {
   const cookieHeader = req.headers.get('cookie') ?? '';
   const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]+)`));
-  if (!match) return false;
+  if (!match) return null;
   const [adminId, expiresStr, sig] = match[1].split('.');
-  if (!adminId || !expiresStr || !sig) return false;
-  // Defence in depth against the NaN-expiry cookie described in
-  // issueSessionCookie: an unparseable expiry is treated as expired, not as
-  // "never expires" (which is what a bare `Date.now() > NaN` comparison gives).
+  if (!adminId || !expiresStr || !sig) return null;
   const expires = parseInt(expiresStr, 10);
-  if (!Number.isFinite(expires) || Date.now() > expires) return false;
+  if (!Number.isFinite(expires) || Date.now() > expires) return null;
   const expectedSig = await sign(`${adminId}.${expiresStr}`, env.ADMIN_COOKIE_SECRET);
-  return constantTimeEqual(expectedSig, sig);
+  return constantTimeEqual(expectedSig, sig) ? adminId : null;
+}
+
+export async function verifyAdminSession(req: Request, env: Env): Promise<boolean> {
+  return (await getSessionAdminId(req, env)) !== null;
 }
