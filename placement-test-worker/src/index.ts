@@ -5,6 +5,10 @@ import {
   requireAdmin, handleAdminLogin, handleAdminListSlots, handleAdminCreateSlot, handleAdminDeleteSlot,
   handleAdminListBookings, handleAdminListQuestions, handleAdminCreateQuestion, handleAdminSetQuestionActive,
 } from './routes/admin';
+import {
+  handleSubmitApplication, handleUploadDocument, handleAdminListApplications,
+  handleAdminSetApplicationStatus, handleAdminGetDocument,
+} from './routes/application';
 
 const ALLOWED_ORIGINS = ['https://elc.com.sa'];
 
@@ -51,6 +55,11 @@ const ROUTES: Route[] = [
   { method: 'GET', pattern: ['api', 'admin', 'questions'], admin: true, handler: (req, env) => handleAdminListQuestions(req, env) },
   { method: 'POST', pattern: ['api', 'admin', 'questions'], admin: true, handler: (req, env) => handleAdminCreateQuestion(req, env) },
   { method: 'PATCH', pattern: ['api', 'admin', 'questions', ':questionId'], admin: true, handler: (req, env, [questionId]) => handleAdminSetQuestionActive(req, env, questionId) },
+  { method: 'POST', pattern: ['api', 'apply'], handler: (req, env) => handleSubmitApplication(req, env) },
+  { method: 'POST', pattern: ['api', 'apply', ':applicationId', 'documents'], handler: (req, env, [applicationId]) => handleUploadDocument(req, env, applicationId) },
+  { method: 'GET', pattern: ['api', 'admin', 'applications'], admin: true, handler: (req, env) => handleAdminListApplications(req, env) },
+  { method: 'PATCH', pattern: ['api', 'admin', 'applications', ':applicationId'], admin: true, handler: (req, env, [applicationId]) => handleAdminSetApplicationStatus(req, env, applicationId) },
+  { method: 'GET', pattern: ['api', 'admin', 'applications', ':applicationId', 'documents', ':documentId'], admin: true, handler: (req, env, [applicationId, documentId]) => handleAdminGetDocument(req, env, applicationId, documentId) },
 ];
 
 function matchRoute(method: string, parts: string[]): { route: Route; params: string[] } | null {
