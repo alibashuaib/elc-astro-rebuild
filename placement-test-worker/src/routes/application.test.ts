@@ -23,13 +23,11 @@ async function completedSession(track: 'kids' | 'adults' = 'adults') {
   return sessionId;
 }
 
-const baseFields = { course: 'Adults General English', idNumber: '1234567890', idType: 'national_id', email: 'student@example.com' };
-
 describe('POST /apply', () => {
   it('creates an application for a completed session', async () => {
     const sessionId = await completedSession();
     const res = await handleSubmitApplication(
-      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields }) }),
+      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, course: 'Adults General English' }) }),
       env as any
     );
     expect(res.status).toBe(201);
@@ -37,60 +35,11 @@ describe('POST /apply', () => {
     expect(typeof applicationId).toBe('string');
   });
 
-  it('rejects a missing idNumber', async () => {
-    const sessionId = await completedSession();
-    const res = await handleSubmitApplication(
-      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields, idNumber: undefined }) }),
-      env as any
-    );
-    expect(res.status).toBe(400);
-  });
-
-  it('rejects a missing email', async () => {
-    const sessionId = await completedSession();
-    const res = await handleSubmitApplication(
-      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields, email: undefined }) }),
-      env as any
-    );
-    expect(res.status).toBe(400);
-  });
-
-  it('rejects a malformed email', async () => {
-    const sessionId = await completedSession();
-    const res = await handleSubmitApplication(
-      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields, email: 'not-an-email' }) }),
-      env as any
-    );
-    expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ error: 'invalid_email' });
-  });
-
-  it('rejects an invalid idType', async () => {
-    const sessionId = await completedSession();
-    const res = await handleSubmitApplication(
-      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields, idType: 'drivers_license' }) }),
-      env as any
-    );
-    expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ error: 'invalid_id_type' });
-  });
-
-  it('accepts iqama and passport as idType values', async () => {
-    for (const idType of ['iqama', 'passport']) {
-      const sessionId = await completedSession();
-      const res = await handleSubmitApplication(
-        new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields, idType }) }),
-        env as any
-      );
-      expect(res.status).toBe(201);
-    }
-  });
-
   it('refuses a session that never completed', async () => {
     const studentId = await insertStudent(env as any, { name: 'A', phone: '1', dob: '2000-01-01', locale: 'en' });
     const sessionId = await insertSession(env as any, studentId, 'adults');
     const res = await handleSubmitApplication(
-      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields }) }),
+      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, course: 'Adults General English' }) }),
       env as any
     );
     expect(res.status).toBe(400);
@@ -98,7 +47,7 @@ describe('POST /apply', () => {
 
   it('refuses a second application for the same session', async () => {
     const sessionId = await completedSession();
-    const body = JSON.stringify({ sessionId, ...baseFields });
+    const body = JSON.stringify({ sessionId, course: 'Adults General English' });
     await handleSubmitApplication(new Request('http://x', { method: 'POST', body }), env as any);
     const second = await handleSubmitApplication(new Request('http://x', { method: 'POST', body }), env as any);
     expect(second.status).toBe(409);
@@ -107,7 +56,7 @@ describe('POST /apply', () => {
   it('rejects a kids-track application with no guardian name', async () => {
     const sessionId = await completedSession('kids');
     const res = await handleSubmitApplication(
-      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields, course: 'Kids General English' }) }),
+      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, course: 'Kids General English' }) }),
       env as any
     );
     expect(res.status).toBe(400);
@@ -119,7 +68,7 @@ describe('POST /apply', () => {
     const res = await handleSubmitApplication(
       new Request('http://x', {
         method: 'POST',
-        body: JSON.stringify({ sessionId, ...baseFields, course: 'Kids General English', guardianName: 'Parent Name' }),
+        body: JSON.stringify({ sessionId, course: 'Kids General English', guardianName: 'Parent Name' }),
       }),
       env as any
     );
@@ -151,13 +100,13 @@ describe('admin application routes', () => {
     const sessionId = await insertSession(env as any, studentId, 'adults');
     await completeSession(env as any, sessionId, 'B1');
     const res = await handleSubmitApplication(
-      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, ...baseFields }) }),
+      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, course: 'Adults General English' }) }),
       env as any
     );
     return ((await res.json()) as any).applicationId as string;
   }
 
-  it('lists applications with student, level, email and id-type details', async () => {
+  it('lists applications with student and level details', async () => {
     const applicationId = await createApplication(adminEnv);
     const res = await handleAdminListApplications(new Request('http://x'), adminEnv as any);
     const data = (await res.json()) as any;
@@ -166,8 +115,6 @@ describe('admin application routes', () => {
     expect(data.applications[0].student_name).toBe('A');
     expect(data.applications[0].estimated_level).toBe('B1');
     expect(data.applications[0].status).toBe('pending');
-    expect(data.applications[0].email).toBe('student@example.com');
-    expect(data.applications[0].id_type).toBe('national_id');
   });
 
   it('filters applications by status', async () => {
