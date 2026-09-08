@@ -91,11 +91,6 @@ export async function getApplicationBySession(env: Env, sessionId: string): Prom
   return row ?? null;
 }
 
-export async function getApplicationById(env: Env, id: string): Promise<ApplicationRow | null> {
-  const row = await env.DB.prepare(`SELECT * FROM applications WHERE id = ?`).bind(id).first<ApplicationRow>();
-  return row ?? null;
-}
-
 export interface ApplicationWithDetails {
   application_id: string;
   student_name: string;
