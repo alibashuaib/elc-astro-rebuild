@@ -66,6 +66,28 @@ describe('POST /apply', () => {
     const second = await handleSubmitApplication(new Request('http://x', { method: 'POST', body }), env as any);
     expect(second.status).toBe(409);
   });
+
+  it('rejects a kids-track application with no guardian name', async () => {
+    const sessionId = await completedSession('kids');
+    const res = await handleSubmitApplication(
+      new Request('http://x', { method: 'POST', body: JSON.stringify({ sessionId, course: 'Kids General English', idNumber: '1234567890' }) }),
+      env as any
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'guardian_name_required' });
+  });
+
+  it('accepts a kids-track application with a guardian name', async () => {
+    const sessionId = await completedSession('kids');
+    const res = await handleSubmitApplication(
+      new Request('http://x', {
+        method: 'POST',
+        body: JSON.stringify({ sessionId, course: 'Kids General English', idNumber: '1234567890', guardianName: 'Parent Name' }),
+      }),
+      env as any
+    );
+    expect(res.status).toBe(201);
+  });
 });
 
 describe('POST /apply/:id/documents', () => {

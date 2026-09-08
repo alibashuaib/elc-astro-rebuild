@@ -20,7 +20,6 @@ const { locale, t, courses } = Astro.props;
   id="application-form"
   class="card"
   hidden
-  data-locale={locale}
   data-already-applied-message={t('apply.alreadyApplied')}
   data-error-message={t('apply.error')}
 >
@@ -79,12 +78,10 @@ const { locale, t, courses } = Astro.props;
     const alreadyAppliedMessage = form.dataset.alreadyAppliedMessage!;
     const errorMessage = form.dataset.errorMessage!;
 
-    // Kids track sessions need a guardian name; there's no track flag on this
-    // form, so infer it the same way the rest of the funnel would show it --
-    // by asking the worker via the session the student already has. Simpler:
-    // always show the field but only require it when the placement result
-    // (recorded earlier in this browser tab via sessionStorage, see
-    // ResultBooking.astro) was a kids-track session.
+    // Kids track sessions need a guardian name. This form has no track prop,
+    // so we read `placement:track` from sessionStorage -- written by
+    // RegistrationForm.astro's submit handler -- to decide whether to show
+    // and require the guardian name field.
     const guardianField = document.getElementById('guardian-field') as HTMLElement;
     const guardianInput = guardianField.querySelector('input') as HTMLInputElement;
     if (sessionStorage.getItem('placement:track') === 'kids') {
@@ -102,17 +99,42 @@ const { locale, t, courses } = Astro.props;
       const idCopy = data.get('idCopy') as File;
       const photo = data.get('photo') as File;
 
-      const result = await submitApplication(sessionId, { course, guardianName, idNumber });
-      if ('error' in result) {
-        errorEl.textContent = result.error === 'already_applied' ? alreadyAppliedMessage : errorMessage;
+      // Reuse an application id from a previous submit on this form (e.g. a
+      // retry after an upload failure) so we don't re-POST /api/apply for a
+      // session that already has an application -- that would 409.
+      let applicationId = form.dataset.applicationId;
+      if (!applicationId) {
+        try {
+          const result = await submitApplication(sessionId, { course, guardianName, idNumber });
+          if ('error' in result) {
+            errorEl.textContent = result.error === 'already_applied' ? alreadyAppliedMessage : errorMessage;
+            errorEl.hidden = false;
+            return;
+          }
+          applicationId = result.applicationId;
+          form.dataset.applicationId = applicationId;
+        } catch {
+          errorEl.textContent = errorMessage;
+          errorEl.hidden = false;
+          return;
+        }
+      }
+
+      try {
+        const [idCopyResult, photoResult] = await Promise.all([
+          uploadDocument(applicationId, 'id_copy', idCopy),
+          uploadDocument(applicationId, 'photo', photo),
+        ]);
+        if ('error' in idCopyResult || 'error' in photoResult) {
+          errorEl.textContent = errorMessage;
+          errorEl.hidden = false;
+          return;
+        }
+      } catch {
+        errorEl.textContent = errorMessage;
         errorEl.hidden = false;
         return;
       }
-
-      await Promise.all([
-        uploadDocument(result.applicationId, 'id_copy', idCopy),
-        uploadDocument(result.applicationId, 'photo', photo),
-      ]);
 
       form.hidden = true;
       doneEl.hidden = false;

@@ -190,7 +190,8 @@
     applications.forEach((a: any) => {
       const li = document.createElement('li');
       const summary = document.createElement('span');
-      summary.textContent = `${a.student_name} (${a.phone}) — ${a.course} — level ${a.estimated_level ?? '—'} — ${a.status}`;
+      const incomplete = a.documents.length < 2 ? ' — INCOMPLETE (missing documents)' : '';
+      summary.textContent = `${a.student_name} (${a.phone}) — ${a.course} — level ${a.estimated_level ?? '—'} — ${a.status}${incomplete}`;
       li.appendChild(summary);
 
       a.documents.forEach((doc: any) => {
