@@ -3,6 +3,10 @@ import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, 
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 import { ADULT_BANDS, BELOW_FIRST_BAND, bandForSequence, isLastBand, evaluateBand, placementLevel, canStillPass, previousBand } from '../bands';
 import { kidsLevelIndex, KIDS_YLE_BY_INDEX } from '../kids';
+import {
+  NAME_RE, PHONE_RE, ID_NUMBER_RE, EMAIL_RE,
+  REFERRAL_SOURCES, SOCIAL_CHANNELS, GUARDIAN_RELATIONSHIPS, computeAge,
+} from '../registrationRules';
 
 // Adults-only: the last question number this track actually serves. The
 // bank has 50 real questions (see migrations/0003_real_questions.sql), but
@@ -105,12 +109,49 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
 
 export async function handleStartSession(req: Request, env: Env): Promise<Response> {
   const body = await req.json<StudentInput>();
-  if (!body.name || !body.phone || !body.dob || !body.locale) {
-    return json({ error: 'name, phone, dob, and locale are required' }, 400);
+
+  const namesValid = [body.firstName, body.fatherName, body.grandfatherName, body.familyName]
+    .every((part) => typeof part === 'string' && NAME_RE.test(part));
+  if (!namesValid) return json({ error: 'invalid_name' }, 400);
+  if (!body.phone || !PHONE_RE.test(body.phone)) return json({ error: 'invalid_phone' }, 400);
+  if (!body.dob) return json({ error: 'dob is required' }, 400);
+  const age = computeAge(body.dob);
+  if (!Number.isFinite(age) || age < 4 || age > 100) return json({ error: 'invalid_age' }, 400);
+  if (!body.idNumber || !ID_NUMBER_RE.test(body.idNumber)) return json({ error: 'invalid_id_number' }, 400);
+  if (!body.nationality?.trim()) return json({ error: 'nationality_required' }, 400);
+  if (body.email && !EMAIL_RE.test(body.email)) return json({ error: 'invalid_email' }, 400);
+  if (!body.locale) return json({ error: 'locale is required' }, 400);
+
+  if (age < 18) {
+    if (!body.guardianName?.trim() || !body.guardianRelationship || !body.guardianPhone?.trim()) {
+      return json({ error: 'guardian_details_required' }, 400);
+    }
   }
+  if (body.guardianRelationship && !GUARDIAN_RELATIONSHIPS.includes(body.guardianRelationship as any)) {
+    return json({ error: 'invalid_guardian_relationship' }, 400);
+  }
+  if (body.guardianRelationship === 'other' && !body.guardianRelationshipOther?.trim()) {
+    return json({ error: 'guardian_relationship_other_required' }, 400);
+  }
+
+  if (!body.referralSource || !REFERRAL_SOURCES.includes(body.referralSource as any)) {
+    return json({ error: 'invalid_referral_source' }, 400);
+  }
+  if (body.referralSource === 'other' && !body.referralSourceOther?.trim()) {
+    return json({ error: 'referral_source_other_required' }, 400);
+  }
+  if (body.referralSocialChannels?.some((c) => !SOCIAL_CHANNELS.includes(c as any))) {
+    return json({ error: 'invalid_social_channel' }, 400);
+  }
+
+  if (!body.termsAccepted || !body.mediaConsentAccepted) {
+    return json({ error: 'consent_required' }, 400);
+  }
+
+  const fullName = [body.firstName, body.fatherName, body.grandfatherName, body.familyName].join(' ');
   const requestedTrack = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
   const track = isUnderEleven(body.dob) ? 'kids' : requestedTrack;
-  const studentId = await insertStudent(env, body);
+  const studentId = await insertStudent(env, { ...body, name: fullName });
   const sessionId = await insertSession(env, studentId, track);
   const state = initialState();
   const first = await nextQuestionPayload(env, sessionId, track, state.currentLevelIndex, []);
