@@ -40,16 +40,20 @@ const { locale, t, courses } = Astro.props;
       <input name="guardianName" type="text" autocomplete="name" />
     </label>
     <label>
+      <span>{t('apply.email')}</span>
+      <input name="email" type="email" autocomplete="email" required />
+    </label>
+    <label>
+      <span>{t('apply.idType')}</span>
+      <select name="idType" required>
+        <option value="national_id">{t('apply.idTypeNational')}</option>
+        <option value="iqama">{t('apply.idTypeIqama')}</option>
+        <option value="passport">{t('apply.idTypePassport')}</option>
+      </select>
+    </label>
+    <label>
       <span>{t('apply.idNumber')}</span>
       <input name="idNumber" type="text" required />
-    </label>
-    <label>
-      <span>{t('apply.idCopy')}</span>
-      <input name="idCopy" type="file" accept="image/jpeg,image/png,application/pdf" required />
-    </label>
-    <label>
-      <span>{t('apply.photo')}</span>
-      <input name="photo" type="file" accept="image/jpeg,image/png" required />
     </label>
   </div>
   <button type="submit" class="btn btn-primary">{t('apply.submit')}</button>
@@ -62,7 +66,7 @@ const { locale, t, courses } = Astro.props;
 </section>
 
 <script>
-  import { submitApplication, uploadDocument } from '../../lib/placementApi';
+  import { submitApplication } from '../../lib/placementApi';
 
   const sessionId = new URLSearchParams(window.location.search).get('session');
   const missingSessionEl = document.getElementById('application-missing-session') as HTMLElement;
@@ -95,38 +99,14 @@ const { locale, t, courses } = Astro.props;
       const data = new FormData(form);
       const course = String(data.get('course') ?? '');
       const guardianName = String(data.get('guardianName') ?? '') || undefined;
+      const email = String(data.get('email') ?? '');
+      const idType = String(data.get('idType') ?? '') as 'national_id' | 'iqama' | 'passport';
       const idNumber = String(data.get('idNumber') ?? '');
-      const idCopy = data.get('idCopy') as File;
-      const photo = data.get('photo') as File;
-
-      // Reuse an application id from a previous submit on this form (e.g. a
-      // retry after an upload failure) so we don't re-POST /api/apply for a
-      // session that already has an application -- that would 409.
-      let applicationId = form.dataset.applicationId;
-      if (!applicationId) {
-        try {
-          const result = await submitApplication(sessionId, { course, guardianName, idNumber });
-          if ('error' in result) {
-            errorEl.textContent = result.error === 'already_applied' ? alreadyAppliedMessage : errorMessage;
-            errorEl.hidden = false;
-            return;
-          }
-          applicationId = result.applicationId;
-          form.dataset.applicationId = applicationId;
-        } catch {
-          errorEl.textContent = errorMessage;
-          errorEl.hidden = false;
-          return;
-        }
-      }
 
       try {
-        const [idCopyResult, photoResult] = await Promise.all([
-          uploadDocument(applicationId, 'id_copy', idCopy),
-          uploadDocument(applicationId, 'photo', photo),
-        ]);
-        if ('error' in idCopyResult || 'error' in photoResult) {
-          errorEl.textContent = errorMessage;
+        const result = await submitApplication(sessionId, { course, guardianName, email, idType, idNumber });
+        if ('error' in result) {
+          errorEl.textContent = result.error === 'already_applied' ? alreadyAppliedMessage : errorMessage;
           errorEl.hidden = false;
           return;
         }

@@ -187,22 +187,13 @@
 
     const applicationList = document.getElementById('application-list')!;
     applicationList.innerHTML = '';
+    const idTypeLabels: Record<string, string> = { national_id: 'National ID', iqama: 'Iqama', passport: 'Passport' };
     applications.forEach((a: any) => {
       const li = document.createElement('li');
       const summary = document.createElement('span');
-      const incomplete = a.documents.length < 2 ? ' — INCOMPLETE (missing documents)' : '';
-      summary.textContent = `${a.student_name} (${a.phone}) — ${a.course} — level ${a.estimated_level ?? '—'} — ${a.status}${incomplete}`;
+      const idTypeLabel = idTypeLabels[a.id_type] ?? a.id_type;
+      summary.textContent = `${a.student_name} (${a.phone}) — ${a.email} — ${a.course} — level ${a.estimated_level ?? '—'} — ${idTypeLabel} #${a.id_number} — ${a.status}`;
       li.appendChild(summary);
-
-      a.documents.forEach((doc: any) => {
-        const link = document.createElement('a');
-        link.href = `${BASE}/api/admin/applications/${a.application_id}/documents/${doc.id}`;
-        link.target = '_blank';
-        link.rel = 'noopener';
-        link.className = 'btn btn-outline';
-        link.textContent = doc.kind;
-        li.appendChild(link);
-      });
 
       if (a.status === 'pending') {
         const approve = document.createElement('button');

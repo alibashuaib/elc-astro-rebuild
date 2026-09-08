@@ -59,12 +59,6 @@ describe('router', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns 401 for GET /api/admin/applications/:id/documents/:docId with no auth cookie', async () => {
-    const req = new Request('http://x/api/admin/applications/app-1/documents/doc-1', { method: 'GET' });
-    const res = await worker.fetch(req, env as any);
-    expect(res.status).toBe(401);
-  });
-
   it('logs in and allows a follow-up authenticated request to a gated route', async () => {
     const hash = await bcrypt.hash('correct-horse', 10);
     await env.DB.prepare(`INSERT INTO admin_users (id, username, password_hash) VALUES ('a1', 'staff', ?)`).bind(hash).run();

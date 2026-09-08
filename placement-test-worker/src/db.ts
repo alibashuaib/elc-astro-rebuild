@@ -1,4 +1,4 @@
-import type { Env, StudentInput, QuestionRow, PassageRow, SessionRow, Track, ApplicationRow, ApplicationDocumentRow, DocumentKind } from './types';
+import type { Env, StudentInput, QuestionRow, PassageRow, SessionRow, Track, ApplicationRow, IdType } from './types';
 
 function newId(): string {
   return crypto.randomUUID();
@@ -74,13 +74,15 @@ export interface ApplicationInput {
   course: string;
   guardianName: string | null;
   idNumber: string;
+  idType: IdType;
+  email: string;
 }
 
 export async function insertApplication(env: Env, input: ApplicationInput): Promise<string> {
   const id = newId();
   await env.DB.prepare(
-    `INSERT INTO applications (id, session_id, course, guardian_name, id_number) VALUES (?, ?, ?, ?, ?)`
-  ).bind(id, input.sessionId, input.course, input.guardianName, input.idNumber).run();
+    `INSERT INTO applications (id, session_id, course, guardian_name, id_number, id_type, email) VALUES (?, ?, ?, ?, ?, ?, ?)`
+  ).bind(id, input.sessionId, input.course, input.guardianName, input.idNumber, input.idType, input.email).run();
   return id;
 }
 
@@ -94,28 +96,6 @@ export async function getApplicationById(env: Env, id: string): Promise<Applicat
   return row ?? null;
 }
 
-export async function insertApplicationDocument(env: Env, applicationId: string, kind: DocumentKind, r2Key: string): Promise<string> {
-  const id = newId();
-  await env.DB.prepare(
-    `INSERT INTO application_documents (id, application_id, kind, r2_key) VALUES (?, ?, ?, ?)`
-  ).bind(id, applicationId, kind, r2Key).run();
-  return id;
-}
-
-export async function listApplicationDocuments(env: Env, applicationId: string): Promise<ApplicationDocumentRow[]> {
-  const { results } = await env.DB.prepare(`SELECT * FROM application_documents WHERE application_id = ?`)
-    .bind(applicationId)
-    .all<ApplicationDocumentRow>();
-  return results ?? [];
-}
-
-export async function getApplicationDocument(env: Env, applicationId: string, documentId: string): Promise<ApplicationDocumentRow | null> {
-  const row = await env.DB.prepare(`SELECT * FROM application_documents WHERE id = ? AND application_id = ?`)
-    .bind(documentId, applicationId)
-    .first<ApplicationDocumentRow>();
-  return row ?? null;
-}
-
 export interface ApplicationWithDetails {
   application_id: string;
   student_name: string;
@@ -124,28 +104,24 @@ export interface ApplicationWithDetails {
   course: string;
   guardian_name: string | null;
   id_number: string;
+  id_type: IdType;
+  email: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
-  documents: Array<{ id: string; kind: DocumentKind }>;
 }
 
 export async function listApplicationsWithDetails(env: Env, status: string | null): Promise<ApplicationWithDetails[]> {
   const sql = `SELECT a.id AS application_id, s.name AS student_name, s.phone AS phone, ts.estimated_level AS estimated_level,
-      a.course AS course, a.guardian_name AS guardian_name, a.id_number AS id_number, a.status AS status, a.created_at AS created_at
+      a.course AS course, a.guardian_name AS guardian_name, a.id_number AS id_number, a.id_type AS id_type,
+      a.email AS email, a.status AS status, a.created_at AS created_at
     FROM applications a
     JOIN test_sessions ts ON ts.id = a.session_id
     JOIN students s ON s.id = ts.student_id
     ${status ? 'WHERE a.status = ?' : ''}
     ORDER BY a.created_at DESC`;
   const stmt = status ? env.DB.prepare(sql).bind(status) : env.DB.prepare(sql);
-  const { results } = await stmt.all<Omit<ApplicationWithDetails, 'documents'>>();
-  const rows = results ?? [];
-  const withDocs: ApplicationWithDetails[] = [];
-  for (const row of rows) {
-    const docs = await listApplicationDocuments(env, row.application_id);
-    withDocs.push({ ...row, documents: docs.map((d) => ({ id: d.id, kind: d.kind })) });
-  }
-  return withDocs;
+  const { results } = await stmt.all<ApplicationWithDetails>();
+  return results ?? [];
 }
 
 export async function setApplicationStatus(env: Env, id: string, status: 'approved' | 'rejected', reviewedBy: string): Promise<void> {
