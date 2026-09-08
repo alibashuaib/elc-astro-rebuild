@@ -1,4 +1,6 @@
-import type { Env, StudentInput, QuestionRow, PassageRow, SessionRow, Track, ApplicationRow, IdType } from './types';
+import type { Env, StudentInput, QuestionRow, PassageRow, SessionRow, Track, ApplicationRow } from './types';
+
+const TERMS_VERSION = '2026-09-08';
 
 function newId(): string {
   return crypto.randomUUID();
@@ -34,9 +36,43 @@ export function isUnderEleven(dob: string): boolean {
 
 export async function insertStudent(env: Env, input: StudentInput): Promise<string> {
   const id = newId();
+  const now = new Date().toISOString();
   await env.DB.prepare(
-    `INSERT INTO students (id, name, phone, dob, guardian_name, locale) VALUES (?, ?, ?, ?, ?, ?)`
-  ).bind(id, input.name, input.phone, input.dob, input.guardianName ?? null, input.locale).run();
+    `INSERT INTO students (
+      id, name, phone, dob, guardian_name, locale,
+      first_name, father_name, grandfather_name, family_name,
+      id_number, nationality, email, education_level, address,
+      guardian_relationship, guardian_relationship_other, guardian_phone, guardian_alt_phone,
+      referral_source, referral_source_other, referral_social_channels,
+      terms_accepted_at, media_consent_accepted_at, terms_version
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    id,
+    input.name,
+    input.phone,
+    input.dob,
+    input.guardianName ?? null,
+    input.locale,
+    input.firstName ?? '',
+    input.fatherName ?? '',
+    input.grandfatherName ?? '',
+    input.familyName ?? '',
+    input.idNumber ?? '',
+    input.nationality ?? '',
+    input.email ?? null,
+    input.educationLevel ?? null,
+    input.address ?? null,
+    input.guardianRelationship ?? null,
+    input.guardianRelationshipOther ?? null,
+    input.guardianPhone ?? null,
+    input.guardianAltPhone ?? null,
+    input.referralSource ?? '',
+    input.referralSourceOther ?? null,
+    input.referralSocialChannels ? JSON.stringify(input.referralSocialChannels) : null,
+    input.termsAccepted ? now : null,
+    input.mediaConsentAccepted ? now : null,
+    input.termsAccepted ? TERMS_VERSION : null
+  ).run();
   return id;
 }
 
@@ -73,16 +109,13 @@ export interface ApplicationInput {
   sessionId: string;
   course: string;
   guardianName: string | null;
-  idNumber: string;
-  idType: IdType;
-  email: string;
 }
 
 export async function insertApplication(env: Env, input: ApplicationInput): Promise<string> {
   const id = newId();
   await env.DB.prepare(
-    `INSERT INTO applications (id, session_id, course, guardian_name, id_number, id_type, email) VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ).bind(id, input.sessionId, input.course, input.guardianName, input.idNumber, input.idType, input.email).run();
+    `INSERT INTO applications (id, session_id, course, guardian_name) VALUES (?, ?, ?, ?)`
+  ).bind(id, input.sessionId, input.course, input.guardianName).run();
   return id;
 }
 
@@ -104,16 +137,15 @@ export interface ApplicationWithDetails {
   course: string;
   guardian_name: string | null;
   id_number: string;
-  id_type: IdType;
-  email: string;
+  nationality: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
 }
 
 export async function listApplicationsWithDetails(env: Env, status: string | null): Promise<ApplicationWithDetails[]> {
   const sql = `SELECT a.id AS application_id, s.name AS student_name, s.phone AS phone, ts.estimated_level AS estimated_level,
-      a.course AS course, a.guardian_name AS guardian_name, a.id_number AS id_number, a.id_type AS id_type,
-      a.email AS email, a.status AS status, a.created_at AS created_at
+      a.course AS course, a.guardian_name AS guardian_name, s.id_number AS id_number, s.nationality AS nationality,
+      a.status AS status, a.created_at AS created_at
     FROM applications a
     JOIN test_sessions ts ON ts.id = a.session_id
     JOIN students s ON s.id = ts.student_id
