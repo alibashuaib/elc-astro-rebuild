@@ -1,0 +1,39 @@
+---
+// src/pages/[lang]/apply.astro
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ApplicationForm from '../../components/placement-test/ApplicationForm.astro';
+import { breadcrumbSchema } from '../../lib/schema';
+import { localePaths, meta, trail, heroKicker } from '../../i18n/pages';
+import { useTranslations, type Locale } from '../../i18n/ui';
+
+export const getStaticPaths = localePaths;
+
+const locale = Astro.params.lang as Locale;
+const t = useTranslations(locale);
+const { title, description, hero } = meta('apply', locale);
+
+const courses = await getCollection('courses', (e) => e.id.startsWith(`${locale}/`) && !e.data.draft);
+---
+
+<Layout
+  locale={locale}
+  path="/apply"
+  title={title}
+  description={description}
+  jsonLd={breadcrumbSchema(trail(locale, ['apply']))}
+>
+  <PageHero kicker={heroKicker[locale]} title={hero!.title} subtitle={hero!.subtitle} />
+  <main class="container apply-wrap">
+    <ApplicationForm locale={locale} t={t} courses={courses} />
+  </main>
+</Layout>
+
+<style>
+  .apply-wrap {
+    max-width: 54rem;
+    margin-inline: auto;
+    padding-block: clamp(2rem, 5vw, 5rem);
+  }
+</style>

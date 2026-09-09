@@ -83,3 +83,40 @@ export function createBooking(sessionId: string, slotId: string) {
     expectedErrors: [409],
   });
 }
+
+export interface ApplicationFields {
+  course: string;
+  guardianName?: string;
+  idNumber: string;
+}
+
+export function submitApplication(sessionId: string, fields: ApplicationFields) {
+  // 409 means this session already has an application -- the caller shows
+  // "already applied" instead of treating it as a transport failure.
+  return request<{ applicationId: string } | { error: string }>('/api/apply', {
+    method: 'POST',
+    body: JSON.stringify({ sessionId, ...fields }),
+    expectedErrors: [409],
+  });
+}
+
+export async function uploadDocument(
+  applicationId: string,
+  kind: 'id_copy' | 'photo' | 'other',
+  file: File
+): Promise<{ documentId: string } | { error: string }> {
+  // Direct fetch() call, not the shared request() helper — that helper sets
+  // content-type: application/json, which would override the browser's automatic
+  // multipart/form-data; boundary=... header needed for FormData bodies.
+  const form = new FormData();
+  form.set('kind', kind);
+  form.set('file', file);
+  const res = await fetch(`${BASE}/api/apply/${applicationId}/documents`, {
+    method: 'POST',
+    credentials: 'include',
+    body: form,
+  });
+  const data = (await res.json()) as { documentId: string } | { error: string };
+  if (!res.ok && !('error' in data)) throw new Error(`document upload failed: ${res.status}`);
+  return data;
+}

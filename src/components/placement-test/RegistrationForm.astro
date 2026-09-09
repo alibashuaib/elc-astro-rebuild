@@ -132,6 +132,7 @@ const { locale, t } = Astro.props;
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(form).entries());
+    sessionStorage.setItem('placement:track', String(data.track ?? 'adults'));
     document.dispatchEvent(
       new CustomEvent('placement:register', { detail: { ...data, locale: form.dataset.locale } })
     );

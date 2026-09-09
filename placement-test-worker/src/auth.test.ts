@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { issueSessionCookie, verifyAdminSession } from './auth';
+import { issueSessionCookie, verifyAdminSession, getSessionAdminId } from './auth';
 
 function makeEnv(overrides: Record<string, unknown> = {}) {
   return {
@@ -64,6 +64,31 @@ describe('admin session cookies', () => {
     Date.now = () => realNow() + 2000;
     try {
       expect(await verifyAdminSession(requestWithCookie(cookie), env)).toBe(false);
+    } finally {
+      Date.now = realNow;
+    }
+  });
+});
+
+describe('getSessionAdminId', () => {
+  it('returns the admin id from a valid cookie', async () => {
+    const env = makeEnv();
+    const cookie = await issueSessionCookie(env, 'a1');
+    expect(await getSessionAdminId(requestWithCookie(cookie), env)).toBe('a1');
+  });
+
+  it('returns null when there is no cookie', async () => {
+    const env = makeEnv();
+    expect(await getSessionAdminId(new Request('http://x'), env)).toBeNull();
+  });
+
+  it('returns null for an expired cookie', async () => {
+    const env = makeEnv({ ADMIN_SESSION_TTL_SECONDS: '1' });
+    const cookie = await issueSessionCookie(env, 'a1');
+    const realNow = Date.now;
+    Date.now = () => realNow() + 2000;
+    try {
+      expect(await getSessionAdminId(requestWithCookie(cookie), env)).toBeNull();
     } finally {
       Date.now = realNow;
     }

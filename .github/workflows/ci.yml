@@ -79,6 +79,13 @@ jobs:
       - name: Create the local D1 database
         run: npm run db:migrate:local --prefix placement-test-worker
 
+      - name: Seed a bookable slot for the smoke tests
+        # listOpenSlots (src/db.ts) requires starts_at in the future and
+        # booked_count < capacity -- migrations don't seed any slot rows, so
+        # application.spec.ts's booking step has nothing to click without this.
+        run: npx wrangler d1 execute placement-test --local --command "INSERT INTO slots (id, starts_at, capacity, booked_count) VALUES ('e2e-smoke-slot', '2027-01-01T10:00:00.000Z', 5, 0)"
+        working-directory: placement-test-worker
+
       - name: Start the Worker
         run: |
           npm run dev --prefix placement-test-worker > /tmp/wrangler.log 2>&1 &

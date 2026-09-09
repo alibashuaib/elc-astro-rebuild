@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import worker from '../src/index.ts';
 import { createFakeD1 } from '../src/test-utils/fakeD1.ts';
+import { createFakeR2 } from '../src/test-utils/fakeR2.ts';
 
 const workerRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const migrations = [
@@ -23,11 +24,13 @@ const migrations = [
   '0015_drop_recent_levels.sql',
   '0017_kids_3d_illustrations.sql',
   '0018_kids_3d_action_illustrations.sql',
-  '0019_single_kids_number_activity.sql',
+  '0019_student_applications.sql',
+  '0020_single_kids_number_activity.sql',
 ].map((file) => path.join(workerRoot, 'migrations', file));
 
 const env = {
   DB: createFakeD1(migrations),
+  DOCS: createFakeR2(),
   ADMIN_COOKIE_SECRET: 'local-development-only',
   ADMIN_SESSION_TTL_SECONDS: '43200',
   LOCAL_DEV: 'true',
