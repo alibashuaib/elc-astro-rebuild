@@ -1,4 +1,4 @@
-﻿import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
 
 /**
  * Fails the test on any console error or uncaught exception.
@@ -285,4 +285,3 @@ test('contact cards use dark surfaces and readable accent labels in dark mode', 
     { soft: '#38291f', label: 'rgb(255, 179, 110)' },
   ]);
 });
-

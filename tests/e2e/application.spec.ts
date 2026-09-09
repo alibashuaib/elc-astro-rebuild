@@ -1,4 +1,4 @@
-﻿import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
 
 function failOnConsoleErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -49,6 +49,13 @@ test('adult student completes the placement test, books a slot, and submits an a
   await expect(slotButton).toBeVisible({ timeout: 10_000 });
   await slotButton.click();
 
+  // Regression coverage for the WhatsApp confirmation message including the student's actual
+  // name (assembled from firstName/fatherName/grandfatherName/familyName by
+  // RegistrationForm.astro) instead of the literal string "undefined".
+  const waLink = page.locator('#pt-whatsapp');
+  await expect(waLink).toBeVisible({ timeout: 10_000 });
+  await expect(waLink).toHaveAttribute('href', /text=.*Application%20Smoke%20Test%20User/);
+
   const applyLink = page.locator('#pt-apply');
   await expect(applyLink).toBeVisible();
   await applyLink.click();
@@ -61,4 +68,3 @@ test('adult student completes the placement test, books a slot, and submits an a
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });
-

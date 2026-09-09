@@ -68,7 +68,7 @@ const { t } = Astro.props;
 
 <script>
   import { startSession, submitAnswer } from '../../lib/placementApi';
-  import type { QuestionPayload } from '../../lib/placementApi';
+  import type { QuestionPayload, StartSessionInput } from '../../lib/placementApi';
 
   const runner = document.getElementById('placement-test-runner') as HTMLElement;
   const progressEl = document.getElementById('pt-progress') as HTMLElement;
@@ -505,14 +505,21 @@ const { t } = Astro.props;
   }
 
   document.addEventListener('placement:register', async (event: Event) => {
-    const detail = (event as CustomEvent).detail;
+    const detail = (event as CustomEvent).detail as StartSessionInput;
     const registrationError = document.getElementById('placement-registration-error') as HTMLElement | null;
     if (registrationError) registrationError.hidden = true;
     let step;
     try {
       step = await startSession(detail);
     } catch {
-      if (registrationError) registrationError.hidden = false;
+      // RegistrationForm.astro's client-side validation writes its own messages into this
+      // same element (e.g. "Please enter a valid email"). Reset to the server-error default
+      // (rendered server-side into data-default-message) before unhiding, so a stale
+      // client-side message never gets shown for what is actually a server-side 400.
+      if (registrationError) {
+        registrationError.textContent = registrationError.dataset.defaultMessage ?? registrationError.textContent;
+        registrationError.hidden = false;
+      }
       return;
     }
     sessionId = step.sessionId;

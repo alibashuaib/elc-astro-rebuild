@@ -7,6 +7,27 @@ export interface StartSessionInput {
   guardianName?: string;
   locale: 'en' | 'ar';
   track?: 'kids' | 'adults';
+  // Registration wizard fields -- mirrors placement-test-worker/src/types.ts's StudentInput.
+  // All optional here too: handleStartSession enforces required-ness server-side; this type
+  // just needs to describe what the wizard's placement:register payload actually contains.
+  firstName?: string;
+  fatherName?: string;
+  grandfatherName?: string;
+  familyName?: string;
+  idNumber?: string;
+  nationality?: string;
+  email?: string;
+  educationLevel?: string;
+  address?: string;
+  guardianRelationship?: string;
+  guardianRelationshipOther?: string;
+  guardianPhone?: string;
+  guardianAltPhone?: string;
+  referralSource?: string;
+  referralSourceOther?: string;
+  referralSocialChannels?: string[];
+  termsAccepted?: boolean;
+  mediaConsentAccepted?: boolean;
 }
 
 export interface QuestionPayload {

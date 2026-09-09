@@ -190,7 +190,7 @@
     applications.forEach((a: any) => {
       const li = document.createElement('li');
       const summary = document.createElement('span');
-      summary.textContent = `${a.student_name} (${a.phone}) — ${a.nationality} — ID ${a.id_number} — ${a.course} — level ${a.estimated_level ?? '—'} — ${a.status}`;
+      summary.textContent = `${a.student_name} (${a.phone}) — ${a.nationality || '—'} — ID ${a.id_number || '—'} — ${a.course} — level ${a.estimated_level ?? '—'} — ${a.status}`;
       li.appendChild(summary);
 
       if (a.status === 'pending') {

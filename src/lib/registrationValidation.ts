@@ -13,14 +13,21 @@ export const SOCIAL_CHANNELS = ['facebook', 'twitter', 'youtube', 'tiktok', 'ins
 export const GUARDIAN_RELATIONSHIPS = ['father', 'mother', 'sibling', 'grandparent', 'legal_guardian', 'other'] as const;
 export const EDUCATION_LEVELS = ['primary', 'intermediate', 'secondary', 'university', 'postgraduate', 'vocational', 'other'] as const;
 
-/** Exact calendar-year age -- same math as placement-test-worker/src/db.ts's computeTrack. */
+/**
+ * Exact calendar-year age -- same math as placement-test-worker/src/db.ts's computeTrack.
+ * Uses UTC getters throughout (not local-time getters) because `dob` is a 'YYYY-MM-DD' string,
+ * which the Date constructor parses as UTC midnight -- reading it back with local-time getters
+ * can land on the previous day for viewers west of UTC, disagreeing with the worker's UTC-based
+ * computeAge by up to a year right at an age boundary.
+ */
 export function computeAge(dob: string): number {
   const birth = new Date(dob);
   if (Number.isNaN(birth.getTime())) return NaN;
   const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
+  let age = today.getUTCFullYear() - birth.getUTCFullYear();
   const hadBirthdayThisYear =
-    today.getMonth() > birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+    today.getUTCMonth() > birth.getUTCMonth() ||
+    (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() >= birth.getUTCDate());
   if (!hadBirthdayThisYear) age--;
   return age;
 }

@@ -24,7 +24,13 @@ const { locale, t } = Astro.props;
   <RegistrationStepBasics locale={locale} t={t} />
   <RegistrationStepDetails locale={locale} t={t} />
 
-  <p id="placement-registration-error" class="form-error" role="alert" hidden>{t('registration.error')}</p>
+  <p
+    id="placement-registration-error"
+    class="form-error"
+    role="alert"
+    hidden
+    data-default-message={t('registration.error')}
+  >{t('registration.error')}</p>
 </form>
 
 <script>
@@ -194,6 +200,14 @@ const { locale, t } = Astro.props;
     data.referralSocialChannels = referralSocialChannels;
     data.termsAccepted = form.querySelector<HTMLInputElement>('input[name="termsAccepted"]')!.checked;
     data.mediaConsentAccepted = form.querySelector<HTMLInputElement>('input[name="mediaConsentAccepted"]')!.checked;
+    // The form collects name parts (firstName/fatherName/grandfatherName/familyName), not a
+    // single `name` field -- the full name is otherwise only assembled server-side. Add it here
+    // so consumers of the placement:register event (ResultBooking.astro's WhatsApp message,
+    // StartSessionInput's `name` field) get a usable value instead of `undefined`.
+    data.name = [data.firstName, data.fatherName, data.grandfatherName, data.familyName]
+      .map((v) => String(v ?? '').trim())
+      .filter(Boolean)
+      .join(' ');
 
     sessionStorage.setItem('placement:track', String(data.track ?? 'adults'));
     document.dispatchEvent(new CustomEvent('placement:register', { detail: { ...data, locale: form.dataset.locale } }));
