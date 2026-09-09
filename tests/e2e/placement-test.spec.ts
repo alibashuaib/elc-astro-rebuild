@@ -176,16 +176,26 @@ test('the registration form assigns under-11 students to the kids track', async 
 
 test('the registration form limits mobile numbers to a Saudi mobile number', async ({ page }) => {
   await page.goto('/en/placement-test/');
-  const phone = page.getByLabel('Mobile number');
+  await page.getByLabel('First name').fill('Test');
+  await page.getByLabel('Father’s name', { exact: true }).fill('Phone');
+  await page.getByLabel('Grandfather’s name').fill('Validation');
+  await page.getByLabel('Family name').fill('Check');
+  await page.getByLabel('Date of birth').fill('1995-01-01');
 
-  await phone.fill('051234567890');
-  await expect(phone).toHaveValue('0512345678');
+  const phone = page.getByLabel('WhatsApp number');
+  const errorBanner = page.locator('#placement-registration-error');
 
+  // Invalid format is rejected: Next is blocked, error banner shows, still on Step 1.
   await phone.fill('0612345678');
-  expect(await phone.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(errorBanner).toBeVisible();
+  await expect(page.getByLabel('First name')).toBeVisible();
 
+  // Valid format is accepted: Next advances to Step 2.
   await phone.fill('0512345678');
-  expect(await phone.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(errorBanner).toBeHidden();
+  await expect(page.getByLabel('National ID / Iqama / passport number')).toBeVisible();
 });
 
 test('interactive controls retain readable contrast when hovered in dark mode', async ({ page }) => {
