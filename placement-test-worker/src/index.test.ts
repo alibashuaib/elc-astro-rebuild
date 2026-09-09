@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from './test-utils/fakeD1';
+import { validRegistration } from './test-utils/fixtures';
 import bcrypt from 'bcryptjs';
 import worker from './index';
 
@@ -29,7 +30,7 @@ describe('router', () => {
   it('dispatches POST /api/session to handleStartSession', async () => {
     const req = new Request('http://x/api/session', {
       method: 'POST',
-      body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en' }),
+      body: JSON.stringify(validRegistration()),
     });
     const res = await worker.fetch(req, env as any);
     expect(res.status).toBe(200);

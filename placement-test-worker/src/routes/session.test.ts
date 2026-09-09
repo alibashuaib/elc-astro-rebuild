@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createFakeD1 } from '../test-utils/fakeD1';
+import { validRegistration, validKidsRegistration, phoneFor } from '../test-utils/fixtures';
 import { handleStartSession, handleAnswer } from './session';
 import { ADULT_BANDS } from '../bands';
 
@@ -21,7 +22,7 @@ describe('session routes', () => {
   it('starts a session for an adult and returns the first question', async () => {
     const req = new Request('http://x/api/session', {
       method: 'POST',
-      body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en' }),
+      body: JSON.stringify(validRegistration()),
     });
     const res = await handleStartSession(req, env as any);
     const data = (await res.json()) as any;
@@ -35,7 +36,7 @@ describe('session routes', () => {
       const res = await handleStartSession(
         new Request('http://x/api/session', {
           method: 'POST',
-          body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en' }),
+          body: JSON.stringify(validRegistration()),
         }),
         env as any
       );
@@ -84,13 +85,7 @@ describe('session routes', () => {
   it('honors an explicit track override even when it contradicts the DOB-derived track', async () => {
     const req = new Request('http://x/api/session', {
       method: 'POST',
-      body: JSON.stringify({
-        name: 'Sam',
-        phone: '+966500000000',
-        dob: '1995-01-01', // would compute to 'adults'
-        locale: 'en',
-        track: 'kids',
-      }),
+      body: JSON.stringify(validRegistration({ track: 'kids' })), // dob would compute to 'adults'
     });
     const res = await handleStartSession(req, env as any);
     const data = (await res.json()) as any;
@@ -101,7 +96,7 @@ describe('session routes', () => {
     const res = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en', track: 'not-a-real-track' }),
+        body: JSON.stringify(validRegistration({ track: 'not-a-real-track' })),
       }),
       env as any
     );
@@ -119,7 +114,7 @@ describe('session routes', () => {
     const startRes = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en' }),
+        body: JSON.stringify(validRegistration()),
       }),
       env as any
     );
@@ -165,7 +160,7 @@ describe('adults band placement (bands.ts, real question content)', () => {
     const res = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Sam', phone, dob: '1995-01-01', locale: 'en' }),
+        body: JSON.stringify(validRegistration({ phone })),
       }),
       env as any
     );
@@ -265,7 +260,7 @@ describe('text-type question grading', () => {
     const startRes = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Kid', phone, dob: '2018-01-01', locale: 'en', track: 'kids' }),
+        body: JSON.stringify(validKidsRegistration({ phone })),
       }),
       env as any
     );
@@ -281,7 +276,7 @@ describe('text-type question grading', () => {
     const startRes = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Kid', phone, dob: '2018-01-01', locale: 'en', track: 'kids' }),
+        body: JSON.stringify(validKidsRegistration({ phone })),
       }),
       env as any
     );
@@ -365,7 +360,7 @@ describe('text-type question grading', () => {
     const startRes = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+        body: JSON.stringify(validKidsRegistration()),
       }),
       env as any
     );
@@ -395,11 +390,11 @@ describe('text-type question grading', () => {
 
     expect(q).toMatchObject({ type: 'text', expected_answer: correctAnswer });
 
-    async function grade(answerText: string, phone: string) {
+    async function grade(answerText: string, phoneSeed: string) {
       const start = await handleStartSession(
         new Request('http://x/api/session', {
           method: 'POST',
-          body: JSON.stringify({ name: 'Kid', phone, dob: '2018-01-01', locale: 'en', track: 'kids' }),
+          body: JSON.stringify(validKidsRegistration({ phone: phoneFor(phoneSeed) })),
         }),
         env as any
       );
@@ -425,7 +420,7 @@ describe('kids placement level reflects the whole run, not its tail', () => {
     const startRes = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+        body: JSON.stringify(validKidsRegistration()),
       }),
       env as any
     );
@@ -495,13 +490,7 @@ describe('kids question order is randomized within each exercise block', () => {
       const res = await handleStartSession(
         new Request('http://x/api/session', {
           method: 'POST',
-          body: JSON.stringify({
-            name: 'Kid',
-            phone: `+9665000001${attempt}`,
-            dob: '2018-01-01',
-            locale: 'en',
-            track: 'kids',
-          }),
+          body: JSON.stringify(validKidsRegistration({ phone: phoneFor(`attempt-${attempt}`) })),
         }),
         attemptEnv as any
       );
@@ -522,7 +511,7 @@ describe('kids question order is randomized within each exercise block', () => {
     const start = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+        body: JSON.stringify(validKidsRegistration()),
       }),
       env2 as any
     );
@@ -548,7 +537,7 @@ describe('kids question order is randomized within each exercise block', () => {
     const start = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+        body: JSON.stringify(validKidsRegistration()),
       }),
       env2 as any
     );
@@ -571,7 +560,7 @@ describe('adults get one skip per band', () => {
     const res = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Sam', phone: '+966500000000', dob: '1995-01-01', locale: 'en' }),
+        body: JSON.stringify(validRegistration()),
       }),
       env2 as any
     );
@@ -634,7 +623,7 @@ describe('adults get one skip per band', () => {
     const res = await handleStartSession(
       new Request('http://x/api/session', {
         method: 'POST',
-        body: JSON.stringify({ name: 'Kid', phone: '+966500000000', dob: '2018-01-01', locale: 'en', track: 'kids' }),
+        body: JSON.stringify(validKidsRegistration()),
       }),
       env2 as any
     );
