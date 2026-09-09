@@ -39,22 +39,6 @@ const { locale, t, courses } = Astro.props;
       <span>{t('apply.guardianName')}</span>
       <input name="guardianName" type="text" autocomplete="name" />
     </label>
-    <label>
-      <span>{t('apply.email')}</span>
-      <input name="email" type="email" autocomplete="email" required />
-    </label>
-    <label>
-      <span>{t('apply.idType')}</span>
-      <select name="idType" required>
-        <option value="national_id">{t('apply.idTypeNational')}</option>
-        <option value="iqama">{t('apply.idTypeIqama')}</option>
-        <option value="passport">{t('apply.idTypePassport')}</option>
-      </select>
-    </label>
-    <label>
-      <span>{t('apply.idNumber')}</span>
-      <input name="idNumber" type="text" required />
-    </label>
   </div>
   <button type="submit" class="btn btn-primary">{t('apply.submit')}</button>
   <p id="application-error" class="form-error" role="alert" hidden></p>
@@ -99,12 +83,9 @@ const { locale, t, courses } = Astro.props;
       const data = new FormData(form);
       const course = String(data.get('course') ?? '');
       const guardianName = String(data.get('guardianName') ?? '') || undefined;
-      const email = String(data.get('email') ?? '');
-      const idType = String(data.get('idType') ?? '') as 'national_id' | 'iqama' | 'passport';
-      const idNumber = String(data.get('idNumber') ?? '');
 
       try {
-        const result = await submitApplication(sessionId, { course, guardianName, email, idType, idNumber });
+        const result = await submitApplication(sessionId, { course, guardianName });
         if ('error' in result) {
           errorEl.textContent = result.error === 'already_applied' ? alreadyAppliedMessage : errorMessage;
           errorEl.hidden = false;

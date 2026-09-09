@@ -87,9 +87,6 @@ export function createBooking(sessionId: string, slotId: string) {
 export interface ApplicationFields {
   course: string;
   guardianName?: string;
-  email: string;
-  idType: 'national_id' | 'iqama' | 'passport';
-  idNumber: string;
 }
 
 export function submitApplication(sessionId: string, fields: ApplicationFields) {
