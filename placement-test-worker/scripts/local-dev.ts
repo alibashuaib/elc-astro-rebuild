@@ -24,7 +24,9 @@ const migrations = [
   '0017_kids_3d_illustrations.sql',
   '0018_kids_3d_action_illustrations.sql',
   '0019_student_applications.sql',
-  '0020_application_email_idtype.sql',
+  '0020_single_kids_number_activity.sql',
+  '0021_application_email_idtype.sql',
+  '0022_registration_fields.sql',
 ].map((file) => path.join(workerRoot, 'migrations', file));
 
 const env = {

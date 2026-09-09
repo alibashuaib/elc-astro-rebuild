@@ -25,7 +25,7 @@ export const KIDS_CEILING_INDEX = 5;
 /**
  * Minimum share of correct answers for each rung, highest first. Even sixths.
  * Shares (not counts) so the bank can grow without retuning -- against the
- * current 44-question bank these land at 37 / 30 / 22 / 15 / 8 correct.
+ * current 35-question session these land at 30 / 24 / 18 / 12 / 6 correct.
  */
 export const KIDS_BANDS: ReadonlyArray<{ minShare: number; index: number }> = [
   { minShare: 5 / 6, index: 5 }, // Super Minds 3A
@@ -54,10 +54,9 @@ export function kidsLevel(correct: number, total: number): string {
 }
 
 /**
- * Cambridge Young Learners exam level per rung, following Cambridge's own
- * alignment for Super Minds: books 1-2 are Starters, book 3 is Movers (books
- * 4-6 would be Movers then Flyers, but placement stops at 3A). Pre-Starters
- * sits beneath the lowest YLE exam, so it has none -- hence the undefined.
+ * Cambridge Young Learners exam level per rung. This is retained for reporting
+ * and future use, but the student result screen currently shows only the
+ * actionable Super Minds course placement.
  */
 export const KIDS_YLE_BY_INDEX: ReadonlyArray<string | undefined> = [
   undefined, // Pre-Starters

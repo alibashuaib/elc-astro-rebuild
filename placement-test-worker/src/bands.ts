@@ -23,7 +23,8 @@ export interface Band {
   end: number; // inclusive
 }
 
-export const PASS_THRESHOLD = 0.6;
+/** Adults pass each proficiency band with at least 50% correct. */
+export const PASS_THRESHOLD = 0.5;
 
 /** Placement for a student who never cleared the first band. */
 export const BELOW_FIRST_BAND = 'Pre Fun';
