@@ -20,8 +20,8 @@ function failOnConsoleErrors(page: Page): string[] {
 async function startKidsTest(page: Page) {
   await page.goto('/en/placement-test/');
   await page.getByLabel('First name').fill('Smoke');
-  await page.getByLabel('Father\'s name').fill('Test');
-  await page.getByLabel('Grandfather\'s name').fill('Kids');
+  await page.getByLabel('Father's name').fill('Test');
+  await page.getByLabel('Grandfather's name').fill('Kids');
   await page.getByLabel('Family name').fill('User');
   await page.getByLabel('WhatsApp number').fill('+966500000000');
   // Under 11, so the form assigns the kids track on its own.
@@ -31,7 +31,7 @@ async function startKidsTest(page: Page) {
   await page.getByLabel('Nationality').fill('Saudi');
   await page.getByLabel('Guardian name').fill('Parent Name');
   await page.getByLabel('Relationship').selectOption('father');
-  await page.getByLabel('Guardian\'s mobile number').fill('+966500000098');
+  await page.getByLabel('Guardian's mobile number').fill('+966500000098');
   await page.getByRole('radio', { name: 'A friend' }).check();
   await page.getByLabel(/I acknowledge that I have read/).check();
   await page.getByLabel(/I agree \(as the trainee or their guardian\)/).check();
@@ -156,14 +156,14 @@ test('the registration form assigns under-11 students to the kids track', async 
 
   await page.goto('/en/placement-test/');
   await page.getByLabel('First name').fill('Test');
-  await page.getByLabel('Father\'s name').fill('User');
-  await page.getByLabel('Grandfather\'s name').fill('Kids');
+  await page.getByLabel('Father's name').fill('User');
+  await page.getByLabel('Grandfather's name').fill('Kids');
   await page.getByLabel('Family name').fill('Track');
   await page.getByLabel('WhatsApp number').fill('+966500000001');
   await page.getByLabel('Date of birth').fill('2018-01-01');
+  await expect(page.getByText('Students under 11 are automatically assigned to the Kids test.')).toBeVisible();
   await page.getByRole('button', { name: 'Next' }).click();
 
-  await expect(page.getByText('Students under 11 are automatically assigned to the Kids test.')).toBeVisible();
   await expect(page.getByLabel('Guardian name')).toBeVisible();
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
