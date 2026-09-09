@@ -1,0 +1,119 @@
+---
+import type { Locale, useTranslations } from '../../i18n/ui';
+
+export interface Props {
+  locale: Locale;
+  t: ReturnType<typeof useTranslations>;
+}
+const { t } = Astro.props;
+---
+
+<div id="step-basics">
+  <fieldset class="track-field">
+    <legend>{t('placementTest.formTrack')}</legend>
+    <div class="track-toggle">
+      <label class="track-pill">
+        <input required name="track" type="radio" value="adults" checked />
+        <span>{t('placementTest.formTrackAdults')}</span>
+      </label>
+      <label class="track-pill">
+        <input required name="track" type="radio" value="kids" />
+        <span>{t('placementTest.formTrackKids')}</span>
+      </label>
+    </div>
+    <p id="age-track-rule" class="age-track-rule" hidden></p>
+  </fieldset>
+  <div class="form-grid">
+    <label>
+      <span>{t('registration.firstName')}</span>
+      <input required name="firstName" type="text" autocomplete="given-name" />
+    </label>
+    <label>
+      <span>{t('registration.fatherName')}</span>
+      <input required name="fatherName" type="text" />
+    </label>
+    <label>
+      <span>{t('registration.grandfatherName')}</span>
+      <input required name="grandfatherName" type="text" />
+    </label>
+    <label>
+      <span>{t('registration.familyName')}</span>
+      <input required name="familyName" type="text" autocomplete="family-name" />
+    </label>
+    <label>
+      <span>{t('registration.phone')}</span>
+      <input class="numeric" required name="phone" type="tel" autocomplete="tel" inputmode="tel" dir="ltr" />
+    </label>
+    <label>
+      <span>{t('registration.dob')}</span>
+      <input required name="dob" type="date" />
+      <p id="estimated-age-note" class="age-track-rule" hidden></p>
+    </label>
+  </div>
+  <button type="button" id="step1-next" class="btn btn-primary">{t('registration.next')}</button>
+</div>
+
+<style>
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  #step-basics label { display: flex; flex-direction: column; gap: 0.45rem; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; }
+  #step-basics input {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-bg-raised);
+    font: inherit;
+  }
+  #step-basics input:focus {
+    outline: 3px solid rgb(182 23 51 / 0.12);
+    border-color: var(--color-primary);
+  }
+  #step1-next { justify-content: center; width: 100%; min-height: 3.5rem; margin-top: 1.25rem; }
+  .track-field { display: grid; gap: 0.6rem; margin: 0 0 1rem; padding: 0; border: none; }
+  .track-field legend { padding: 0; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; }
+  .age-track-rule {
+    margin: 0;
+    padding: 0.65rem 0.8rem;
+    border-radius: 0.8rem;
+    color: #1a6f48;
+    background: rgb(53 168 111 / 0.12);
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-align: center;
+  }
+  .card label.track-pill:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+  .track-toggle { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .card label.track-pill {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 3.5rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    color: var(--color-ink-muted);
+    background: var(--color-surface-soft);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
+  }
+  .track-pill input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+  .card label.track-pill:has(input:checked) {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 8px 20px rgb(182 23 51 / 0.18);
+  }
+  .card label.track-pill:has(input:focus-visible) { outline: 3px solid rgb(182 23 51 / 0.12); outline-offset: 2px; }
+  @media (max-width: 580px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .track-toggle { grid-template-columns: 1fr; }
+  }
+</style>
