@@ -14,9 +14,18 @@ test('adult student completes the placement test, books a slot, and submits an a
   const errors = failOnConsoleErrors(page);
 
   await page.goto('/en/placement-test/');
-  await page.getByLabel('Full name').fill('Application Smoke Test');
-  await page.getByLabel('Mobile number').fill('0500000001');
+  await page.getByLabel('First name').fill('Application');
+  await page.getByLabel('Father\'s name').fill('Smoke');
+  await page.getByLabel('Grandfather\'s name').fill('Test');
+  await page.getByLabel('Family name').fill('User');
+  await page.getByLabel('WhatsApp number').fill('+966500000001');
   await page.getByLabel('Date of birth').fill('1995-01-01'); // well over 11, stays on the adults track
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByLabel('National ID / Iqama / passport number').fill('1234567890');
+  await page.getByLabel('Nationality').fill('Saudi');
+  await page.getByRole('radio', { name: 'A friend' }).check();
+  await page.getByLabel(/I acknowledge that I have read/).check();
+  await page.getByLabel(/I agree \(as the trainee or their guardian\)/).check();
   await page.getByRole('button', { name: 'Start test' }).click();
 
   // Answer every adults-track question with the first available option until
@@ -46,9 +55,6 @@ test('adult student completes the placement test, books a slot, and submits an a
 
   await expect(page.getByRole('heading', { name: 'Complete your application' })).toBeVisible();
   await page.getByLabel('Course').selectOption({ index: 1 });
-  await page.getByLabel('Email address').fill('smoke-test@example.com');
-  await page.getByLabel('ID type').selectOption('national_id');
-  await page.getByLabel('ID number').fill('1234567890');
   await page.getByRole('button', { name: 'Submit application' }).click();
 
   await expect(page.getByRole('heading', { name: 'Application received' })).toBeVisible({ timeout: 10_000 });
