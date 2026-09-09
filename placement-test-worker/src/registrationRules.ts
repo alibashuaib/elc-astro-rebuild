@@ -13,15 +13,7 @@ export const REFERRAL_SOURCES = ['friend', 'paper_ad', 'sms', 'internet', 'road_
 export const SOCIAL_CHANNELS = ['facebook', 'twitter', 'youtube', 'tiktok', 'instagram', 'snapchat'] as const;
 export const GUARDIAN_RELATIONSHIPS = ['father', 'mother', 'sibling', 'grandparent', 'legal_guardian', 'other'] as const;
 
-/** Exact calendar-year age, matching db.ts's computeTrack/isUnderEleven math. */
-export function computeAge(dob: string): number {
-  const birth = new Date(dob);
-  if (Number.isNaN(birth.getTime())) return NaN;
-  const today = new Date();
-  let age = today.getUTCFullYear() - birth.getUTCFullYear();
-  const hadBirthdayThisYear =
-    today.getUTCMonth() > birth.getUTCMonth() ||
-    (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() >= birth.getUTCDate());
-  if (!hadBirthdayThisYear) age--;
-  return age;
-}
+// computeAge lives in db.ts (computeTrack/isUnderEleven need the same exact
+// calendar-year math) -- re-exported here so callers only need to import
+// from registrationRules.ts for everything registration-related.
+export { computeAge } from './db';

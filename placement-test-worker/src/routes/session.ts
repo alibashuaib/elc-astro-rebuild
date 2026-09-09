@@ -110,8 +110,8 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
 export async function handleStartSession(req: Request, env: Env): Promise<Response> {
   const body = await req.json<StudentInput>();
 
-  const namesValid = [body.firstName, body.fatherName, body.grandfatherName, body.familyName]
-    .every((part) => typeof part === 'string' && NAME_RE.test(part));
+  const nameParts = [body.firstName, body.fatherName, body.grandfatherName, body.familyName];
+  const namesValid = nameParts.every((part) => typeof part === 'string' && NAME_RE.test(part));
   if (!namesValid) return json({ error: 'invalid_name' }, 400);
   if (!body.phone || !PHONE_RE.test(body.phone)) return json({ error: 'invalid_phone' }, 400);
   if (!body.dob) return json({ error: 'dob is required' }, 400);
@@ -148,7 +148,7 @@ export async function handleStartSession(req: Request, env: Env): Promise<Respon
     return json({ error: 'consent_required' }, 400);
   }
 
-  const fullName = [body.firstName, body.fatherName, body.grandfatherName, body.familyName].join(' ');
+  const fullName = nameParts.join(' ');
   const requestedTrack = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
   const track = isUnderEleven(body.dob) ? 'kids' : requestedTrack;
   const studentId = await insertStudent(env, { ...body, name: fullName });

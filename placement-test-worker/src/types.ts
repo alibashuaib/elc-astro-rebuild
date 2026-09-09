@@ -81,7 +81,6 @@ export interface SessionRow {
   current_question_id: string | null;
 }
 
-
 export interface ApplicationRow {
   id: string;
   session_id: string;

@@ -6,73 +6,70 @@ function newId(): string {
   return crypto.randomUUID();
 }
 
-// Kids track is age 12 and under; 13+ is adults. Computed as an exact
-// calendar-year age (not ms-elapsed / 365.25 days) -- that average-year
+// Exact calendar-year age (not ms-elapsed / 365.25 days) -- that average-year
 // approximation put a student turning 12 exactly today on the wrong side of
 // the cutoff, since "now" is always some hours past midnight while `dob`
 // parses to midnight, nudging the approximate age fractionally past 12.
-export function computeTrack(dob: string): Track {
+// Shared by computeTrack/isUnderEleven below and by registrationRules.ts's
+// age-range validation, so the math lives in exactly one place.
+export function computeAge(dob: string): number {
   const birth = new Date(dob);
+  if (Number.isNaN(birth.getTime())) return NaN;
   const today = new Date();
   let age = today.getUTCFullYear() - birth.getUTCFullYear();
   const hadBirthdayThisYear =
     today.getUTCMonth() > birth.getUTCMonth() ||
     (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() >= birth.getUTCDate());
   if (!hadBirthdayThisYear) age--;
-  return age <= 12 ? 'kids' : 'adults';
+  return age;
+}
+
+// Kids track is age 12 and under; 13+ is adults.
+export function computeTrack(dob: string): Track {
+  return computeAge(dob) <= 12 ? 'kids' : 'adults';
 }
 
 export function isUnderEleven(dob: string): boolean {
-  const birth = new Date(dob);
-  if (Number.isNaN(birth.getTime())) return false;
-  const today = new Date();
-  let age = today.getUTCFullYear() - birth.getUTCFullYear();
-  const hadBirthdayThisYear =
-    today.getUTCMonth() > birth.getUTCMonth() ||
-    (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() >= birth.getUTCDate());
-  if (!hadBirthdayThisYear) age--;
-  return age < 11;
+  const age = computeAge(dob);
+  return !Number.isNaN(age) && age < 11;
 }
 
 export async function insertStudent(env: Env, input: StudentInput): Promise<string> {
   const id = newId();
   const now = new Date().toISOString();
+  // Column name and bind value are declared side by side so the two can't
+  // drift out of order the way they could with a separate column list and a
+  // 25-argument .bind() call.
+  const fields: Array<[string, unknown]> = [
+    ['id', id],
+    ['name', input.name],
+    ['phone', input.phone],
+    ['dob', input.dob],
+    ['guardian_name', input.guardianName ?? null],
+    ['locale', input.locale],
+    ['first_name', input.firstName ?? ''],
+    ['father_name', input.fatherName ?? ''],
+    ['grandfather_name', input.grandfatherName ?? ''],
+    ['family_name', input.familyName ?? ''],
+    ['id_number', input.idNumber ?? ''],
+    ['nationality', input.nationality ?? ''],
+    ['email', input.email ?? null],
+    ['education_level', input.educationLevel ?? null],
+    ['address', input.address ?? null],
+    ['guardian_relationship', input.guardianRelationship ?? null],
+    ['guardian_relationship_other', input.guardianRelationshipOther ?? null],
+    ['guardian_phone', input.guardianPhone ?? null],
+    ['guardian_alt_phone', input.guardianAltPhone ?? null],
+    ['referral_source', input.referralSource ?? ''],
+    ['referral_source_other', input.referralSourceOther ?? null],
+    ['referral_social_channels', input.referralSocialChannels ? JSON.stringify(input.referralSocialChannels) : null],
+    ['terms_accepted_at', input.termsAccepted ? now : null],
+    ['media_consent_accepted_at', input.mediaConsentAccepted ? now : null],
+    ['terms_version', input.termsAccepted ? TERMS_VERSION : null],
+  ];
   await env.DB.prepare(
-    `INSERT INTO students (
-      id, name, phone, dob, guardian_name, locale,
-      first_name, father_name, grandfather_name, family_name,
-      id_number, nationality, email, education_level, address,
-      guardian_relationship, guardian_relationship_other, guardian_phone, guardian_alt_phone,
-      referral_source, referral_source_other, referral_social_channels,
-      terms_accepted_at, media_consent_accepted_at, terms_version
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(
-    id,
-    input.name,
-    input.phone,
-    input.dob,
-    input.guardianName ?? null,
-    input.locale,
-    input.firstName ?? '',
-    input.fatherName ?? '',
-    input.grandfatherName ?? '',
-    input.familyName ?? '',
-    input.idNumber ?? '',
-    input.nationality ?? '',
-    input.email ?? null,
-    input.educationLevel ?? null,
-    input.address ?? null,
-    input.guardianRelationship ?? null,
-    input.guardianRelationshipOther ?? null,
-    input.guardianPhone ?? null,
-    input.guardianAltPhone ?? null,
-    input.referralSource ?? '',
-    input.referralSourceOther ?? null,
-    input.referralSocialChannels ? JSON.stringify(input.referralSocialChannels) : null,
-    input.termsAccepted ? now : null,
-    input.mediaConsentAccepted ? now : null,
-    input.termsAccepted ? TERMS_VERSION : null
-  ).run();
+    `INSERT INTO students (${fields.map(([col]) => col).join(', ')}) VALUES (${fields.map(() => '?').join(', ')})`
+  ).bind(...fields.map(([, value]) => value)).run();
   return id;
 }
 
