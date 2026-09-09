@@ -24,6 +24,14 @@ const formattedPrice = price?.toLocaleString('en-US');
     border-color: color-mix(in srgb, var(--course-accent) 24%, var(--color-border)) !important;
     background: color-mix(in srgb, var(--course-soft) 76%, var(--color-bg-raised)) !important;
   }
+  /* --color-ink-muted's gray only clears WCAG 4.5:1 against the plain
+     surface color .fact-label was designed for -- against this card's own
+     tinted .meta background it falls to ~4.3:1 on most palettes. Each
+     course's --course-accent was already picked to read against that same
+     tint (it's what colors the badge/icons above), so reuse it here. */
+  .course-card[data-course] .fact-label {
+    color: var(--course-accent) !important;
+  }
   /* Same palette as the homepage tiles — one course, one color in either view. */
   .course-card[data-course='kids-general'] { --course-accent: #41670e !important; --course-soft: #dff5ae !important; --course-bg-start: #dff5ae; --course-bg-end: #a9d96b; }
   .course-card[data-course='adults-general'] { --course-accent: #29497d !important; --course-soft: #dce8ff !important; --course-bg-start: #dce8ff; --course-bg-end: #abc4f0; }
