@@ -44,10 +44,6 @@ const { locale, t } = Astro.props;
   const estimatedAgeNote = document.getElementById('estimated-age-note') as HTMLElement;
   const isAr = form.dataset.locale === 'ar';
 
-  function selectedTrack(): string {
-    return form.querySelector<HTMLInputElement>('input[name="track"]:checked')?.value ?? 'adults';
-  }
-
   function isUnderEleven(dob: string): boolean {
     return computeAge(dob) < 11;
   }
@@ -80,7 +76,6 @@ const { locale, t } = Astro.props;
   dobInput.addEventListener('change', enforceAgeTrack);
 
   // --- Guardian section (age-gated requirement) ---
-  const guardianSection = document.getElementById('guardian-section') as HTMLFieldSetElement;
   const guardianBadge = document.getElementById('guardian-badge') as HTMLElement;
   const guardianToggle = document.getElementById('guardian-toggle') as HTMLButtonElement;
   const guardianFields = document.getElementById('guardian-fields') as HTMLElement;
@@ -150,14 +145,18 @@ const { locale, t } = Astro.props;
 
   const step1Next = document.getElementById('step1-next') as HTMLButtonElement;
   const step2Back = document.getElementById('step2-back') as HTMLButtonElement;
+  const step2Submit = document.getElementById('step2-submit') as HTMLButtonElement;
 
   step1Next.addEventListener('click', () => {
     if (!step1Valid()) {
-      form.reportValidity();
+      errorEl.hidden = false;
+      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى ملء جميع الحقول بشكل صحيح' : 'Please fill all fields correctly';
       return;
     }
+    errorEl.hidden = true;
     stepBasics.hidden = true;
     stepDetails.hidden = false;
+    step2Submit.disabled = false;
     stepNumber.textContent = '02';
     stepEyebrow.textContent = form.dataset.locale === 'ar' ? 'الخطوة 2 من 2' : 'Step 2 of 2';
   });
@@ -165,6 +164,7 @@ const { locale, t } = Astro.props;
   step2Back.addEventListener('click', () => {
     stepDetails.hidden = true;
     stepBasics.hidden = false;
+    step2Submit.disabled = true;
     stepNumber.textContent = '01';
     stepEyebrow.textContent = form.dataset.locale === 'ar' ? 'الخطوة 1 من 2' : 'Step 1 of 2';
   });
@@ -177,12 +177,14 @@ const { locale, t } = Astro.props;
     const idNumberInput = form.querySelector<HTMLInputElement>('input[name="idNumber"]')!;
     const nationalityInput = form.querySelector<HTMLInputElement>('input[name="nationality"]')!;
     if (!ID_NUMBER_RE.test(idNumberInput.value) || !nationalityInput.value.trim()) {
-      form.reportValidity();
+      errorEl.hidden = false;
+      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى ملء رقم الهوية والجنسية بشكل صحيح' : 'Please enter ID number and nationality correctly';
       return;
     }
     const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]')!;
     if (emailInput.value && !EMAIL_RE.test(emailInput.value)) {
-      form.reportValidity();
+      errorEl.hidden = false;
+      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email';
       return;
     }
 
@@ -197,6 +199,7 @@ const { locale, t } = Astro.props;
     document.dispatchEvent(new CustomEvent('placement:register', { detail: { ...data, locale: form.dataset.locale } }));
   });
 
+  step2Submit.disabled = true;
   updateGuardianRequirement(NaN);
 </script>
 
