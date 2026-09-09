@@ -711,3 +711,177 @@ describe('adults get one skip per band', () => {
     }
   });
 });
+
+describe('registration validation', () => {
+  it('rejects a name part with digits', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ firstName: 'Sam1' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a name part shorter than 2 characters', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ familyName: 'A' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('accepts an Arabic name', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ firstName: 'سامي' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects a malformed phone number', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ phone: '0501234' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('accepts a local-format Saudi phone number', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ phone: '0512345678' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects age below 4', async () => {
+    const dob = new Date();
+    dob.setFullYear(dob.getFullYear() - 3);
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ dob: dob.toISOString().slice(0, 10) })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects age above 100', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ dob: '1900-01-01' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects an ID number with letters', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ idNumber: '12345AB' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects an ID number shorter than 7 digits', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ idNumber: '123456' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a missing nationality', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ nationality: '' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects a malformed email when one is provided', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ email: 'not-an-email' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('accepts no email at all', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration()) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(200);
+  });
+
+  it('requires guardian details for a student under 18', async () => {
+    const dob = new Date();
+    dob.setFullYear(dob.getFullYear() - 15);
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify(validRegistration({ dob: dob.toISOString().slice(0, 10), track: 'kids' })),
+    });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'guardian_details_required' });
+  });
+
+  it('accepts a student under 18 with full guardian details', async () => {
+    const dob = new Date();
+    dob.setFullYear(dob.getFullYear() - 15);
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify(validRegistration({
+        dob: dob.toISOString().slice(0, 10),
+        track: 'kids',
+        guardianName: 'Parent Name',
+        guardianRelationship: 'father',
+        guardianPhone: '+966500000099',
+      })),
+    });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(200);
+  });
+
+  it('does not require guardian details for an adult', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration()) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(200);
+  });
+
+  it('requires guardianRelationshipOther when relationship is other', async () => {
+    const dob = new Date();
+    dob.setFullYear(dob.getFullYear() - 15);
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify(validRegistration({
+        dob: dob.toISOString().slice(0, 10),
+        track: 'kids',
+        guardianName: 'Parent Name',
+        guardianRelationship: 'other',
+        guardianPhone: '+966500000099',
+      })),
+    });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'guardian_relationship_other_required' });
+  });
+
+  it('rejects an invalid referral source', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ referralSource: 'carrier-pigeon' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('requires referralSourceOther when referral source is other', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ referralSource: 'other' })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'referral_source_other_required' });
+  });
+
+  it('accepts social channels alongside a social referral source', async () => {
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify(validRegistration({ referralSource: 'social', referralSocialChannels: ['instagram', 'tiktok'] })),
+    });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(200);
+  });
+
+  it('rejects an unknown social channel', async () => {
+    const req = new Request('http://x/api/session', {
+      method: 'POST',
+      body: JSON.stringify(validRegistration({ referralSource: 'social', referralSocialChannels: ['myspace'] })),
+    });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+  });
+
+  it('rejects missing terms acceptance', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ termsAccepted: false })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'consent_required' });
+  });
+
+  it('rejects missing media consent', async () => {
+    const req = new Request('http://x/api/session', { method: 'POST', body: JSON.stringify(validRegistration({ mediaConsentAccepted: false })) });
+    const res = await handleStartSession(req, env as any);
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'consent_required' });
+  });
+});
