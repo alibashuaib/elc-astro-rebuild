@@ -15,7 +15,7 @@ test('adult student completes the placement test, books a slot, and submits an a
 
   await page.goto('/en/placement-test/');
   await page.getByLabel('Full name').fill('Application Smoke Test');
-  await page.getByLabel('WhatsApp number').fill('+966500000001');
+  await page.getByLabel('Mobile number').fill('0500000001');
   await page.getByLabel('Date of birth').fill('1995-01-01'); // well over 11, stays on the adults track
   await page.getByRole('button', { name: 'Start test' }).click();
 
