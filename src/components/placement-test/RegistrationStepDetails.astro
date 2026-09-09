@@ -1,0 +1,212 @@
+---
+import type { Locale, useTranslations } from '../../i18n/ui';
+
+export interface Props {
+  locale: Locale;
+  t: ReturnType<typeof useTranslations>;
+}
+const { locale, t } = Astro.props;
+
+const termsAr = [
+  'يجب على المتدرب/ة سداد كامل الرسوم الدراسية قبل بداية الدورة.',
+  'يحق للمتدرب/ة استرداد كامل الرسوم في الحالات التالية: عدم وجود المستوى الدراسي المحدد، أو الانسحاب قبل بداية الدورة بأسبوع.',
+  'يتم خصم ٥٠٪ من الرسوم الدراسية عند انسحاب المتدرب/ة خلال أول ثلاثة أيام من بدء الدورة.',
+  'لا يحق للمتدرب/ة الانسحاب من الدورة أو استرجاع الرسوم أو أي جزء منها بعد مرور ثلاثة أيام من بدء الدورة.',
+  'لا يحق للمتدرب/ة استرداد الرسوم أو المطالبة بالتعويض في حالة الانقطاع عن الدورة.',
+  'لا يحق للمتدرب/ة المطالبة بخصم الاستمرارية في حال انقطاعه أو توقفه مدة ٣ أشهر من تاريخ انتهاء الدورة.',
+  'يتم دفع مبلغ (٢٠٠ ريال) في حال فقدان حقيبة المتدرب/ة الدراسية.',
+  'يتم دفع مبلغ (١٠٠ ريال) رسوم إعادة الاختبار النهائي.',
+  'في حالة عدم اجتياز المتدرب/ة يحق له الحصول على خصم ٥٠٪ من القيمة الأساسية للدورة عند الإعادة.',
+  'تخضع باقات العروض الموسمية للالتزام بالمدة المحددة، ولا يسمح بالتأجيل أو الإيقاف لأي سبب كان بعد بدء الباقة.',
+  'يلتزم المتدرب/ة بالحضور في المواعيد المحددة للدورة بنسبة لا تقل عن ٨٠٪ من الساعات المقررة، وفي حال تجاوز نسبة الغياب الحد المسموح به لا يتم إصدار شهادة للمتدرب.',
+  'في حالة انقطاع المتدرب/ة عن الدراسة لأكثر من شهرين يتم إعادة تقييم مستواه.',
+  'في حال عدم قيام المتدرب/ة باستلام الشهادة بعد مضي ٦ أشهر من تاريخ انتهاء الدورة، لا يحق له المطالبة بها.',
+  'يلتزم المتدرب/ة بالانضباط بسلوك التعلم، ويحق للمعهد إيقافه في حال صدور سلوك مخالف.',
+  'يلتزم المتدرب/ة بالاستخدام الأمثل للأثاث والأدوات والأجهزة الموجودة، ويتحمل قيمة ما يتسبب في إتلافه.',
+  'يوافق ولي أمر المتدرب/ة على تصوير البنين والبنات بالصور أو مقاطع الفيديو لأغراض دعائية أو تعليمية للمعهد، مع التأكيد على عدم تصوير البنات البالغات أو استخدام أي محتوى يخصهن.',
+];
+
+// Plain-language English rendering for readability only -- Arabic (above)
+// is the legally authoritative text; see the note rendered under the box.
+const termsEn = [
+  'The trainee must pay the full course fees before the course begins.',
+  'The trainee is entitled to a full refund if: the specified course level doesn’t run, or they withdraw at least a week before the course starts.',
+  '50% of the course fees is deducted if the trainee withdraws within the first three days after the course starts.',
+  'The trainee may not withdraw from the course or reclaim any part of the fees after three days have passed since the course started.',
+  'The trainee is not entitled to a refund or compensation in case of dropping out of the course.',
+  'The trainee may not claim a continuity discount if they drop out or pause for 3 months from the course’s end date.',
+  'A fee of 200 SAR applies if the trainee’s course bag/kit is lost.',
+  'A fee of 100 SAR applies for retaking the final exam.',
+  'A trainee who does not pass is entitled to a 50% discount off the base course price when repeating it.',
+  'Seasonal offer packages are bound to their stated duration; no postponement or pause is allowed for any reason once the package has started.',
+  'The trainee must attend at least 80% of the scheduled course hours; exceeding the allowed absence rate means no certificate will be issued.',
+  'If the trainee is absent from study for more than two months, their level will be reassessed.',
+  'If the trainee does not collect their certificate within 6 months of the course’s end date, they forfeit the right to claim it.',
+  'The trainee must maintain disciplined learning conduct; the institute may suspend a trainee for improper conduct.',
+  'The trainee must make proper use of the furniture, tools, and equipment provided, and is liable for the cost of any damage they cause.',
+  'The trainee’s guardian agrees to the trainee (male or female) being photographed or filmed for the institute’s promotional or educational purposes, with the assurance that adult female students will not be photographed or have any related content used.',
+];
+
+const terms = locale === 'ar' ? termsAr : termsEn;
+---
+
+<div id="step-details" hidden>
+  <div class="form-grid">
+    <label>
+      <span>{t('registration.idNumber')}</span>
+      <input required name="idNumber" type="text" inputmode="numeric" />
+    </label>
+    <label>
+      <span>{t('registration.nationality')}</span>
+      <input required name="nationality" type="text" list="nationality-options" />
+      <datalist id="nationality-options">
+        <option value="سعودي" /><option value="مصري" /><option value="يمني" /><option value="سوداني" />
+        <option value="سوري" /><option value="أردني" /><option value="فلسطيني" /><option value="باكستاني" />
+        <option value="هندي" /><option value="بنغلاديشي" /><option value="فلبيني" /><option value="إندونيسي" />
+        <option value="نيجيري" /><option value="إثيوبي" /><option value="تركي" /><option value="بريطاني" />
+        <option value="أمريكي" />
+      </datalist>
+    </label>
+    <label>
+      <span>{t('registration.email')}</span>
+      <input name="email" type="email" autocomplete="email" />
+    </label>
+    <label>
+      <span>{t('registration.educationLevel')}</span>
+      <select name="educationLevel">
+        <option value="">{t('registration.educationLevelChoose')}</option>
+        <option value="primary">{t('registration.educationPrimary')}</option>
+        <option value="intermediate">{t('registration.educationIntermediate')}</option>
+        <option value="secondary">{t('registration.educationSecondary')}</option>
+        <option value="university">{t('registration.educationUniversity')}</option>
+        <option value="postgraduate">{t('registration.educationPostgraduate')}</option>
+        <option value="vocational">{t('registration.educationVocational')}</option>
+        <option value="other">{t('registration.educationOther')}</option>
+      </select>
+    </label>
+  </div>
+  <label class="full-width">
+    <span>{t('registration.address')}</span>
+    <textarea name="address" rows="2"></textarea>
+  </label>
+
+  <fieldset id="guardian-section" class="guardian-fieldset">
+    <legend>
+      {t('registration.guardianHeading')}
+      <span id="guardian-badge" class="badge"></span>
+    </legend>
+    <button type="button" id="guardian-toggle" class="btn btn-outline" hidden>{t('registration.guardianAddLink')}</button>
+    <div id="guardian-fields" class="form-grid">
+      <label>
+        <span>{t('registration.guardianName')}</span>
+        <input name="guardianName" type="text" autocomplete="name" />
+      </label>
+      <label>
+        <span>{t('registration.guardianRelationship')}</span>
+        <select name="guardianRelationship">
+          <option value="">{t('registration.guardianRelationshipChoose')}</option>
+          <option value="father">{t('registration.relationFather')}</option>
+          <option value="mother">{t('registration.relationMother')}</option>
+          <option value="sibling">{t('registration.relationSibling')}</option>
+          <option value="grandparent">{t('registration.relationGrandparent')}</option>
+          <option value="legal_guardian">{t('registration.relationLegalGuardian')}</option>
+          <option value="other">{t('registration.relationOther')}</option>
+        </select>
+      </label>
+      <label id="guardian-relationship-other-field" hidden>
+        <span>{t('registration.guardianRelationshipOther')}</span>
+        <input name="guardianRelationshipOther" type="text" />
+      </label>
+      <label>
+        <span>{t('registration.guardianPhone')}</span>
+        <input name="guardianPhone" type="tel" dir="ltr" />
+      </label>
+      <label>
+        <span>{t('registration.guardianAltPhone')}</span>
+        <input name="guardianAltPhone" type="tel" dir="ltr" />
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset class="referral-fieldset">
+    <legend>{t('registration.referralHeading')}</legend>
+    <div class="chip-group" id="referral-source-group">
+      <label class="chip"><input required type="radio" name="referralSource" value="friend" /><span>{t('registration.referralFriend')}</span></label>
+      <label class="chip"><input required type="radio" name="referralSource" value="paper_ad" /><span>{t('registration.referralPaperAd')}</span></label>
+      <label class="chip"><input required type="radio" name="referralSource" value="sms" /><span>{t('registration.referralSms')}</span></label>
+      <label class="chip"><input required type="radio" name="referralSource" value="internet" /><span>{t('registration.referralInternet')}</span></label>
+      <label class="chip"><input required type="radio" name="referralSource" value="road_ad" /><span>{t('registration.referralRoadAd')}</span></label>
+      <label class="chip"><input required type="radio" name="referralSource" value="social" /><span>{t('registration.referralSocial')}</span></label>
+      <label class="chip"><input required type="radio" name="referralSource" value="other" /><span>{t('registration.referralOther')}</span></label>
+    </div>
+    <div class="chip-group" id="referral-social-group" hidden>
+      <label class="chip"><input type="checkbox" name="referralSocialChannels" value="facebook" /><span>{t('registration.referralSocialFacebook')}</span></label>
+      <label class="chip"><input type="checkbox" name="referralSocialChannels" value="twitter" /><span>{t('registration.referralSocialTwitter')}</span></label>
+      <label class="chip"><input type="checkbox" name="referralSocialChannels" value="youtube" /><span>{t('registration.referralSocialYoutube')}</span></label>
+      <label class="chip"><input type="checkbox" name="referralSocialChannels" value="tiktok" /><span>{t('registration.referralSocialTiktok')}</span></label>
+      <label class="chip"><input type="checkbox" name="referralSocialChannels" value="instagram" /><span>{t('registration.referralSocialInstagram')}</span></label>
+      <label class="chip"><input type="checkbox" name="referralSocialChannels" value="snapchat" /><span>{t('registration.referralSocialSnapchat')}</span></label>
+    </div>
+    <label id="referral-other-field" class="full-width" hidden>
+      <span>{t('registration.referralOtherSpecify')}</span>
+      <input name="referralSourceOther" type="text" />
+    </label>
+  </fieldset>
+
+  <fieldset class="terms-fieldset">
+    <legend>{t('registration.termsHeading')}</legend>
+    <ol id="terms-box" class="terms-box">
+      {terms.map((clause) => <li>{clause}</li>)}
+    </ol>
+    {locale !== 'ar' && <p class="terms-translation-note">This is a plain-language summary translation; the Arabic version above is legally binding.</p>}
+    <p class="terms-warning">{t('registration.termsWarning')}</p>
+    <label class="consent-check">
+      <input required type="checkbox" name="termsAccepted" />
+      <span>{t('registration.consentTerms')}</span>
+    </label>
+    <label class="consent-check">
+      <input required type="checkbox" name="mediaConsentAccepted" />
+      <span>{t('registration.consentMedia')}</span>
+    </label>
+  </fieldset>
+
+  <div class="step2-actions">
+    <button type="button" id="step2-back" class="btn btn-outline">{t('registration.back')}</button>
+    <button type="submit" id="step2-submit" class="btn btn-primary">{t('registration.submit')}</button>
+  </div>
+</div>
+
+<style>
+  .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  #step-details label, #step-details .full-width { display: flex; flex-direction: column; gap: 0.45rem; color: var(--color-navy); font-size: 0.88rem; font-weight: 700; }
+  #step-details input, #step-details select, #step-details textarea {
+    width: 100%;
+    min-height: 3.25rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 0.85rem;
+    color: var(--color-ink);
+    background: var(--color-bg-raised);
+    font: inherit;
+  }
+  #step-details textarea { min-height: 5rem; resize: vertical; }
+  fieldset { margin: 1.5rem 0 0; padding: 1rem; border: 1px solid var(--color-border); border-radius: 1rem; }
+  legend { padding: 0 0.4rem; color: var(--color-navy); font-size: 0.9rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; }
+  .badge { padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 800; }
+  .badge.required { color: #7a1c1c; background: rgb(182 23 51 / 0.12); }
+  .badge.optional { color: #1a6f48; background: rgb(53 168 111 / 0.12); }
+  .chip-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem; border: 1px solid var(--color-border); border-radius: 999px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+  .chip:has(input:checked) { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
+  .terms-box { max-height: 16rem; overflow-y: auto; margin: 0.75rem 0; padding: 1rem 1.5rem; border: 1px solid var(--color-border); border-radius: 0.85rem; background: var(--color-surface-soft); font-size: 0.85rem; line-height: 1.7; display: grid; gap: 0.5rem; }
+  .terms-translation-note { margin: 0 0 0.75rem; font-size: 0.78rem; font-style: italic; color: var(--color-ink-muted); }
+  .terms-warning { margin: 0 0 1rem; padding: 0.65rem 0.8rem; border-radius: 0.8rem; color: var(--color-primary-text); background: rgb(182 23 51 / 0.09); font-size: 0.85rem; font-weight: 800; text-align: center; }
+  .consent-check { display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 0.75rem; font-size: 0.85rem; font-weight: 600; color: var(--color-ink); }
+  .consent-check input { width: auto; min-height: auto; margin-top: 0.2rem; }
+  .step2-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 0.75rem; margin-top: 1.5rem; }
+  .step2-actions .btn { justify-content: center; min-height: 3.5rem; }
+  @media (max-width: 580px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .step2-actions { grid-template-columns: 1fr; }
+  }
+</style>
