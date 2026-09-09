@@ -20,7 +20,7 @@ function failOnConsoleErrors(page: Page): string[] {
 async function startKidsTest(page: Page) {
   await page.goto('/en/placement-test/');
   await page.getByLabel('First name').fill('Smoke');
-  await page.getByLabel('Father’s name').fill('Test');
+  await page.getByLabel('Father’s name', { exact: true }).fill('Test');
   await page.getByLabel('Grandfather’s name').fill('Kids');
   await page.getByLabel('Family name').fill('User');
   await page.getByLabel('WhatsApp number').fill('+966500000000');
@@ -30,7 +30,12 @@ async function startKidsTest(page: Page) {
   await page.getByLabel('National ID / Iqama / passport number').fill('1234567890');
   await page.getByLabel('Nationality').fill('Saudi');
   await page.getByLabel('Guardian name').fill('Parent Name');
-  await page.getByLabel('Relationship').selectOption('father');
+  // getByLabel('Relationship') is unreliable here: the <select> is wrapped by
+  // its <label> (implicit labelling), so its accessible name is computed from
+  // all of the label's text content plus the select's own rendered option
+  // text (e.g. "Relationship Select Father"), not just the "Relationship"
+  // span. Target the control directly instead.
+  await page.locator('select[name="guardianRelationship"]').selectOption('father');
   await page.getByLabel('Guardian’s mobile number').fill('+966500000098');
   await page.getByRole('radio', { name: 'A friend' }).check();
   await page.getByLabel(/I acknowledge that I have read/).check();
@@ -156,7 +161,7 @@ test('the registration form assigns under-11 students to the kids track', async 
 
   await page.goto('/en/placement-test/');
   await page.getByLabel('First name').fill('Test');
-  await page.getByLabel('Father’s name').fill('User');
+  await page.getByLabel('Father’s name', { exact: true }).fill('User');
   await page.getByLabel('Grandfather’s name').fill('Kids');
   await page.getByLabel('Family name').fill('Track');
   await page.getByLabel('WhatsApp number').fill('+966500000001');

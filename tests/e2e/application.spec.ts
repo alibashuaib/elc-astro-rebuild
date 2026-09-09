@@ -15,7 +15,7 @@ test('adult student completes the placement test, books a slot, and submits an a
 
   await page.goto('/en/placement-test/');
   await page.getByLabel('First name').fill('Application');
-  await page.getByLabel('Father’s name').fill('Smoke');
+  await page.getByLabel('Father’s name', { exact: true }).fill('Smoke');
   await page.getByLabel('Grandfather’s name').fill('Test');
   await page.getByLabel('Family name').fill('User');
   await page.getByLabel('WhatsApp number').fill('+966500000001');
