@@ -1,4 +1,4 @@
-import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+﻿import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
 
 /**
  * Fails the test on any console error or uncaught exception.
@@ -20,8 +20,8 @@ function failOnConsoleErrors(page: Page): string[] {
 async function startKidsTest(page: Page) {
   await page.goto('/en/placement-test/');
   await page.getByLabel('First name').fill('Smoke');
-  await page.getByLabel('Father's name').fill('Test');
-  await page.getByLabel('Grandfather's name').fill('Kids');
+  await page.getByLabel('Father’s name').fill('Test');
+  await page.getByLabel('Grandfather’s name').fill('Kids');
   await page.getByLabel('Family name').fill('User');
   await page.getByLabel('WhatsApp number').fill('+966500000000');
   // Under 11, so the form assigns the kids track on its own.
@@ -31,7 +31,7 @@ async function startKidsTest(page: Page) {
   await page.getByLabel('Nationality').fill('Saudi');
   await page.getByLabel('Guardian name').fill('Parent Name');
   await page.getByLabel('Relationship').selectOption('father');
-  await page.getByLabel('Guardian's mobile number').fill('+966500000098');
+  await page.getByLabel('Guardian’s mobile number').fill('+966500000098');
   await page.getByRole('radio', { name: 'A friend' }).check();
   await page.getByLabel(/I acknowledge that I have read/).check();
   await page.getByLabel(/I agree \(as the trainee or their guardian\)/).check();
@@ -156,8 +156,8 @@ test('the registration form assigns under-11 students to the kids track', async 
 
   await page.goto('/en/placement-test/');
   await page.getByLabel('First name').fill('Test');
-  await page.getByLabel('Father's name').fill('User');
-  await page.getByLabel('Grandfather's name').fill('Kids');
+  await page.getByLabel('Father’s name').fill('User');
+  await page.getByLabel('Grandfather’s name').fill('Kids');
   await page.getByLabel('Family name').fill('Track');
   await page.getByLabel('WhatsApp number').fill('+966500000001');
   await page.getByLabel('Date of birth').fill('2018-01-01');
@@ -270,3 +270,4 @@ test('contact cards use dark surfaces and readable accent labels in dark mode', 
     { soft: '#38291f', label: 'rgb(255, 179, 110)' },
   ]);
 });
+

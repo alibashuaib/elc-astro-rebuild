@@ -1,4 +1,4 @@
-import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+﻿import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
 
 function failOnConsoleErrors(page: Page): string[] {
   const errors: string[] = [];
@@ -15,8 +15,8 @@ test('adult student completes the placement test, books a slot, and submits an a
 
   await page.goto('/en/placement-test/');
   await page.getByLabel('First name').fill('Application');
-  await page.getByLabel('Father's name').fill('Smoke');
-  await page.getByLabel('Grandfather's name').fill('Test');
+  await page.getByLabel('Father’s name').fill('Smoke');
+  await page.getByLabel('Grandfather’s name').fill('Test');
   await page.getByLabel('Family name').fill('User');
   await page.getByLabel('WhatsApp number').fill('+966500000001');
   await page.getByLabel('Date of birth').fill('1995-01-01'); // well over 11, stays on the adults track
@@ -61,3 +61,4 @@ test('adult student completes the placement test, books a slot, and submits an a
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });
+
