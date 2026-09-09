@@ -1,5 +1,5 @@
 import type { Env, StudentInput } from '../types';
-import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countActiveQuestions, countBandCorrect, countBandAnswered, listAnsweredQuestionIds, setCurrentQuestion, getQuestion } from '../db';
+import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countSessionQuestions, countBandCorrect, countBandAnswered, listAnsweredQuestionIds, setCurrentQuestion, getQuestion } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 import { ADULT_BANDS, BELOW_FIRST_BAND, bandForSequence, isLastBand, evaluateBand, placementLevel, canStillPass, previousBand } from '../bands';
 import { kidsLevelIndex, KIDS_YLE_BY_INDEX } from '../kids';
@@ -75,8 +75,6 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
     const levelName = STAGE_NAMES_BY_TRACK[track as 'kids' | 'adults'][finalIndex];
     await completeSession(env, sessionId, level);
     await setCurrentQuestion(env, sessionId, null);
-    // Cambridge YLE exam level, kids only -- adults aren't on that scale, and
-    // Pre-Starters sits below the lowest YLE exam, so it stays absent there.
     const yle = track === 'kids' ? KIDS_YLE_BY_INDEX[finalIndex] : undefined;
     return { done: true, level, levelName, ...(yle ? { yle } : {}) };
   }
@@ -86,7 +84,7 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
   const passage = q.passage_id ? await getPassage(env, q.passage_id) : null;
   // Adults only serves its banded prefix (see ADULT_BANDED_QUESTION_COUNT) --
   // report progress against that, not the track's full 50-question bank.
-  const total = track === 'adults' ? ADULT_BANDED_QUESTION_COUNT : await countActiveQuestions(env, track as 'kids' | 'adults');
+  const total = track === 'adults' ? ADULT_BANDED_QUESTION_COUNT : await countSessionQuestions(env, track as 'kids' | 'adults');
   return {
     done: false,
     questionId: q.id,
@@ -107,6 +105,11 @@ export async function handleStartSession(req: Request, env: Env): Promise<Respon
   const body = await req.json<StudentInput>();
   if (!body.name || !body.phone || !body.dob || !body.locale) {
     return json({ error: 'name, phone, dob, and locale are required' }, 400);
+  }
+  // The browser uses the 10-digit local form. Accept the equivalent Saudi
+  // international form for API clients and existing integrations.
+  if (!/^(?:05\d{8}|\+9665\d{8})$/.test(body.phone)) {
+    return json({ error: 'phone must be a Saudi mobile number (05xxxxxxxx)' }, 400);
   }
   const requestedTrack = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
   const track = isUnderEleven(body.dob) ? 'kids' : requestedTrack;

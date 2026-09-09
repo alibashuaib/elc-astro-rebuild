@@ -8,7 +8,7 @@ durationWeeks: 4
 hoursPerWeek: 10
 hoursPerMonth: "40"
 hoursPerDay: 2
-scheduleDays: 5 days per week
+scheduleDays: "5"
 classTimes:
   - label: Class time
     start: "7:00"
@@ -36,9 +36,7 @@ Qualified female instructors guide the learning experience in an environment des
 - For female learners aged 13 and above
 - Dedicated women's section with qualified female instructors
 - One month and 40 learning hours per course
-- Two hours per day, five days per week
 - Structured CEFR-aligned General English pathway
 - Speaking, listening, reading, and writing
-- SAR 1,500 per level
 
 Contact ELC to book a placement test and confirm the next women's intake.

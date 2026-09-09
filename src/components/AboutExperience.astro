@@ -2,10 +2,14 @@
 import PageHero from './PageHero.astro';
 import Icon from './Icon.astro';
 import AnimatedNumber from './AnimatedNumber.astro';
+import { getCollection } from 'astro:content';
 import type { Locale } from '../i18n/ui';
 
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
+const courseCount = (await getCollection('courses', (entry) => (
+  entry.id.startsWith(`${locale}/`) && !entry.data.draft && !entry.id.endsWith('/special-courses')
+))).length;
 
 const content = locale === 'ar' ? {
   kicker: 'من نحن ولماذا معهد صرح المعرفة',
@@ -30,9 +34,9 @@ const content = locale === 'ar' ? {
     { icon: 'check' as const, title: 'الالتزام' },
   ],
   stats: [
-    { value: '+15,000', label: 'متعلم' },
-    { value: '+9', label: 'برامج تعليمية' },
-    { value: '2010', label: 'عام التأسيس' },
+    { value: '١٥ الف', label: 'تم تدريب أكثر من' },
+    { value: String(courseCount), label: 'برامج تعليمية' },
+    { value: '2010', label: 'تم التاسيس' },
   ],
   whyKicker: 'لماذا معهد صرح المعرفة',
   whyTitle: 'كل ما تحتاجه لتتعلم بثقة',
@@ -79,8 +83,8 @@ const content = locale === 'ar' ? {
     { icon: 'check' as const, title: 'Commitment' },
   ],
   stats: [
-    { value: '15,000+', label: 'learners taught' },
-    { value: '9+', label: 'learning programs' },
+    { value: '15K', label: 'learners taught' },
+    { value: String(courseCount), label: 'learning programs' },
     { value: '2010', label: 'founded' },
   ],
   whyKicker: 'Why ELC',
@@ -241,8 +245,8 @@ const basePath = `/${locale}`;
   .purpose-card p { margin: 0; line-height: 1.75; }
   .mission-card { color: #fff; background: var(--color-primary); }
   .mission-card p { color: #fce5ea; }
-  .vision-card { color: #292b2f; background: var(--color-coral-soft); }
-  .vision-card p { color: #76532e; }
+  .vision-card { color: var(--color-navy); background: var(--color-coral-soft); }
+  .vision-card p { color: var(--color-amber-text); }
   .values-card { color: #fff; background: var(--zone-ink-bg); }
   .values-card p { margin-bottom: 1.25rem; color: #c7cbd6; }
   .purpose-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; padding: 0; margin: 0; list-style: none; }
@@ -268,7 +272,7 @@ const basePath = `/${locale}`;
   .stat::after { content: ''; position: absolute; width: 5rem; height: 5rem; inset-inline-end: -2.5rem; bottom: -2.5rem; border-radius: 50%; background: var(--color-coral-soft); transition: transform var(--motion-base) var(--ease); }
   .stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
   .stat:hover::after { transform: scale(1.2); }
-  .stat :global(strong) { position: relative; z-index: 1; color: var(--color-primary); font-size: clamp(2rem, 3.6vw, 3.2rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
+  .stat :global(strong) { position: relative; z-index: 1; color: var(--color-primary-text); font-size: clamp(2rem, 3.6vw, 3.2rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
   .stat span { position: relative; z-index: 1; color: var(--color-ink-muted); font-size: .8rem; font-weight: 700; }
   .stat-line { display: none; }
   .why-section { background: var(--zone-ink-bg); color: #fff; }
@@ -283,7 +287,7 @@ const basePath = `/${locale}`;
   .reason-icon { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border-radius: 1rem; color: var(--color-primary); background: #fff; }
   .reason-number { display: grid; width: 2.45rem; height: 2.45rem; place-items: center; border: 1px solid #5b5e64; border-radius: .8rem; color: #fff; background: #404248; font-size: .8rem; font-weight: 850; transition: transform var(--motion-base) var(--ease), border-color var(--motion-base) var(--ease); }
   .reason-card:hover .reason-number { border-color: #f7b75f; transform: rotate(7deg) scale(1.08); }
-  .reason-card:nth-child(even) .reason-icon { color: #8a5513; background: var(--color-coral-soft); }
+  .reason-card:nth-child(even) .reason-icon { color: var(--color-amber-text); background: var(--color-coral-soft); }
   .reason-card h3 { margin-bottom: .7rem; color: #fff; font-size: 1.2rem; }
   .reason-card p { margin: 0; color: #c6c3bf; font-size: .9rem; line-height: 1.75; }
   .faq-section { background: var(--color-bg-raised); }
@@ -295,9 +299,9 @@ const basePath = `/${locale}`;
   details { border-bottom: 1px solid var(--color-border); }
   summary { display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: center; gap: 1rem; padding-block: 1.5rem; color: var(--color-navy); font-size: 1.05rem; font-weight: 750; cursor: pointer; list-style: none; }
   summary::-webkit-details-marker { display: none; }
-  summary::after { content: '+'; grid-column: 3; color: var(--color-primary); font-size: 1.4rem; font-weight: 500; transition: transform var(--motion-fast) var(--ease); }
+  summary::after { content: '+'; grid-column: 3; color: var(--color-primary-text); font-size: 1.4rem; font-weight: 500; transition: transform var(--motion-fast) var(--ease); }
   details[open] summary::after { transform: rotate(45deg); }
-  summary span { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border: 1px solid rgb(182 23 51 / .14); border-radius: .75rem; color: var(--color-primary); background: var(--color-blue-soft); font-size: .76rem; font-weight: 850; transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); }
+  summary span { display: grid; width: 2.35rem; height: 2.35rem; place-items: center; border: 1px solid rgb(182 23 51 / .14); border-radius: .75rem; color: var(--color-primary-text); background: var(--color-blue-soft); font-size: .76rem; font-weight: 850; transition: color var(--motion-fast) var(--ease), background var(--motion-fast) var(--ease); }
   details[open] summary span { color: #fff; background: var(--color-primary); }
   details p { max-width: 65ch; margin: -.45rem 0 1.5rem 3.5rem; color: var(--color-ink-muted); line-height: 1.8; }
   :global(:dir(rtl)) details p { margin-right: 3.5rem; margin-left: 0; }
@@ -319,8 +323,8 @@ const basePath = `/${locale}`;
     .purpose-card { min-height: 15rem; }
     .purpose-card h3 { margin-top: 2.5rem; }
     .stats-row { grid-template-columns: repeat(3, 1fr); gap: .75rem; }
-    .stat { padding: 1rem; }
-    .stat :global(strong) { font-size: clamp(1.6rem, 8vw, 2.25rem); }
+    .stat { padding: 1rem .65rem; }
+    .stat :global(strong) { max-width: 100%; font-size: clamp(1.35rem, 5.6vw, 1.8rem); letter-spacing: -.06em; white-space: nowrap; }
     .stat-line { display: none; }
     .reason-grid { grid-template-columns: 1fr; }
     .reason-card, .reason-card:nth-last-child(-n + 2) { grid-column: auto; min-height: 15rem; }

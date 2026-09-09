@@ -130,7 +130,7 @@ h3 { font-size: var(--fs-lg); }
 .zone-ink p { color: var(--zone-ink-muted); }
 .zone-ink a:not(.btn) { color: var(--zone-ink-signal); }
 .zone-ink .btn-primary { background: var(--zone-ink-signal); color: var(--zone-ink-bg); }
-.zone-ink .btn-primary:hover { background: #fff; }
+.zone-ink .btn-primary:hover { background: #fff; color: var(--zone-ink-bg); }
 .zone-ink .btn-outline { border-color: var(--zone-ink-border); color: var(--zone-ink-text); }
 .zone-ink .btn-outline:hover { border-color: var(--zone-ink-signal); }
 
@@ -140,7 +140,7 @@ a {
   color: var(--color-crimson-text);
   text-decoration: none;
 }
-a:hover { color: var(--color-crimson-ink); text-decoration: underline; }
+a:hover { color: var(--color-crimson-text); text-decoration: underline; }
 
 img, svg { max-width: 100%; height: auto; display: block; }
 
@@ -187,6 +187,7 @@ img, svg { max-width: 100%; height: auto; display: block; }
 [hidden] { display: none !important; }
 .btn-primary:hover {
   background: var(--color-primary-deep);
+  color: #fff;
   transform: translateY(-2px);
   text-decoration: none;
 }
