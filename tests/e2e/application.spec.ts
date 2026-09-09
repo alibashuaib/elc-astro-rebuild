@@ -46,9 +46,9 @@ test('adult student completes the placement test, books a slot, and submits an a
 
   await expect(page.getByRole('heading', { name: 'Complete your application' })).toBeVisible();
   await page.getByLabel('Course').selectOption({ index: 1 });
-  await page.getByLabel('National ID / passport number').fill('1234567890');
-  await page.getByLabel('ID or passport copy').setInputFiles({ name: 'id.png', mimeType: 'image/png', buffer: Buffer.from([1, 2, 3]) });
-  await page.getByLabel('Photo').setInputFiles({ name: 'photo.jpg', mimeType: 'image/jpeg', buffer: Buffer.from([4, 5, 6]) });
+  await page.getByLabel('Email address').fill('smoke-test@example.com');
+  await page.getByLabel('ID type').selectOption('national_id');
+  await page.getByLabel('ID number').fill('1234567890');
   await page.getByRole('button', { name: 'Submit application' }).click();
 
   await expect(page.getByRole('heading', { name: 'Application received' })).toBeVisible({ timeout: 10_000 });

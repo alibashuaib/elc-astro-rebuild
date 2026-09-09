@@ -2,7 +2,6 @@ import type { CefrLevel } from './scoring';
 
 export interface Env {
   DB: D1Database;
-  DOCS: R2Bucket; // uploaded application documents (ID copy, photo) — see migrations/0019
   ADMIN_SESSION_TTL_SECONDS: string;
   ADMIN_COOKIE_SECRET: string; // set via `wrangler secret put ADMIN_COOKIE_SECRET`
   /** 'true' only under local dev (see scripts/local-dev.ts) -- gates loopback CORS origins and verbose error messages. */
@@ -61,24 +60,18 @@ export interface SessionRow {
   current_question_id: string | null;
 }
 
+export type IdType = 'national_id' | 'iqama' | 'passport';
+
 export interface ApplicationRow {
   id: string;
   session_id: string;
   course: string;
   guardian_name: string | null;
   id_number: string;
+  id_type: IdType;
+  email: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   reviewed_at: string | null;
   reviewed_by: string | null;
-}
-
-export type DocumentKind = 'id_copy' | 'photo' | 'other';
-
-export interface ApplicationDocumentRow {
-  id: string;
-  application_id: string;
-  kind: DocumentKind;
-  r2_key: string;
-  uploaded_at: string;
 }

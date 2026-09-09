@@ -16,11 +16,10 @@ database_id = "00000000-0000-0000-0000-000000000000"
 # filenames before the first run against such a database.
 migrations_dir = "migrations"
 
-[[r2_buckets]]
-binding = "DOCS"
-bucket_name = "elc-application-documents"
-# Create with `wrangler r2 bucket create elc-application-documents` before the
-# first deploy — unlike D1, R2 buckets aren't created by a migrations command.
+# Document upload (R2 bucket "elc-application-documents", binding DOCS) was
+# removed — the application flow no longer collects ID copy/photo uploads.
+# If that bucket was ever created via `wrangler r2 bucket create`, delete it
+# manually with `wrangler r2 bucket delete elc-application-documents`.
 
 [vars]
 ADMIN_SESSION_TTL_SECONDS = "43200"
