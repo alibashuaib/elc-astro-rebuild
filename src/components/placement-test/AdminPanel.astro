@@ -187,12 +187,10 @@
 
     const applicationList = document.getElementById('application-list')!;
     applicationList.innerHTML = '';
-    const idTypeLabels: Record<string, string> = { national_id: 'National ID', iqama: 'Iqama', passport: 'Passport' };
     applications.forEach((a: any) => {
       const li = document.createElement('li');
       const summary = document.createElement('span');
-      const idTypeLabel = idTypeLabels[a.id_type] ?? a.id_type;
-      summary.textContent = `${a.student_name} (${a.phone}) — ${a.email} — ${a.course} — level ${a.estimated_level ?? '—'} — ${idTypeLabel} #${a.id_number} — ${a.status}`;
+      summary.textContent = `${a.student_name} (${a.phone}) — ${a.nationality} — ID ${a.id_number} — ${a.course} — level ${a.estimated_level ?? '—'} — ${a.status}`;
       li.appendChild(summary);
 
       if (a.status === 'pending') {
