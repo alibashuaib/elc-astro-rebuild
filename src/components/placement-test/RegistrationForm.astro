@@ -1,5 +1,8 @@
 ---
+// src/components/placement-test/RegistrationForm.astro
 import type { Locale, useTranslations } from '../../i18n/ui';
+import RegistrationStepBasics from './RegistrationStepBasics.astro';
+import RegistrationStepDetails from './RegistrationStepDetails.astro';
 
 export interface Props {
   locale: Locale;
@@ -10,133 +13,208 @@ const { locale, t } = Astro.props;
 
 <form id="placement-registration" class="card" data-locale={locale}>
   <header class="card-heading">
-    <span class="step-number" aria-hidden="true">01</span>
+    <span class="step-number" aria-hidden="true" id="step-number">01</span>
     <div>
-      <p class="card-eyebrow">{t('placementTest.stageDetails')}</p>
-      <h2>{t('placementTest.formHeading')}</h2>
-      <p class="card-intro">{t('placementTest.formIntro')}</p>
+      <p class="card-eyebrow" id="step-eyebrow">{t('registration.step1Of2')}</p>
+      <h2>{t('registration.heading')}</h2>
+      <p class="card-intro">{t('registration.intro')}</p>
     </div>
   </header>
-  <fieldset class="track-field">
-    <legend>{t('placementTest.formTrack')}</legend>
-    <div class="track-toggle">
-      <label class="track-pill">
-        <input required name="track" type="radio" value="adults" checked />
-        <span>{t('placementTest.formTrackAdults')}</span>
-      </label>
-      <label class="track-pill">
-        <input required name="track" type="radio" value="kids" />
-        <span>{t('placementTest.formTrackKids')}</span>
-      </label>
-    </div>
-    <p id="age-track-rule" class="age-track-rule" hidden></p>
-  </fieldset>
-  <div class="form-grid">
-    <label>
-      <span>{t('placementTest.formName')}</span>
-      <input required name="name" type="text" autocomplete="name" />
-    </label>
-      <label>
-        <span>{t('placementTest.formPhone')}</span>
-        <input
-          class="numeric"
-          required
-          name="phone"
-          type="tel"
-          autocomplete="tel"
-          inputmode="numeric"
-          maxlength="10"
-          minlength="10"
-          pattern="05[0-9]{8}"
-          placeholder="05xxxxxxxx"
-          aria-describedby="placement-phone-hint"
-          data-invalid-message={t('placementTest.formPhoneInvalid')}
-        />
-        <small id="placement-phone-hint">{t('placementTest.formPhoneHint')}</small>
-      </label>
-    <label>
-      <span>{t('placementTest.formDob')}</span>
-      <input required name="dob" type="date" />
-    </label>
-    <label id="guardian-field" hidden>
-      <span>{t('placementTest.formGuardian')}</span>
-      <input name="guardianName" type="text" autocomplete="name" />
-    </label>
-  </div>
-  <button type="submit" class="btn btn-primary">{t('placementTest.formSubmit')}</button>
-  <p id="placement-registration-error" class="form-error" role="alert" hidden>
-    {t('placementTest.answerError')}
-  </p>
+
+  <RegistrationStepBasics locale={locale} t={t} />
+  <RegistrationStepDetails locale={locale} t={t} />
+
+  <p
+    id="placement-registration-error"
+    class="form-error"
+    role="alert"
+    hidden
+    data-default-message={t('registration.error')}
+  >{t('registration.error')}</p>
 </form>
 
 <script>
+  import { computeAge, NAME_RE, PHONE_RE, ID_NUMBER_RE, EMAIL_RE } from '../../lib/registrationValidation';
+
   const form = document.getElementById('placement-registration') as HTMLFormElement;
-  const trackInputs = form.querySelectorAll<HTMLInputElement>('input[name="track"]');
-  const guardianField = document.getElementById('guardian-field') as HTMLElement;
+  const errorEl = document.getElementById('placement-registration-error') as HTMLElement;
+  const stepNumber = document.getElementById('step-number') as HTMLElement;
+  const stepEyebrow = document.getElementById('step-eyebrow') as HTMLElement;
+  const stepBasics = document.getElementById('step-basics') as HTMLElement;
+  const stepDetails = document.getElementById('step-details') as HTMLElement;
+
   const dobInput = form.querySelector<HTMLInputElement>('input[name="dob"]')!;
-  const phoneInput = form.querySelector<HTMLInputElement>('input[name="phone"]')!;
   const adultsInput = form.querySelector<HTMLInputElement>('input[name="track"][value="adults"]')!;
   const kidsInput = form.querySelector<HTMLInputElement>('input[name="track"][value="kids"]')!;
   const ageRule = document.getElementById('age-track-rule') as HTMLElement;
-
-  function selectedTrack(): string {
-    return (form.querySelector<HTMLInputElement>('input[name="track"]:checked'))?.value ?? 'adults';
-  }
-
-  function updateGuardianField() {
-    const isKids = selectedTrack() === 'kids';
-    guardianField.hidden = !isKids;
-    const guardianInput = guardianField.querySelector<HTMLInputElement>('input')!;
-    guardianInput.required = isKids;
-  }
+  const estimatedAgeNote = document.getElementById('estimated-age-note') as HTMLElement;
+  const isAr = form.dataset.locale === 'ar';
 
   function isUnderEleven(dob: string): boolean {
-    const parts = dob.split('-').map(Number);
-    if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part))) return false;
-    const [year, month, day] = parts;
-    const today = new Date();
-    let age = today.getFullYear() - year;
-    const hadBirthday = today.getMonth() + 1 > month || (today.getMonth() + 1 === month && today.getDate() >= day);
-    if (!hadBirthday) age--;
-    return age < 11;
+    return computeAge(dob) < 11;
+  }
+
+  function updateEstimatedAge() {
+    const age = computeAge(dobInput.value);
+    if (!Number.isFinite(age) || !dobInput.value) {
+      estimatedAgeNote.hidden = true;
+      return;
+    }
+    const prefix = isAr ? 'العمر التقديري:' : 'Estimated age:';
+    const suffix = isAr ? 'سنة' : 'years';
+    estimatedAgeNote.textContent = `${prefix} ${age} ${suffix}`;
+    estimatedAgeNote.hidden = false;
+    updateGuardianRequirement(age);
   }
 
   function enforceAgeTrack() {
     const forcedKids = isUnderEleven(dobInput.value);
     adultsInput.disabled = forcedKids;
     ageRule.hidden = !forcedKids;
-    ageRule.textContent = form.dataset.locale === 'ar'
+    ageRule.textContent = isAr
       ? 'يتم اختيار اختبار الأطفال تلقائيًا للطلاب دون سن 11 عامًا.'
       : 'Students under 11 are automatically assigned to the Kids test.';
     if (forcedKids) kidsInput.checked = true;
-    updateGuardianField();
+    updateEstimatedAge();
   }
 
-  trackInputs.forEach((input) => input.addEventListener('change', updateGuardianField));
   dobInput.addEventListener('input', enforceAgeTrack);
   dobInput.addEventListener('change', enforceAgeTrack);
 
-  const validatePhone = () => {
-    const isValid = /^05\d{8}$/.test(phoneInput.value);
-    phoneInput.setCustomValidity(
-      phoneInput.value && !isValid ? (phoneInput.dataset.invalidMessage ?? '') : ''
-    );
-  };
-  phoneInput.addEventListener('input', () => {
-    phoneInput.value = phoneInput.value.replace(/\D/g, '').slice(0, 10);
-    validatePhone();
-  });
-  phoneInput.addEventListener('invalid', validatePhone);
-  updateGuardianField();
+  // --- Guardian section (age-gated requirement) ---
+  const guardianBadge = document.getElementById('guardian-badge') as HTMLElement;
+  const guardianToggle = document.getElementById('guardian-toggle') as HTMLButtonElement;
+  const guardianFields = document.getElementById('guardian-fields') as HTMLElement;
+  const guardianNameInput = form.querySelector<HTMLInputElement>('input[name="guardianName"]')!;
+  const guardianRelationshipSelect = form.querySelector<HTMLSelectElement>('select[name="guardianRelationship"]')!;
+  const guardianPhoneInput = form.querySelector<HTMLInputElement>('input[name="guardianPhone"]')!;
+  const guardianRelationshipOtherField = document.getElementById('guardian-relationship-other-field') as HTMLElement;
+  const guardianRelationshipOtherInput = form.querySelector<HTMLInputElement>('input[name="guardianRelationshipOther"]')!;
 
+  let guardianManuallyOpened = false;
+
+  function updateGuardianRequirement(age: number) {
+    const required = Number.isFinite(age) && age < 18;
+    guardianBadge.textContent = required
+      ? (isAr ? 'مطلوبة (أقل من 18 سنة)' : 'Required (under 18)')
+      : (isAr ? 'اختيارية للبالغين (18+)' : 'Optional for adults (18+)');
+    guardianBadge.className = `badge ${required ? 'required' : 'optional'}`;
+    guardianToggle.hidden = required;
+    guardianFields.hidden = !required && !guardianManuallyOpened;
+    guardianNameInput.required = required;
+    guardianRelationshipSelect.required = required;
+    guardianPhoneInput.required = required;
+  }
+
+  guardianToggle.addEventListener('click', () => {
+    guardianManuallyOpened = true;
+    guardianFields.hidden = false;
+  });
+
+  guardianRelationshipSelect.addEventListener('change', () => {
+    const isOther = guardianRelationshipSelect.value === 'other';
+    guardianRelationshipOtherField.hidden = !isOther;
+    guardianRelationshipOtherInput.required = isOther;
+  });
+
+  // --- Referral source (conditional chips) ---
+  const referralSocialGroup = document.getElementById('referral-social-group') as HTMLElement;
+  const referralOtherField = document.getElementById('referral-other-field') as HTMLElement;
+  const referralOtherInput = form.querySelector<HTMLInputElement>('input[name="referralSourceOther"]')!;
+  form.querySelectorAll<HTMLInputElement>('input[name="referralSource"]').forEach((input) => {
+    input.addEventListener('change', () => {
+      referralSocialGroup.hidden = input.value !== 'social' || !input.checked;
+      const isOther = input.value === 'other' && input.checked;
+      if (isOther) {
+        referralOtherField.hidden = false;
+        referralOtherInput.required = true;
+      } else if (input.checked) {
+        referralOtherField.hidden = true;
+        referralOtherInput.required = false;
+      }
+    });
+  });
+
+  // --- Step navigation ---
+  function namePartsValid(): boolean {
+    return ['firstName', 'fatherName', 'grandfatherName', 'familyName'].every((name) => {
+      const input = form.querySelector<HTMLInputElement>(`input[name="${name}"]`)!;
+      return NAME_RE.test(input.value);
+    });
+  }
+
+  function step1Valid(): boolean {
+    const phone = form.querySelector<HTMLInputElement>('input[name="phone"]')!;
+    const age = computeAge(dobInput.value);
+    return namePartsValid() && PHONE_RE.test(phone.value) && Number.isFinite(age) && age >= 4 && age <= 100;
+  }
+
+  const step1Next = document.getElementById('step1-next') as HTMLButtonElement;
+  const step2Back = document.getElementById('step2-back') as HTMLButtonElement;
+  const step2Submit = document.getElementById('step2-submit') as HTMLButtonElement;
+
+  step1Next.addEventListener('click', () => {
+    if (!step1Valid()) {
+      errorEl.hidden = false;
+      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى ملء جميع الحقول بشكل صحيح' : 'Please fill all fields correctly';
+      return;
+    }
+    errorEl.hidden = true;
+    stepBasics.hidden = true;
+    stepDetails.hidden = false;
+    step2Submit.disabled = false;
+    stepNumber.textContent = '02';
+    stepEyebrow.textContent = form.dataset.locale === 'ar' ? 'الخطوة 2 من 2' : 'Step 2 of 2';
+  });
+
+  step2Back.addEventListener('click', () => {
+    stepDetails.hidden = true;
+    stepBasics.hidden = false;
+    step2Submit.disabled = true;
+    stepNumber.textContent = '01';
+    stepEyebrow.textContent = form.dataset.locale === 'ar' ? 'الخطوة 1 من 2' : 'Step 1 of 2';
+  });
+
+  // --- Submit ---
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const data = Object.fromEntries(new FormData(form).entries());
+    errorEl.hidden = true;
+
+    const idNumberInput = form.querySelector<HTMLInputElement>('input[name="idNumber"]')!;
+    const nationalityInput = form.querySelector<HTMLInputElement>('input[name="nationality"]')!;
+    if (!ID_NUMBER_RE.test(idNumberInput.value) || !nationalityInput.value.trim()) {
+      errorEl.hidden = false;
+      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى ملء رقم الهوية والجنسية بشكل صحيح' : 'Please enter ID number and nationality correctly';
+      return;
+    }
+    const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]')!;
+    if (emailInput.value && !EMAIL_RE.test(emailInput.value)) {
+      errorEl.hidden = false;
+      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email';
+      return;
+    }
+
+    const formData = new FormData(form);
+    const referralSocialChannels = formData.getAll('referralSocialChannels');
+    const data: Record<string, unknown> = Object.fromEntries(formData.entries());
+    data.referralSocialChannels = referralSocialChannels;
+    data.termsAccepted = form.querySelector<HTMLInputElement>('input[name="termsAccepted"]')!.checked;
+    data.mediaConsentAccepted = form.querySelector<HTMLInputElement>('input[name="mediaConsentAccepted"]')!.checked;
+    // The form collects name parts (firstName/fatherName/grandfatherName/familyName), not a
+    // single `name` field -- the full name is otherwise only assembled server-side. Add it here
+    // so consumers of the placement:register event (ResultBooking.astro's WhatsApp message,
+    // StartSessionInput's `name` field) get a usable value instead of `undefined`.
+    data.name = [data.firstName, data.fatherName, data.grandfatherName, data.familyName]
+      .map((v) => String(v ?? '').trim())
+      .filter(Boolean)
+      .join(' ');
+
     sessionStorage.setItem('placement:track', String(data.track ?? 'adults'));
-    document.dispatchEvent(
-      new CustomEvent('placement:register', { detail: { ...data, locale: form.dataset.locale } })
-    );
+    document.dispatchEvent(new CustomEvent('placement:register', { detail: { ...data, locale: form.dataset.locale } }));
   });
+
+  step2Submit.disabled = true;
+  updateGuardianRequirement(NaN);
 </script>
 
 <style>
@@ -149,167 +227,13 @@ const { locale, t } = Astro.props;
     background: var(--color-bg-raised);
     box-shadow: var(--shadow-md);
   }
-  .card-heading {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 1rem;
-    align-items: start;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--color-border);
-  }
-  .step-number {
-    display: grid;
-    width: 2.75rem;
-    height: 2.75rem;
-    place-items: center;
-    border-radius: 0.85rem;
-    color: #fff;
-    background: var(--color-primary);
-    box-shadow: 0 8px 20px rgb(182 23 51 / 0.2);
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    font-weight: 700;
-  }
-  .card-eyebrow {
-    margin: 0 0 0.25rem;
-    color: var(--color-primary-text);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .card-heading h2 {
-    margin: 0 0 0.45rem;
-    color: var(--color-navy);
-    font-size: clamp(1.45rem, 4vw, 2rem);
-  }
-  .card-intro {
-    max-width: 38rem;
-    margin: 0;
-    color: var(--color-ink-muted);
-    font-size: 0.92rem;
-  }
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-  }
-  .card label {
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-    color: var(--color-navy);
-    font-size: 0.88rem;
-    font-weight: 700;
-  }
-  .card input {
-    width: 100%;
-    min-height: 3.25rem;
-    padding: 0.75rem 0.9rem;
-    border: 1px solid var(--color-border-strong);
-    border-radius: 0.85rem;
-    color: var(--color-ink);
-    background: var(--color-bg-raised);
-    font: inherit;
-  }
-  .card input:focus {
-    outline: 3px solid rgb(182 23 51 / 0.12);
-    border-color: var(--color-primary);
-  }
-  .card .btn {
-    justify-content: center;
-    width: 100%;
-    min-height: 3.5rem;
-    margin-top: 0.25rem;
-  }
-  .track-field {
-    display: grid;
-    gap: 0.6rem;
-    margin: 0;
-    padding: 0;
-    border: none;
-  }
-  .track-field legend {
-    padding: 0;
-    color: var(--color-navy);
-    font-size: 0.88rem;
-    font-weight: 700;
-  }
-  .age-track-rule {
-    margin: 0;
-    padding: 0.65rem 0.8rem;
-    border-radius: 0.8rem;
-    color: var(--color-success-text);
-    background: rgb(53 168 111 / 0.12);
-    font-size: 0.82rem;
-    font-weight: 700;
-    text-align: center;
-  }
-  .card label.track-pill:has(input:disabled) {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-  .track-toggle {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-  /* `.card label.track-pill` (not just `.track-pill`) so this beats the
-     generic `.card label` rule's flex-direction/gap on specificity instead
-     of losing to it silently. */
-  .card label.track-pill {
-    position: relative;
-    flex: 1;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    min-height: 3.5rem;
-    padding: 0.7rem 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: 1rem;
-    color: var(--color-ink-muted);
-    background: var(--color-surface-soft);
-    font-size: 0.88rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease),
-      color var(--motion-fast) var(--ease);
-  }
-  .track-pill input {
-    position: absolute;
-    inset: 0;
-    margin: 0;
-    opacity: 0;
-    cursor: pointer;
-  }
-  /* Same `.card label.track-pill` prefix as the base rule above, plus
-     :has() -- otherwise this loses the specificity fight to that base rule's
-     own color/background instead of overriding it on check. */
-  .card label.track-pill:has(input:checked) {
-    border-color: var(--color-primary);
-    background: var(--color-primary);
-    color: #fff;
-    box-shadow: 0 8px 20px rgb(182 23 51 / 0.18);
-  }
-  .card label.track-pill:has(input:focus-visible) {
-    outline: 3px solid rgb(182 23 51 / 0.12);
-    outline-offset: 2px;
-  }
-  .form-error {
-    margin: -0.5rem 0 0;
-    padding: 0.75rem 0.9rem;
-    border-radius: 0.85rem;
-    color: var(--color-primary-text);
-    background: rgb(182 23 51 / 0.09);
-    font-size: 0.88rem;
-    font-weight: 700;
-    text-align: center;
-  }
+  .card-heading { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; padding-bottom: 1.25rem; border-bottom: 1px solid var(--color-border); }
+  .step-number { display: grid; width: 2.75rem; height: 2.75rem; place-items: center; border-radius: 0.85rem; color: #fff; background: var(--color-primary); box-shadow: 0 8px 20px rgb(182 23 51 / 0.2); font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; }
+  .card-eyebrow { margin: 0 0 0.25rem; color: var(--color-primary-text); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+  .card-heading h2 { margin: 0 0 0.45rem; color: var(--color-navy); font-size: clamp(1.45rem, 4vw, 2rem); }
+  .card-intro { max-width: 38rem; margin: 0; color: var(--color-ink-muted); font-size: 0.92rem; }
+  .form-error { margin: -0.5rem 0 0; padding: 0.75rem 0.9rem; border-radius: 0.85rem; color: var(--color-primary-text); background: rgb(182 23 51 / 0.09); font-size: 0.88rem; font-weight: 700; text-align: center; }
   @media (max-width: 580px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .track-toggle { grid-template-columns: 1fr; }
     .card-heading { grid-template-columns: 1fr; }
   }
 </style>

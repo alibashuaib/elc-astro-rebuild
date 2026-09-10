@@ -17,6 +17,27 @@ export interface StudentInput {
   guardianName?: string;
   locale: 'en' | 'ar';
   track?: Track; // explicit choice from the registration form; falls back to age-based computeTrack(dob) if omitted/invalid
+  // Registration wizard fields (all optional on this type -- handleStartSession
+  // enforces required-ness; insertStudent just persists whatever it's given,
+  // so existing minimal test fixtures elsewhere keep compiling).
+  firstName?: string;
+  fatherName?: string;
+  grandfatherName?: string;
+  familyName?: string;
+  idNumber?: string;
+  nationality?: string;
+  email?: string;
+  educationLevel?: string;
+  address?: string;
+  guardianRelationship?: string;
+  guardianRelationshipOther?: string;
+  guardianPhone?: string;
+  guardianAltPhone?: string;
+  referralSource?: string;
+  referralSourceOther?: string;
+  referralSocialChannels?: string[];
+  termsAccepted?: boolean;
+  mediaConsentAccepted?: boolean;
 }
 
 export type QuestionType = 'mcq' | 'text';
@@ -60,16 +81,11 @@ export interface SessionRow {
   current_question_id: string | null;
 }
 
-export type IdType = 'national_id' | 'iqama' | 'passport';
-
 export interface ApplicationRow {
   id: string;
   session_id: string;
   course: string;
   guardian_name: string | null;
-  id_number: string;
-  id_type: IdType;
-  email: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   reviewed_at: string | null;

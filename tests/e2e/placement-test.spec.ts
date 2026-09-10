@@ -19,11 +19,27 @@ function failOnConsoleErrors(page: Page): string[] {
 
 async function startKidsTest(page: Page) {
   await page.goto('/en/placement-test/');
-  await page.getByLabel('Full name').fill('Smoke Test');
-  await page.getByLabel('Mobile number').fill('0500000000');
+  await page.getByLabel('First name').fill('Smoke');
+  await page.getByLabel('Father’s name', { exact: true }).fill('Test');
+  await page.getByLabel('Grandfather’s name').fill('Kids');
+  await page.getByLabel('Family name').fill('User');
+  await page.getByLabel('WhatsApp number').fill('+966500000000');
   // Under 11, so the form assigns the kids track on its own.
   await page.getByLabel('Date of birth').fill('2018-01-01');
-  await page.getByLabel('Guardian name').fill('Guardian');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByLabel('National ID / Iqama / passport number').fill('1234567890');
+  await page.getByLabel('Nationality').fill('Saudi');
+  await page.getByLabel('Guardian name').fill('Parent Name');
+  // getByLabel('Relationship') is unreliable here: the <select> is wrapped by
+  // its <label> (implicit labelling), so its accessible name is computed from
+  // all of the label's text content plus the select's own rendered option
+  // text (e.g. "Relationship Select Father"), not just the "Relationship"
+  // span. Target the control directly instead.
+  await page.locator('select[name="guardianRelationship"]').selectOption('father');
+  await page.getByLabel('Guardian’s mobile number').fill('+966500000098');
+  await page.getByRole('radio', { name: 'A friend' }).check();
+  await page.getByLabel(/I acknowledge that I have read/).check();
+  await page.getByLabel(/I agree \(as the trainee or their guardian\)/).check();
   await page.getByRole('button', { name: 'Start test' }).click();
 }
 
@@ -144,9 +160,15 @@ test('the registration form assigns under-11 students to the kids track', async 
   const errors = failOnConsoleErrors(page);
 
   await page.goto('/en/placement-test/');
+  await page.getByLabel('First name').fill('Test');
+  await page.getByLabel('Father’s name', { exact: true }).fill('User');
+  await page.getByLabel('Grandfather’s name').fill('Kids');
+  await page.getByLabel('Family name').fill('Track');
+  await page.getByLabel('WhatsApp number').fill('+966500000001');
   await page.getByLabel('Date of birth').fill('2018-01-01');
-
   await expect(page.getByText('Students under 11 are automatically assigned to the Kids test.')).toBeVisible();
+  await page.getByRole('button', { name: 'Next' }).click();
+
   await expect(page.getByLabel('Guardian name')).toBeVisible();
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
@@ -154,16 +176,26 @@ test('the registration form assigns under-11 students to the kids track', async 
 
 test('the registration form limits mobile numbers to a Saudi mobile number', async ({ page }) => {
   await page.goto('/en/placement-test/');
-  const phone = page.getByLabel('Mobile number');
+  await page.getByLabel('First name').fill('Test');
+  await page.getByLabel('Father’s name', { exact: true }).fill('Phone');
+  await page.getByLabel('Grandfather’s name').fill('Validation');
+  await page.getByLabel('Family name').fill('Check');
+  await page.getByLabel('Date of birth').fill('1995-01-01');
 
-  await phone.fill('051234567890');
-  await expect(phone).toHaveValue('0512345678');
+  const phone = page.getByLabel('WhatsApp number');
+  const errorBanner = page.locator('#placement-registration-error');
 
+  // Invalid format is rejected: Next is blocked, error banner shows, still on Step 1.
   await phone.fill('0612345678');
-  expect(await phone.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(false);
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(errorBanner).toBeVisible();
+  await expect(page.getByLabel('First name')).toBeVisible();
 
+  // Valid format is accepted: Next advances to Step 2.
   await phone.fill('0512345678');
-  expect(await phone.evaluate((input: HTMLInputElement) => input.checkValidity())).toBe(true);
+  await page.getByRole('button', { name: 'Next' }).click();
+  await expect(errorBanner).toBeHidden();
+  await expect(page.getByLabel('National ID / Iqama / passport number')).toBeVisible();
 });
 
 test('interactive controls retain readable contrast when hovered in dark mode', async ({ page }) => {
