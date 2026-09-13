@@ -1,0 +1,137 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icon from './Icon.astro';
+import kids from '../assets/mascots/kids-boy.png';
+import adults from '../assets/mascots/adults.png';
+import girls from '../assets/mascots/girls.png';
+import pup from '../assets/mascots/pup.png';
+import stepMale from '../assets/mascots/step-male.png';
+import ielts from '../assets/mascots/ielts-male-red.png';
+import business from '../assets/mascots/business.png';
+
+interface Props {
+  slug: string;
+  category: 'kids' | 'adults' | 'women' | 'business' | 'exam-prep';
+}
+
+const { slug, category } = Astro.props;
+const mascots: Record<string, ImageMetadata[]> = {
+  'kids-general': [kids],
+  'adults-general': [adults],
+  'womens-general-english': [girls],
+  'university-exam-prep': [pup],
+  'step-exam-preparation': [stepMale],
+  'ielts-preparation': [ielts],
+  'business-english': [business],
+};
+const mascotImages = mascots[slug];
+---
+
+<div class:list={['course-artwork', { 'has-mascot': mascotImages }]} data-course={slug} aria-hidden="true">
+  {mascotImages ? (
+    <div class:list={['mascot-pair', { 'is-pair': mascotImages.length > 1 }]}>
+      {mascotImages.map((mascot) => (
+        <Image
+          src={mascot}
+          alt=""
+          widths={[320, 640, 960]}
+          sizes="(max-width: 680px) calc(100vw - 5rem), (max-width: 1023px) 42vw, 320px"
+          format="webp"
+          quality={85}
+          loading="lazy"
+          decoding="async"
+        />
+      ))}
+    </div>
+  ) : (
+    <span class="artwork-symbol"><Icon name={category} size={72} /></span>
+  )}
+</div>
+
+<style>
+  .course-artwork {
+    --art-start: #f8f5ee;
+    --art-end: #f8f5ee;
+    --art-glow: rgb(255 255 255 / .72);
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    height: clamp(12rem, 20vw, 14rem);
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: #f8f5ee;
+    color: var(--course-accent, var(--course-ink));
+  }
+  .course-artwork::before,
+  .course-artwork::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .course-artwork::before {
+    width: 10rem;
+    height: 10rem;
+    inset-inline-end: -7rem;
+    top: -3rem;
+    border: 1px solid color-mix(in srgb, var(--art-shape) 25%, transparent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1rem #f8f5ee, 0 0 0 calc(1rem + 1px) color-mix(in srgb, var(--art-shape) 16%, transparent);
+  }
+  .course-artwork::after {
+    width: 5rem;
+    height: 8rem;
+    inset-inline-start: -3.4rem;
+    bottom: -3rem;
+    border-radius: 3rem;
+    background: var(--art-glow);
+    transform: rotate(28deg);
+    opacity: .35;
+  }
+  .has-mascot { background: #f8f5ee; }
+  .course-artwork[data-course='kids-general'] { --art-start: #f1fbd9; --art-end: #c8ee8a; --art-shape: #568019; --art-glow: rgb(86 128 25 / .26); }
+  .course-artwork[data-course='adults-general'] { --art-start: #edf3ff; --art-end: #c9dbfb; --art-shape: #3d5d99; --art-glow: rgb(61 93 153 / .24); }
+  .course-artwork[data-course='womens-general-english'] { --art-start: #fff1f6; --art-end: #f6c4d8; --art-shape: #a52b59; --art-glow: rgb(165 43 89 / .22); }
+  .course-artwork[data-course='university-exam-prep'] { --art-start: #fff5df; --art-end: #ffd08a; --art-shape: #9a5708; --art-glow: rgb(154 87 8 / .24); }
+  .course-artwork[data-course='step-exam-preparation'] { --art-start: #e6efff; --art-end: #a9c9ff; --art-shape: #2358b9; --art-glow: rgb(35 88 185 / .26); }
+  .course-artwork[data-course='ielts-preparation'] { --art-start: #fbe9ed; --art-end: #f2ced6; --art-shape: #a71938; --art-glow: rgb(167 25 56 / .24); }
+  .course-artwork[data-course='business-english'] { --art-start: #e2f7e9; --art-end: #9ad9b1; --art-shape: #0d623a; --art-glow: rgb(13 98 58 / .26); }
+  .mascot-pair {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    place-items: center;
+  }
+  .mascot-pair.is-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mascot-pair.is-pair img { width: 100%; }
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    min-height: 0;
+    /* The source art has an ivory matte. Feather only its empty side margins
+       so the shared canvas and edge decoration meet without a hard rectangle. */
+    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  }
+  .artwork-symbol {
+    display: grid;
+    place-items: center;
+    width: 7rem;
+    height: 7rem;
+    border: 1px solid currentColor;
+    border-radius: 2rem;
+    opacity: .65;
+  }
+  @media (max-width: 599px) {
+    .course-artwork { height: 13rem; }
+  }
+</style>

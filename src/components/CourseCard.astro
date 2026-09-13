@@ -1,6 +1,7 @@
 ---
 import { useTranslations, localizePath, categoryLabels, type Locale } from '../i18n/ui';
 import Icon from './Icon.astro';
+import CourseArtwork from './CourseArtwork.astro';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -33,12 +34,12 @@ const formattedPrice = price?.toLocaleString('en-US');
     color: var(--course-accent) !important;
   }
   /* Same palette as the homepage tiles — one course, one color in either view. */
-  .course-card[data-course='kids-general'] { --course-accent: #41670e !important; --course-soft: #dff5ae !important; --course-bg-start: #dff5ae; --course-bg-end: #a9d96b; }
-  .course-card[data-course='adults-general'] { --course-accent: #29497d !important; --course-soft: #dce8ff !important; --course-bg-start: #dce8ff; --course-bg-end: #abc4f0; }
-  .course-card[data-course='business-english'] { --course-accent: #0d623a !important; --course-soft: #cbeed9 !important; --course-bg-start: #cbeed9; --course-bg-end: #84d0a4; }
-  .course-card[data-course='university-exam-prep'] { --course-accent: #824500 !important; --course-soft: #ffe0a8 !important; --course-bg-start: #ffe0a8; --course-bg-end: #f4ad54; }
-  .course-card[data-course='womens-general-english'] { --course-accent: #8b1647 !important; --course-soft: #f9d1df !important; --course-bg-start: #f9d1df; --course-bg-end: #e889ad; }
-  .course-card[data-course='ielts-preparation'] { --course-accent: #8d112b !important; --course-soft: #f8c9d1 !important; --course-bg-start: #f8c9d1; --course-bg-end: #e9798c; }
+  .course-card[data-course='kids-general'] { --course-accent: #41670e !important; --course-soft: #eef7df !important; --course-bg-start: #eef7df; --course-bg-end: #dfedc9; }
+  .course-card[data-course='adults-general'] { --course-accent: #29497d !important; --course-soft: #edf2fb !important; --course-bg-start: #edf2fb; --course-bg-end: #dde7f6; }
+  .course-card[data-course='business-english'] { --course-accent: #0d623a !important; --course-soft: #e7f3eb !important; --course-bg-start: #e7f3eb; --course-bg-end: #cee6d7; }
+  .course-card[data-course='university-exam-prep'] { --course-accent: #824500 !important; --course-soft: #fff2dd !important; --course-bg-start: #fff2dd; --course-bg-end: #f4dfbc; }
+  .course-card[data-course='womens-general-english'] { --course-accent: #8b1647 !important; --course-soft: #fcebf1 !important; --course-bg-start: #fcebf1; --course-bg-end: #f3d8e3; }
+  .course-card[data-course='ielts-preparation'] { --course-accent: #a71938 !important; --course-soft: #fbe9ed !important; --course-bg-start: #fbe9ed; --course-bg-end: #f2ced6; }
   .course-card[data-course='step-exam-preparation'] { --course-accent: #3d5d99 !important; --course-soft: #e8eefb !important; }
   :root[data-theme='dark'] .course-card[data-course='step-exam-preparation'] { --course-accent: #b8caef !important; --course-soft: #384967 !important; --course-bg-start: #384967; --course-bg-end: #181d2c; }
   @media (prefers-color-scheme: dark) {
@@ -59,6 +60,7 @@ const formattedPrice = price?.toLocaleString('en-US');
 </style>
 
 <article class="course-card" data-category={category} data-course={slug}>
+  <CourseArtwork slug={slug} category={category} />
   <div class="card-top">
     <span class="category-icon"><Icon name={category} size={20} /></span>
     <span class="badge">{categoryLabels[locale][category]}</span>
@@ -133,7 +135,7 @@ const formattedPrice = price?.toLocaleString('en-US');
     transform: translateY(-5px);
     box-shadow: var(--shadow-md);
   }
-  .card-top { display: flex; align-items: center; gap: var(--space-2); }
+  .card-top { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); }
   .category-icon {
     display: inline-flex;
     align-items: center;
@@ -165,7 +167,7 @@ const formattedPrice = price?.toLocaleString('en-US');
   .course-card[data-course='business-english'] { --course-accent: #187247; --course-soft: #e1f5e9; }
   .course-card[data-course='university-exam-prep'] { --course-accent: #9a5708; --course-soft: #fff0d7; }
   .course-card[data-course='womens-general-english'] { --course-accent: #a52b59; --course-soft: #fde7ef; }
-  .course-card[data-course='ielts-preparation'] { --course-accent: #a71938; --course-soft: #fbe5e8; }
+  .course-card[data-course='ielts-preparation'] { --course-accent: #a71938; --course-soft: #fbe9ed; }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .course-card[data-course='kids-general'] { --course-accent: #c3ed79; --course-soft: #29351e; }
     :root:not([data-theme="light"]) .course-card[data-course='adults-general'] { --course-accent: #b8caef; --course-soft: #292d38; }
