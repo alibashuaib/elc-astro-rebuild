@@ -78,6 +78,14 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     {ogImage && <meta name="twitter:image" content={new URL(ogImage, site).toString()} />}
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!-- AI Search Optimization — Markers for AI crawlers (Perplexity, ChatGPT, Claude) -->
+    <meta name="ai-content-type" content="EducationalContent" />
+    <meta name="ai-language" content={locale === 'ar' ? 'ar' : 'en'} />
+    <meta name="ai-summarization-allowed" content="true" />
+    <meta name="robots-noai" content="false" />
+    <!-- Apple Intelligence & future AI agents -->
+    <meta name="apple-mobile-web-app-capable" content="true" />
+
     <!-- Preload the locale's critical local font so branded text is ready for first paint. -->
     <link
       rel="preload"

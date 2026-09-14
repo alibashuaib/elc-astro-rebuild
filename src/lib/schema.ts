@@ -156,3 +156,79 @@ export function articleSchema(article: {
     ...(article.image && { image: article.image }),
   };
 }
+
+/**
+ * LocalBusiness schema with complete GBP optimization
+ * Used for Google Business Profile and local search visibility
+ */
+export function localBusinessSchema(
+  locale: 'en' | 'ar' = 'en',
+  businessHours?: { day: string; open: string; close: string }[]
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': `${SITE_URL}/#local-business`,
+    name: locale === 'ar' ? 'معهد صرح المعرفة' : 'ELC - Knowledge Institute',
+    alternateName: locale === 'ar' ? 'ELC' : 'معهد صرح المعرفة',
+    description: locale === 'ar'
+      ? 'معهد متخصص في تعليم اللغة الإنجليزية معتمد من المؤسسة العامة للتدريب التقني والمهني'
+      : 'Accredited English language learning institute in Jeddah, Saudi Arabia',
+    url: SITE_URL,
+    telephone: '+966591799917',
+    email: 'info@elc.com.sa',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
+      addressLocality: 'Jeddah',
+      addressRegion: 'Makkah Province',
+      postalCode: '21413',
+      addressCountry: 'SA',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 21.4971147,
+      longitude: 39.2156796,
+    },
+    priceRange: '$$',
+    image: `${SITE_URL}/favicon-180.png`,
+    // Business hours (ISO 8601 format)
+    ...(businessHours && businessHours.length > 0 && {
+      openingHoursSpecification: businessHours.map(h => ({
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: h.day,
+        opens: h.open,
+        closes: h.close,
+      })),
+    }),
+    sameAs: [
+      'https://www.facebook.com/ELCJeddah',
+      'https://twitter.com/elcjeddah',
+      'https://www.instagram.com/elcjeddah',
+      'https://www.youtube.com/c/ELCInst',
+      'https://www.linkedin.com/company/elcjeddah',
+    ],
+  };
+}
+
+/**
+ * AI-Optimized metadata helper
+ * Adds markers for AI crawlers and summarization engines
+ */
+export function getAiMetadata(
+  content: string,
+  locale: 'en' | 'ar' = 'en'
+) {
+  return {
+    // Machine-readable content summary for AI indexing
+    aiSummary: content.slice(0, 500), // First 500 chars as AI summary
+    // Keywords for AI understanding
+    aiKeywords: locale === 'ar'
+      ? ['دورات إنجليزي', 'تعليم اللغة', 'معهد معتمد', 'اختبار تحديد مستوى']
+      : ['English courses', 'language learning', 'accredited institute', 'placement test'],
+    // Content type hint for AI parsing
+    contentType: 'EducationalContent',
+    // AI accessibility marker
+    aiAccessible: true,
+  };
+}

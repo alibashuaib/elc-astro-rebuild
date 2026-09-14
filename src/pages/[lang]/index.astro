@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import HomeExperience from '../../components/HomeExperience.astro';
-import { organizationSchema } from '../../lib/schema';
+import { organizationSchema, localBusinessSchema } from '../../lib/schema';
 import { fetchGoogleReviews } from '../../lib/googleReviews';
 import { localePaths, meta } from '../../i18n/pages';
 import type { Locale } from '../../i18n/ui';
@@ -16,10 +16,23 @@ const orgSchema = organizationSchema(
   reviews ? { rating: reviews.overallRating, reviewCount: reviews.totalReviewCount } : undefined,
   locale
 );
+
+// GBP Optimization: Add LocalBusiness schema with business hours
+const businessHours = [
+  { day: 'Monday', open: '09:00', close: '21:00' },
+  { day: 'Tuesday', open: '09:00', close: '21:00' },
+  { day: 'Wednesday', open: '09:00', close: '21:00' },
+  { day: 'Thursday', open: '09:00', close: '21:00' },
+  { day: 'Friday', open: '09:00', close: '21:00' },
+  { day: 'Saturday', open: '09:00', close: '17:00' },
+];
+
+const localSchema = localBusinessSchema(locale, businessHours);
+
 // Use the hero image for social sharing (og:image)
 const ogImage = '/images/og-home.png';
 ---
 
-<Layout locale={locale} path="/" title={title} description={description} jsonLd={orgSchema} ogImage={ogImage}>
+<Layout locale={locale} path="/" title={title} description={description} jsonLd={[orgSchema, localSchema]} ogImage={ogImage}>
   <HomeExperience locale={locale} reviews={reviews} />
 </Layout>
