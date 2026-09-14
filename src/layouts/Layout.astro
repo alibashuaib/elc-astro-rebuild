@@ -75,6 +75,7 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:locale" content={locale === 'ar' ? 'ar_SA' : 'en_US'} />
     {ogImage && <meta property="og:image" content={new URL(ogImage, site).toString()} />}
+    {ogImage && <meta name="twitter:image" content={new URL(ogImage, site).toString()} />}
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Preload the locale's critical local font so branded text is ready for first paint. -->

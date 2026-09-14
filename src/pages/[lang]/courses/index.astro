@@ -4,7 +4,7 @@ import Layout from '../../../layouts/Layout.astro';
 import PageHero from '../../../components/PageHero.astro';
 import CourseCard from '../../../components/CourseCard.astro';
 import CourseFilter from '../../../components/CourseFilter.astro';
-import { breadcrumbSchema } from '../../../lib/schema';
+import { breadcrumbSchema, serviceSchema } from '../../../lib/schema';
 import { localePaths, meta, trail, heroKicker, SITE } from '../../../i18n/pages';
 import type { Locale } from '../../../i18n/ui';
 
@@ -47,6 +47,14 @@ const collectionPageSchema = {
 };
 
 const breadcrumbs = breadcrumbSchema(trail(locale, ['courses']));
+
+// Service schema for course offerings
+const courseService = serviceSchema({
+  name: locale === 'ar' ? 'دورات اللغة الإنجليزية' : 'English Language Courses',
+  description: description,
+  url: `${SITE}/${locale}/courses/`,
+  areaServed: 'SA',
+});
 ---
 
 <Layout
@@ -54,7 +62,7 @@ const breadcrumbs = breadcrumbSchema(trail(locale, ['courses']));
   path="/courses"
   title={title}
   description={description}
-  jsonLd={[collectionPageSchema, breadcrumbs]}
+  jsonLd={[collectionPageSchema, breadcrumbs, courseService]}
 >
   <PageHero kicker={heroKicker[locale]} title={hero!.title} subtitle={hero!.subtitle} />
 

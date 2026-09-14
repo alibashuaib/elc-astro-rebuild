@@ -115,3 +115,44 @@ export function courseSchema(course: {
     } : {}),
   };
 }
+
+export function serviceSchema(service: {
+  name: string;
+  description: string;
+  url: string;
+  areaServed?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalService',
+    '@id': `${service.url}#service`,
+    name: service.name,
+    description: service.description,
+    provider: { '@type': 'EducationalOrganization', name: 'ELC', sameAs: SITE_URL },
+    url: service.url,
+    ...(service.areaServed && { areaServed: service.areaServed }),
+  };
+}
+
+export function articleSchema(article: {
+  headline: string;
+  description: string;
+  datePublished: string;
+  dateModified?: string;
+  author?: string;
+  url: string;
+  image?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: article.headline,
+    description: article.description,
+    datePublished: article.datePublished,
+    ...(article.dateModified && { dateModified: article.dateModified }),
+    author: { '@type': 'Organization', name: article.author ?? 'ELC' },
+    publisher: { '@type': 'Organization', name: 'ELC', url: SITE_URL },
+    url: article.url,
+    ...(article.image && { image: article.image }),
+  };
+}

@@ -16,8 +16,10 @@ const orgSchema = organizationSchema(
   reviews ? { rating: reviews.overallRating, reviewCount: reviews.totalReviewCount } : undefined,
   locale
 );
+// Use the hero image for social sharing (og:image)
+const ogImage = '/images/og-home.png';
 ---
 
-<Layout locale={locale} path="/" title={title} description={description} jsonLd={orgSchema}>
+<Layout locale={locale} path="/" title={title} description={description} jsonLd={orgSchema} ogImage={ogImage}>
   <HomeExperience locale={locale} reviews={reviews} />
 </Layout>
