@@ -57,7 +57,7 @@ const copy = isArabic ? {
       {copy.course}
       <select name="course" required>
         <option value="">{copy.choose}</option>
-        {courses.map((course) => <option value={course.data.title}>{course.data.title}</option>)}
+        {courses.map((course) => <option value={course.data.title} data-course={course.id.slice(`${locale}/`.length)}>{course.data.title}</option>)}
       </select>
     </label>
     <button type="submit" class="btn btn-primary">{copy.submit}</button>
@@ -67,6 +67,11 @@ const copy = isArabic ? {
 
 <script>
   document.querySelectorAll<HTMLFormElement>('[data-registration-form]').forEach((form) => {
+    const selectedCourse = new URLSearchParams(window.location.search).get('course');
+    const courseSelect = form.querySelector<HTMLSelectElement>('select[name="course"]');
+    const selectedOption = Array.from(courseSelect.options).find((option) => option.dataset.course === selectedCourse);
+    if (selectedOption) courseSelect.value = selectedOption.value;
+
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       const data = new FormData(form);

@@ -162,26 +162,6 @@ const formattedPrice = price?.toLocaleString('en-US');
   h2 { margin: 0; font-size: clamp(1.25rem, 2vw, 1.45rem); line-height: 1.3; }
   h2 a { color: var(--color-navy); }
   h2 a:hover { color: var(--course-accent); text-decoration: none; }
-  .course-card[data-course='kids-general'] { --course-accent: #568019; --course-soft: #eef8d8; }
-  .course-card[data-course='adults-general'] { --course-accent: #3d5d99; --course-soft: #e8eefb; }
-  .course-card[data-course='business-english'] { --course-accent: #187247; --course-soft: #e1f5e9; }
-  .course-card[data-course='university-exam-prep'] { --course-accent: #9a5708; --course-soft: #fff0d7; }
-  .course-card[data-course='womens-general-english'] { --course-accent: #a52b59; --course-soft: #fde7ef; }
-  .course-card[data-course='ielts-preparation'] { --course-accent: #a71938; --course-soft: #fbe9ed; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .course-card[data-course='kids-general'] { --course-accent: #c3ed79; --course-soft: #29351e; }
-    :root:not([data-theme="light"]) .course-card[data-course='adults-general'] { --course-accent: #b8caef; --course-soft: #292d38; }
-    :root:not([data-theme="light"]) .course-card[data-course='business-english'] { --course-accent: #82e4a5; --course-soft: #20362a; }
-    :root:not([data-theme="light"]) .course-card[data-course='university-exam-prep'] { --course-accent: #ffc879; --course-soft: #3a2a1b; }
-    :root:not([data-theme="light"]) .course-card[data-course='womens-general-english'] { --course-accent: #ff9fbe; --course-soft: #3b2430; }
-    :root:not([data-theme="light"]) .course-card[data-course='ielts-preparation'] { --course-accent: #ff9aaa; --course-soft: #3a2026; }
-  }
-  :root[data-theme="dark"] .course-card[data-course='kids-general'] { --course-accent: #c3ed79; --course-soft: #29351e; }
-  :root[data-theme="dark"] .course-card[data-course='adults-general'] { --course-accent: #b8caef; --course-soft: #292d38; }
-  :root[data-theme="dark"] .course-card[data-course='business-english'] { --course-accent: #82e4a5; --course-soft: #20362a; }
-  :root[data-theme="dark"] .course-card[data-course='university-exam-prep'] { --course-accent: #ffc879; --course-soft: #3a2a1b; }
-  :root[data-theme="dark"] .course-card[data-course='womens-general-english'] { --course-accent: #ff9fbe; --course-soft: #3b2430; }
-  :root[data-theme="dark"] .course-card[data-course='ielts-preparation'] { --course-accent: #ff9aaa; --course-soft: #3a2026; }
   .course-card > p { color: var(--color-ink-muted); font-size: .95rem; line-height: 1.7; }
   .meta { display: grid; gap: .75rem; margin-top: auto; padding: .9rem; border: 1px solid color-mix(in srgb, var(--course-accent) 15%, var(--color-border)); border-radius: 1rem; background: linear-gradient(145deg, color-mix(in srgb, var(--color-bg-raised) 94%, var(--course-soft)), var(--course-soft)); }
   .price-row { position: relative; display: flex; min-height: 3.6rem; align-items: center; justify-content: space-between; gap: .75rem; padding-bottom: .7rem; border-bottom: 1px solid var(--color-border); }
@@ -201,4 +181,10 @@ const formattedPrice = price?.toLocaleString('en-US');
   :global(:dir(rtl)) .metric-shape { border-radius: .85rem .85rem .28rem .85rem; transform: rotate(2deg); }
   .schedule-item.is-variable { justify-items: start; align-content: start; gap: .4rem; }
   .schedule-item.is-variable p { position: relative; z-index: 1; margin: 0; color: var(--color-ink-muted); font-size: .72rem; font-weight: 650; line-height: 1.35; }
+  @media (max-width: 680px) {
+    .course-card { padding: 1.25rem; }
+    .fact-label { font-size: .72rem; }
+    .price small { font-size: .7rem; }
+    .contact-price { font-size: .78rem; }
+  }
 </style>

@@ -184,7 +184,7 @@ export function trail(
 ): Array<{ name: string; url: string }> {
   const crumbs = [{ name: HOME_CRUMB[locale], url: `${SITE}/${locale}/` }];
   for (const page of pages) {
-    crumbs.push({ name: pageMeta[page][locale].crumb, url: `${SITE}/${locale}/${pagePath(page)}` });
+    crumbs.push({ name: pageMeta[page][locale].crumb, url: `${SITE}/${locale}/${PATHS[page]}` });
   }
   if (extra) crumbs.push({ name: extra.name, url: `${SITE}/${locale}${extra.path}` });
   return crumbs;
@@ -202,7 +202,3 @@ const PATHS: Record<PageKey, string> = {
   terms: 'legal/terms',
   privacy: 'legal/privacy',
 };
-
-function pagePath(page: PageKey): string {
-  return PATHS[page];
-}

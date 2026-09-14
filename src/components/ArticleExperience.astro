@@ -10,7 +10,7 @@ interface Props {
 
 const { locale, title, summary, publishDate } = Astro.props;
 const isArabic = locale === 'ar';
-const formattedDate = publishDate.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const formattedDate = publishDate.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', numberingSystem: 'latn' });
 ---
 
 <article class="container article-page">

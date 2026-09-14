@@ -33,9 +33,6 @@ const socialLinks = [
     <nav class="social-nav" aria-label={locale === 'ar' ? 'وسائل التواصل الاجتماعي' : 'Social media'}>
       {socialLinks.map((s) => (
         <a href={s.href} target="_blank" rel="noopener" aria-label={s.label} title={s.label}>
-          {s.icon === 'facebook' && (
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.19 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.78-3.91 1.09 0 2.23.2 2.23.2v2.47H15.2c-1.24 0-1.63.77-1.63 1.57v1.88h2.77l-.44 2.91h-2.33V22C18.34 21.25 22 17.08 22 12.06Z" /></svg>
-          )}
           {s.icon === 'x' && (
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.77 7.74L23.2 22h-6.24l-4.89-6.39L6.48 22H3.36l7.26-8.3L2.98 2h6.4l4.42 5.84L18.9 2Zm-1.1 17.84h1.73L8.44 4.05H6.58L17.8 19.84Z" /></svg>
           )}
@@ -47,9 +44,6 @@ const socialLinks = [
           )}
           {s.icon === 'youtube' && (
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.498 6.186a2.999 2.999 0 0 0-2.112-2.12C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.386.521a2.999 2.999 0 0 0-2.112 2.12C0 8.07 0 12 0 12s0 3.93.502 5.814a2.999 2.999 0 0 0 2.112 2.12c1.881.521 9.386.521 9.386.521s7.505 0 9.386-.521a2.999 2.999 0 0 0 2.112-2.12C24 15.93 24 12 24 12s0-3.93-.502-5.814ZM9.75 15.568V8.432L15.818 12 9.75 15.568Z" /></svg>
-          )}
-          {s.icon === 'linkedin' && (
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14ZM8.27 18.5V10.13H5.5v8.37h2.77Zm-1.39-9.94a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68ZM18.5 18.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79Z" /></svg>
           )}
           <span class="sr-only">{s.label}</span>
         </a>
@@ -117,4 +111,10 @@ const socialLinks = [
     border: 0;
   }
   .footer-inner a:hover { color: #fff; }
+  @media (max-width: 680px) {
+    .legal-nav a { display: inline-block; padding-block: .6rem; }
+    /* Room under the last row so the fixed WhatsApp button never covers these links. */
+    .site-footer { margin-top: var(--space-5); padding-bottom: 6rem; }
+    :global(.social-nav a) { width: 2.75rem; height: 2.75rem; }
+  }
 </style>

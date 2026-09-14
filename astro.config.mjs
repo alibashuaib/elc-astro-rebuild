@@ -21,6 +21,9 @@ export default defineConfig({
   build: {
     // static output, keep it lean — Hostinger shared hosting has no server runtime
     format: 'directory',
+    // Inline CSS into each page: removes 3 render-blocking requests, which on
+    // mobile networks was the main delay before the headline painted.
+    inlineStylesheets: 'always',
   },
   compressHTML: true,
   // Static-safe redirect: Astro emits a real HTML file with a meta-refresh + canonical

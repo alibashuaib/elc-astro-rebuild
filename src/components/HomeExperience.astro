@@ -27,11 +27,11 @@ const copy = isArabic ? {
   titleStart: 'الإنجليزية التي تفتح لك',
   titleAccent: 'آفاقًا أوسع.',
   lead: `مسارات تعليمية واضحة من ${rtlA1} إلى ${rtlC2}، يقودها مدرّبون معتمدون للأطفال والكبار وفرق العمل.`,
-  primaryCta: 'احجز اختبار تحديد المستوى',
+  primaryCta: 'ابدأ اختبار تحديد المستوى مجانًا',
   secondaryCta: 'استكشف الدورات',
   proof: [`مسار واضح من ${rtlA1} إلى ${rtlC2}`, 'مدرّبون معتمدون', 'تعلم يناسب هدفك'],
   stats: [
-    { value: '١٥ الف', label: 'تم تدريب أكثر من' },
+    { value: '15,000', label: 'تم تدريب أكثر من' },
     { value: String(courseCount), label: 'دورات تعليمية' },
     { value: '2010', label: 'تم التاسيس' },
   ],
@@ -70,13 +70,13 @@ const copy = isArabic ? {
   ctaKicker: 'خطوتك الأولى بسيطة',
   ctaTitle: 'اعرف مستواك، وابنِ خطتك.',
   ctaText: 'اختبار تحديد المستوى يساعدنا على توجيهك إلى البرنامج الأنسب دون تخمين.',
-  ctaButton: 'ابدأ باختبار تحديد المستوى',
+  ctaButton: 'ابدأ اختبار تحديد المستوى مجانًا',
 } : {
   badge: 'Accredited by the Technical and Vocational Training Corporation',
   titleStart: 'English that opens',
   titleAccent: 'bigger possibilities.',
   lead: 'Clear learning pathways from A1 to C2, led by credentialed instructors for children, adults, and teams.',
-  primaryCta: 'Book a placement test',
+  primaryCta: 'Start your free placement test',
   secondaryCta: 'Explore courses',
   proof: ['Clear A1–C2 pathway', 'Credentialed instructors', 'Goal-led learning'],
   stats: [
@@ -119,7 +119,7 @@ const copy = isArabic ? {
   ctaKicker: 'Your first step is simple',
   ctaTitle: 'Know your level. Build your plan.',
   ctaText: 'A placement test helps us guide you to the right program without guesswork.',
-  ctaButton: 'Start with a placement test',
+  ctaButton: 'Start your free placement test',
 };
 
 const basePath = `/${locale}`;
@@ -131,7 +131,7 @@ const basePath = `/${locale}`;
   <div class="container hero-grid">
     <div class="hero-copy hero-animate">
       <span class="eyebrow"><span class="eyebrow-dot"></span>{copy.badge}</span>
-      <h1>{copy.titleStart}<br />{' '}<span>{copy.titleAccent}</span></h1>
+      <h1 class="hero-headline">{copy.titleStart}<br />{' '}<span>{copy.titleAccent}</span></h1>
       <p class="hero-lead">{copy.lead}</p>
       <div class="hero-actions">
         <a href={`${basePath}/placement-test`} class="btn btn-primary">{copy.primaryCta}<span aria-hidden="true">↗</span></a>
@@ -155,16 +155,16 @@ const basePath = `/${locale}`;
           class="hero-ensemble"
           src={heroEnsemble}
           alt={isArabic ? 'شخصيات برامج الأطفال والكبار والنساء تحتفل بالتعلّم معًا' : 'Our kids, adult and women’s course mascots celebrating learning together'}
-          widths={[480, 800, 1200, 1600]}
+          widths={[480, 800, 1200]}
           sizes="(max-width: 680px) calc(100vw - 4rem), (max-width: 980px) 560px, 520px"
           format="webp"
-          quality={90}
+          quality={80}
           loading="eager"
           fetchpriority="high"
         />
         <div class="visual-footer">
           <span class="avatar-stack" aria-hidden="true"><i>R</i><i>S</i><i>M</i></span>
-          <p><strong>{isArabic ? '١٥ الف' : '15K'}</strong> {isArabic ? 'متدرب بدأ رحلته معنا' : 'learners started here'}</p>
+          <p><strong>{isArabic ? '15,000' : '15K'}</strong> {isArabic ? 'متدرب بدأ رحلته معنا' : 'learners started here'}</p>
         </div>
       </div>
       <div class="floating-card floating-top"><Icon name="certificate" size={20} /><span><strong>{isArabic ? '+15 عامًا' : '15+ years'}</strong>{isArabic ? 'من التدريب' : 'of training'}</span></div>
@@ -266,7 +266,7 @@ const basePath = `/${locale}`;
   :global(:lang(ar)) .eyebrow, :global(:lang(ar)) .section-kicker { letter-spacing: 0; }
   .eyebrow { padding: .55rem .85rem; border: 1px solid rgb(182 23 51 / .17); border-radius: 999px; background: rgb(255 255 255 / .72); box-shadow: 0 8px 30px rgb(66 54 49 / .08); }
   .eyebrow-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--color-coral); box-shadow: 0 0 0 4px rgb(242 148 32 / .14); }
-  h1 { margin: 1.5rem 0; max-width: 12ch; color: var(--color-navy); font-size: clamp(3.35rem, 6.6vw, 6.85rem); line-height: .96; letter-spacing: -.065em; }
+  h1 { margin: 1.5rem 0; max-width: 12ch; color: var(--color-navy); font-size: clamp(3rem, 5.2vw, 5rem); line-height: .96; letter-spacing: -.065em; }
   h1 span { color: var(--color-primary-text); }
   :global(:lang(ar)) h1 { max-width: 15ch; font-size: clamp(3rem, 5vw, 5.25rem); line-height: 1.22; letter-spacing: -.035em; }
   .hero-lead { max-width: 55ch; margin-bottom: 1.8rem; color: var(--color-ink-muted); font-size: clamp(1.08rem, 1.6vw, 1.3rem); line-height: 1.75; }
@@ -457,18 +457,24 @@ const basePath = `/${locale}`;
     :global(:lang(ar)) h1 { font-size: clamp(2.75rem, 12vw, 3.8rem); }
     .hero-actions .btn { width: 100%; justify-content: center; }
     .hero-proof { display: grid; grid-template-columns: 1fr; }
-    .hero-visual { padding: 2.5rem .6rem 2.8rem; }
-    .visual-card { padding: 1rem; border-radius: 1.5rem; }
-    .floating-top { inset-inline-end: -.3rem; top: .2rem; }
-    .floating-bottom { inset-inline-start: -.25rem; bottom: 1.4rem; }
+    .hero-visual { padding: 1.5rem .25rem .5rem; }
+    .visual-card { padding: 1rem; border-radius: 1.5rem; transform: none; }
+    /* On a phone-width card these overlap the card's own text. */
+    .floating-card { display: none; }
     .stats-panel { grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; padding-block: 1.2rem; }
     .stat { min-height: 7.5rem; padding: 1rem; gap: .4rem; }
     .stat :global(strong) { font-size: clamp(1.65rem, 9vw, 2.25rem); }
     .stat span { font-size: .7rem; }
     .split-heading, .courses-heading { grid-template-columns: 1fr; gap: 1.2rem; }
-    .feature-grid, .course-grid { grid-template-columns: 1fr; }
-    .feature-card { min-height: 14rem; }
-    .course-card { min-height: 16.5rem; }
+    .text-link { margin-top: .5rem; padding-block: .3rem; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .feature-card { min-height: 0; }
+    .icon-box { margin-bottom: 1.25rem; }
+    /* Swipeable row instead of six full-height stacked cards (~3 screens of scrolling). */
+    .course-grid { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 85%; margin-inline: calc(-1 * var(--space-4)); padding: .5rem var(--space-4) 1rem; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--space-4); scrollbar-width: none; }
+    .course-grid::-webkit-scrollbar { display: none; }
+    .course-card { min-height: 16.5rem; scroll-snap-align: start; }
+    .course-number, .course-meta { font-size: .72rem; }
     .final-cta { grid-template-columns: 1fr; margin-inline: 1rem; border-radius: 1.5rem; }
     .final-cta .btn { width: 100%; justify-content: center; }
   }
