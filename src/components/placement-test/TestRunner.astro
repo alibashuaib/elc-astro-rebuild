@@ -246,32 +246,13 @@ const { t } = Astro.props;
     optionsEl.innerHTML = '';
     errorEl.hidden = true;
 
-    if (isPictureMatch) {
-      const wordButtons = Array.from(pictureWordBankEl.querySelectorAll('button')) as HTMLButtonElement[];
+    const wordBankEl = isPictureMatch ? pictureWordBankEl : isRoomPicture ? roomWordBankEl : isActionWordQuestion ? actionWordBankEl : null;
+    if (wordBankEl) {
+      const wordButtons = Array.from(wordBankEl.querySelectorAll('button'));
       wordButtons.forEach((button) => {
         button.disabled = false;
         button.classList.remove('pt-selected-correct', 'pt-selected-incorrect');
         button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, wordButtons, button);
-      });
-      return;
-    }
-
-    if (isRoomPicture) {
-      const roomButtons = Array.from(roomWordBankEl.querySelectorAll('button')) as HTMLButtonElement[];
-      roomButtons.forEach((button) => {
-        button.disabled = false;
-        button.classList.remove('pt-selected-correct', 'pt-selected-incorrect');
-        button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, roomButtons, button);
-      });
-      return;
-    }
-
-    if (isActionWordQuestion) {
-      const actionButtons = Array.from(actionWordBankEl.querySelectorAll('button')) as HTMLButtonElement[];
-      actionButtons.forEach((button) => {
-        button.disabled = false;
-        button.classList.remove('pt-selected-correct', 'pt-selected-incorrect');
-        button.onclick = () => handleSubmit(step, { answerText: button.textContent ?? '' }, actionButtons, button);
       });
       return;
     }
@@ -709,7 +690,6 @@ const { t } = Astro.props;
       0 22px 34px rgb(81 54 35 / 0.2);
     perspective: 700px;
   }
-  .pt-image-stage[hidden] { display: none; }
   .pt-image-stage::after {
     content: '';
     position: absolute;
@@ -927,8 +907,6 @@ const { t } = Astro.props;
     box-shadow: 0 8px 0 rgb(223 149 81 / 0.28), 0 15px 28px rgb(81 54 35 / 0.1);
   }
 
-  .pt-counting-strip[hidden] { display: none; }
-
   .pt-number-sequence,
   .pt-number-bank {
     display: flex;
@@ -982,7 +960,6 @@ const { t } = Astro.props;
     box-shadow: inset 0 4px 0 rgb(255 255 255 / 0.28), 0 6px 0 #24668b, 0 10px 14px rgb(36 102 139 / 0.2);
     touch-action: manipulation;
   }
-  .pt-number-bank :global(.pt-number-choice[hidden]) { display: none; }
   .pt-number-bank :global(.pt-number-choice.is-selected) {
     outline: 4px solid #7e0f24;
     outline-offset: 4px;
@@ -1014,8 +991,6 @@ const { t } = Astro.props;
     box-shadow: 0 8px 22px rgb(49 43 40 / 0.13);
     backdrop-filter: blur(10px);
   }
-
-  .pt-picture-word-bank[hidden] { display: none; }
 
   .pt-picture-word-bank :global(button) {
     padding: 0.55rem 0.9rem;

@@ -3,7 +3,6 @@
   --color-primary: #b61733;
   --color-primary-deep: #8c1027;
   --color-crimson: #b61733;
-  --color-crimson-ink: #841026;
   --color-crimson-text: #a4132d;
   /* Text-safe variant of --color-primary: identical in light mode, brightened
      for dark mode so brand-red text (kickers, prices, stat numbers) meets
@@ -15,10 +14,8 @@
   --color-mint: #a6a8ab;
   --color-mint-ink: #5b5e62;
   --color-mint-soft: #eff0f1;
-  --color-yellow: #f6ad43;
   --color-yellow-ink: #895411;
   --color-yellow-soft: #fff3dc;
-  --color-success: #1a7a49;
   --color-success-text: #1a6f48;
   --color-blue-soft: #fae9ed;
 
@@ -32,8 +29,7 @@
   --color-border-strong: #cec8c1;
   --color-header-bg: rgb(255 255 255 / .9);
 
-  /* Legacy aliases retained for components outside the redesigned homepage. */
-  --color-amber: var(--color-yellow);
+  /* Legacy alias retained for components outside the redesigned homepage. */
   --color-amber-text: var(--color-yellow-ink);
   /* Fixed literal, not var(--color-navy) — this needs to stay the same dark
      shade in both themes for the "always-dark editorial zone" sections that
@@ -41,23 +37,19 @@
      flips to a light color in dark mode (it's also used as heading text), so
      aliasing this to it would turn those sections light-on-light. */
   --zone-ink-bg: #292b2f;
-  --zone-ink-bg-raised: #36383d;
   --zone-ink-text: #ffffff;
   --zone-ink-muted: #d0ccc7;
   --zone-ink-border: #4c4e53;
   --zone-ink-signal: #f4b15b;
-  --zone-ink-ember: var(--color-coral);
 
   --font-display: 'Manrope', 'Alexandria', system-ui, sans-serif;
   --font-body: 'Manrope', 'Alexandria', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-  --font-editorial: 'Manrope', 'Alexandria', system-ui, sans-serif;
 
   --fs-sm: clamp(0.875rem, 0.83rem + 0.2vw, 0.95rem);
   --fs-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   --fs-lg: clamp(1.2rem, 1.08rem + 0.55vw, 1.48rem);
   --fs-xl: clamp(1.75rem, 1.5rem + 1.2vw, 2.5rem);
-  --fs-2xl: clamp(2.5rem, 1.8rem + 3.5vw, 4.75rem);
   --fs-3xl: clamp(3rem, 2rem + 5vw, 6.5rem);
 
   --space-1: 0.25rem;
@@ -67,7 +59,6 @@
   --space-5: 2.5rem;
   --space-6: 4rem;
   --space-7: 6rem;
-  --space-8: 8.5rem;
 
   --radius: 0.85rem;
   --max-width: 76rem;

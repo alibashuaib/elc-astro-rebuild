@@ -191,7 +191,11 @@ const directionsUrl = 'https://maps.app.goo.gl/U8Q3QDT1AKAVbaWv6';
     .contact-cta .btn { justify-self: start; }
   }
   @media (max-width: 520px) {
-    .map-wrap, .map-wrap :global(.map-embed), .map-placeholder { min-height: 24rem; height: 24rem; }
+    .contact-actions { padding-block: 2rem; }
+    .contact-card { min-height: 0; }
+    .contact-icon { width: 3.5rem; height: 3.5rem; }
+    .contact-label { margin-top: 1.25rem; }
+    .map-wrap, .map-wrap :global(.map-embed), .map-placeholder { min-height: 18rem; height: 18rem; }
     .contact-cta .btn { width: 100%; justify-content: center; }
   }
 </style>

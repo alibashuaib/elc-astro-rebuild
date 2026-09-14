@@ -34,7 +34,7 @@ const content = locale === 'ar' ? {
     { icon: 'check' as const, title: 'الالتزام' },
   ],
   stats: [
-    { value: '١٥ الف', label: 'تم تدريب أكثر من' },
+    { value: '15,000', label: 'تم تدريب أكثر من' },
     { value: String(courseCount), label: 'برامج تعليمية' },
     { value: '2010', label: 'تم التاسيس' },
   ],
@@ -159,7 +159,6 @@ const basePath = `/${locale}`;
     {content.stats.map((stat) => (
       <div class="stat"><AnimatedNumber class="numeric" value={stat.value} /><span>{stat.label}</span></div>
     ))}
-    <div class="stat-line" aria-hidden="true"></div>
   </div>
 </section>
 
@@ -273,8 +272,10 @@ const basePath = `/${locale}`;
   .stat:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
   .stat:hover::after { transform: scale(1.2); }
   .stat :global(strong) { position: relative; z-index: 1; color: var(--color-primary-text); font-size: clamp(2rem, 3.6vw, 3.2rem); font-weight: 800; line-height: 1; letter-spacing: -.045em; }
+  /* .numeric forces direction:ltr for correct digit shaping, which also flips its own
+     default text-align to left - override back to right to match the RTL page. */
+  :global(:dir(rtl)) .stat :global(strong.numeric) { text-align: right; }
   .stat span { position: relative; z-index: 1; color: var(--color-ink-muted); font-size: .8rem; font-weight: 700; }
-  .stat-line { display: none; }
   .why-section { background: var(--zone-ink-bg); color: #fff; }
   .why-section .section-kicker { color: #f7b75f; }
   .section-heading { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(18rem, .8fr); align-items: end; gap: 3rem; margin-bottom: 2.5rem; }
@@ -325,7 +326,6 @@ const basePath = `/${locale}`;
     .stats-row { grid-template-columns: repeat(3, 1fr); gap: .75rem; }
     .stat { padding: 1rem .65rem; }
     .stat :global(strong) { max-width: 100%; font-size: clamp(1.35rem, 5.6vw, 1.8rem); letter-spacing: -.06em; white-space: nowrap; }
-    .stat-line { display: none; }
     .reason-grid { grid-template-columns: 1fr; }
     .reason-card, .reason-card:nth-last-child(-n + 2) { grid-column: auto; min-height: 15rem; }
     .closing-actions .btn { width: 100%; justify-content: center; }

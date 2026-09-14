@@ -48,4 +48,20 @@ const labels = categoryLabels[locale];
   .no-results { color: var(--color-ink-muted); margin-top: var(--space-4); }
 </style>
 
-<script src="/scripts/course-filter.js" defer></script>
+<script>
+  const filterEl = document.querySelector('.course-filter');
+  const cards = document.querySelectorAll<HTMLElement>('.course-grid [data-category]');
+  const noResults = document.querySelector<HTMLElement>('.no-results');
+
+  filterEl?.addEventListener('click', (e) => {
+    const chip = (e.target as HTMLElement).closest<HTMLElement>('.filter-chip');
+    if (!chip) return;
+    filterEl.querySelectorAll('.filter-chip').forEach((c) => c.classList.toggle('is-active', c === chip));
+    let visible = 0;
+    cards.forEach((card) => {
+      card.hidden = chip.dataset.filter !== 'all' && card.dataset.category !== chip.dataset.filter;
+      if (!card.hidden) visible++;
+    });
+    if (noResults) noResults.hidden = visible > 0;
+  });
+</script>

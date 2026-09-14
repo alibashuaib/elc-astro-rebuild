@@ -30,6 +30,8 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
         <li><a href={localizePath(locale, '/courses')} aria-current={currentPath.startsWith('/courses') ? 'page' : undefined}>{t('nav.courses')}</a></li>
         <li><a href={localizePath(locale, '/blog')} aria-current={currentPath.startsWith('/blog') ? 'page' : undefined}>{t('nav.blog')}</a></li>
         <li><a href={localizePath(locale, '/contact')} aria-current={currentPath === '/contact' ? 'page' : undefined}>{t('nav.contact')}</a></li>
+        <li class="mobile-nav-action"><a href="https://elc-org.com" target="_blank" rel="noopener">{t('nav.lms')}</a></li>
+        <li class="mobile-nav-action"><a href={localizePath(locale, '/register')} class="btn btn-primary">{t('nav.register')}</a></li>
       </ul>
     </nav>
 
@@ -129,6 +131,7 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     font-weight: 650;
   }
   .main-nav a:hover, .main-nav a[aria-current='page'] { color: var(--color-primary-text); background: var(--color-blue-soft); text-decoration: none; }
+  .mobile-nav-action { display: none; }
   .header-actions {
     display: flex;
     align-items: center;
@@ -174,10 +177,14 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
   .nav-toggle {
     display: none;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
     gap: 4px;
+    width: 2.75rem;
+    height: 2.75rem;
     background: none;
     border: none;
-    padding: var(--space-2);
+    padding: 0;
     cursor: pointer;
   }
   .nav-toggle span {
@@ -189,6 +196,12 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
 
   /* Mobile: this is the exact bug the audit flagged — mobile nav must never silently fail */
   @media (max-width: 860px) {
+    /* Solid header on phones: backdrop blur on a sticky bar repaints on every
+       scroll frame, which is noticeable jank on low-end Android. */
+    .site-header { background: var(--color-bg-raised); backdrop-filter: none; }
+    .header-inner { min-height: 4.25rem; padding-block: .5rem; gap: .5rem; }
+    .header-actions { gap: .4rem; }
+    .lang-switch, .theme-toggle, .header-actions :global(.search-toggle) { width: 2.75rem; height: 2.75rem; }
     .main-nav {
       position: absolute;
       inset-inline: 0;
@@ -212,13 +225,20 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     }
     .main-nav li { padding: .15rem; }
     .main-nav a { display: flex; padding: .75rem 1rem; }
+    .mobile-nav-action { display: block; margin-top: .3rem; }
+    .main-nav .mobile-nav-action .btn { display: flex; width: 100%; }
     .lms-btn, .btn-primary { display: none; }
     .nav-toggle { display: flex; }
   }
 </style>
 
-<script src="/scripts/mobile-nav.js" defer></script>
 <script>
+  const navToggle = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.main-nav');
+  navToggle?.addEventListener('click', () => {
+    navToggle.setAttribute('aria-expanded', String(!!nav?.classList.toggle('open')));
+  });
+
   document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const root = document.documentElement;

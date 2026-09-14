@@ -103,7 +103,7 @@ const { t, locale, whatsappNumber } = Astro.props;
         const message = messageTemplate
           .replace('{name}', studentName)
           .replace('{level}', formatLevel(detail))
-          .replace('{time}', new Date(slot.starts_at).toLocaleString(locale));
+          .replace('{time}', new Date(slot.starts_at).toLocaleString(`${locale}-u-nu-latn`));
         const text = encodeURIComponent(message);
         waLink.href = `https://wa.me/${whatsappNumber}?text=${text}`;
         waLink.hidden = false;
