@@ -45,7 +45,7 @@ test('adult student completes the placement test, books a slot, and submits an a
   await applyLink.click();
 
   await expect(page.getByRole('heading', { name: 'Complete your application' })).toBeVisible();
-  await page.getByLabel('Course', { exact: true }).selectOption({ index: 1 });
+  await page.getByRole('combobox', { name: 'Course' }).selectOption({ index: 1 });
   await page.getByLabel('Email address').fill('smoke-test@example.com');
   await page.getByLabel('ID type').selectOption('national_id');
   await page.getByLabel('ID number').fill('1234567890');
