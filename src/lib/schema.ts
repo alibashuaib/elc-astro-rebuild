@@ -288,6 +288,16 @@ export function videoSchema(video: {
   };
 }
 
+function sanitizeJson(str: string): string {
+  // Escape special JSON characters to prevent breakout from JSON-LD script tags
+  return str
+    .replace(/\\/g, '\\\\')  // backslash first
+    .replace(/"/g, '\\"')    // double quote
+    .replace(/\n/g, '\\n')   // newline
+    .replace(/\r/g, '\\r')   // carriage return
+    .replace(/\t/g, '\\t');  // tab
+}
+
 export function reviewSchema(review: {
   text: string;
   author: string;
@@ -305,9 +315,9 @@ export function reviewSchema(review: {
     },
     author: {
       '@type': 'Person',
-      name: review.author,
+      name: sanitizeJson(review.author),
     },
-    reviewBody: review.text,
+    reviewBody: sanitizeJson(review.text),
     ...(review.datePublished && { datePublished: review.datePublished }),
   };
 }
