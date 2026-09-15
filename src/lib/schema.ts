@@ -211,6 +211,83 @@ export function localBusinessSchema(
   };
 }
 
+export function eventSchema(event: {
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  location: { streetAddress: string; addressLocality: string; addressCountry: string };
+  url: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: event.name,
+    description: event.description,
+    startDate: event.startDate,
+    endDate: event.endDate,
+    eventStatus: 'EventScheduled',
+    eventAttendanceMode: 'OfflineEventAttendanceMode',
+    location: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: event.location.streetAddress,
+        addressLocality: event.location.addressLocality,
+        addressCountry: event.location.addressCountry,
+      },
+    },
+    organizer: {
+      '@type': 'Organization',
+      name: 'ELC',
+      url: SITE_URL,
+    },
+    url: event.url,
+  };
+}
+
+export function offerSchema(offer: {
+  name: string;
+  price: number;
+  priceCurrency: string;
+  validFrom: string;
+  validThrough?: string;
+  description?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Offer',
+    name: offer.name,
+    description: offer.description || '',
+    price: offer.price,
+    priceCurrency: offer.priceCurrency,
+    validFrom: offer.validFrom,
+    ...(offer.validThrough && { validThrough: offer.validThrough }),
+    availability: 'InStock',
+    offerCount: 999,
+  };
+}
+
+export function videoSchema(video: {
+  name: string;
+  description: string;
+  thumbnailUrl: string;
+  uploadDate: string;
+  duration: string;
+  url?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: video.name,
+    description: video.description,
+    thumbnailUrl: video.thumbnailUrl,
+    uploadDate: video.uploadDate,
+    duration: video.duration,
+    ...(video.url && { contentUrl: video.url }),
+  };
+}
+
 /**
  * AI-Optimized metadata helper
  * Adds markers for AI crawlers and summarization engines

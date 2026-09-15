@@ -12,7 +12,7 @@ interface Props {
 const { locale, currentSlug, title, subtitle } = Astro.props;
 const isArabic = locale === 'ar';
 
-// Related course recommendations by category
+// Related course recommendations by category — progression and skill-building paths
 const relatedBySlug: Record<string, { title: string; slug: string; description: string }[]> = {
   'kids-general': [
     {
@@ -27,6 +27,11 @@ const relatedBySlug: Record<string, { title: string; slug: string; description: 
       slug: 'business-english',
       description: isArabic ? 'طبّق مهاراتك في الحياة المهنية' : 'Apply skills to career',
     },
+    {
+      title: isArabic ? 'تحضير IELTS' : 'IELTS Preparation',
+      slug: 'ielts-preparation',
+      description: isArabic ? 'استعد للامتحان باستخدام مهاراتك الحالية' : 'Prepare for IELTS exam',
+    },
   ],
   'ielts-preparation': [
     {
@@ -34,12 +39,38 @@ const relatedBySlug: Record<string, { title: string; slug: string; description: 
       slug: 'adults-general',
       description: isArabic ? 'أساس قوي قبل التحضير للاختبار' : 'Strong foundation before exam prep',
     },
+    {
+      title: isArabic ? 'تحضير الجامعة' : 'University Exam Prep',
+      slug: 'university-exam-prep',
+      description: isArabic ? 'تحضير شامل للاختبارات الجامعية' : 'Complete university entrance prep',
+    },
   ],
   'business-english': [
     {
       title: isArabic ? 'إنجليزي عام للكبار' : 'Adult General English',
       slug: 'adults-general',
       description: isArabic ? 'أساس الثقة في التواصل' : 'Foundation for confident communication',
+    },
+  ],
+  'step-exam-preparation': [
+    {
+      title: isArabic ? 'إنجليزي عام للكبار' : 'Adult General English',
+      slug: 'adults-general',
+      description: isArabic ? 'قوّ أساسياتك قبل التحضير للاختبار' : 'Build strong foundation before STEP',
+    },
+  ],
+  'university-exam-prep': [
+    {
+      title: isArabic ? 'تحضير IELTS' : 'IELTS Preparation',
+      slug: 'ielts-preparation',
+      description: isArabic ? 'خيار بديل للاختبارات الدولية' : 'Alternative for international exams',
+    },
+  ],
+  'womens-general-english': [
+    {
+      title: isArabic ? 'إنجليزي الأعمال' : 'Business English',
+      slug: 'business-english',
+      description: isArabic ? 'الخطوة التالية في رحلتك المهنية' : 'Next step in your career journey',
     },
   ],
 };

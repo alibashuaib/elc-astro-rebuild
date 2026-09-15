@@ -4,7 +4,8 @@ import Layout from '../../../layouts/Layout.astro';
 import FaqAccordion from '../../../components/FaqAccordion.astro';
 import Icon from '../../../components/Icon.astro';
 import CourseContentPanel from '../../../components/CourseContentPanel.astro';
-import { courseSchema, breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
+import RelatedCourses from '../../../components/RelatedCourses.astro';
+import { courseSchema, breadcrumbSchema, faqPageSchema, offerSchema } from '../../../lib/schema';
 import { categoryLabels, useTranslations, locales, type Locale } from '../../../i18n/ui';
 import { SITE, trail } from '../../../i18n/pages';
 
@@ -44,7 +45,15 @@ const ldCourse = courseSchema({
 
 const breadcrumbs = breadcrumbSchema(trail(locale, ['courses'], { name: title, path: `/courses/${slug}` }));
 
-const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(faqs)] : [])];
+const ldOffer = price !== undefined ? offerSchema({
+  name: title,
+  price,
+  priceCurrency: currency ?? 'SAR',
+  validFrom: new Date().toISOString().split('T')[0],
+  description: summary,
+}) : null;
+
+const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(faqs)] : []), ...(ldOffer ? [ldOffer] : [])];
 ---
 
 <Layout
@@ -110,6 +119,8 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
     <a href={`/${locale}/register?course=${slug}`} class="btn btn-primary">{t('courses.enroll')}</a>
 
     <CourseContentPanel locale={locale} Content={Content} />
+
+    <RelatedCourses locale={locale} currentSlug={slug} />
 
     <FaqAccordion faqs={faqs} title={t('courseDetail.faqs')} />
   </article>

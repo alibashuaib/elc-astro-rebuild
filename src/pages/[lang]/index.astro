@@ -1,15 +1,18 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import HomeExperience from '../../components/HomeExperience.astro';
-import { organizationSchema, localBusinessSchema } from '../../lib/schema';
+import FaqAccordion from '../../components/FaqAccordion.astro';
+import { organizationSchema, localBusinessSchema, faqPageSchema } from '../../lib/schema';
 import { fetchGoogleReviews } from '../../lib/googleReviews';
 import { localePaths, meta } from '../../i18n/pages';
-import type { Locale } from '../../i18n/ui';
+import { getFaqsByPage } from '../../i18n/faqs';
+import { useTranslations, type Locale } from '../../i18n/ui';
 
 export const getStaticPaths = localePaths;
 
 const locale = Astro.params.lang as Locale;
 const { title, description } = meta('home', locale);
+const t = useTranslations(locale);
 
 const reviews = await fetchGoogleReviews(locale);
 const orgSchema = organizationSchema(
@@ -29,10 +32,17 @@ const businessHours = [
 
 const localSchema = localBusinessSchema(locale, businessHours);
 
+// FAQs for home page
+const faqs = getFaqsByPage('home', locale);
+const faqSchema = faqs.length > 0 ? faqPageSchema(faqs) : null;
+
 // Use the hero image for social sharing (og:image)
 const ogImage = '/images/og-home.png';
 ---
 
-<Layout locale={locale} path="/" title={title} description={description} jsonLd={[orgSchema, localSchema]} ogImage={ogImage}>
+<Layout locale={locale} path="/" title={title} description={description} jsonLd={[orgSchema, localSchema, ...(faqSchema ? [faqSchema] : [])]} ogImage={ogImage}>
   <HomeExperience locale={locale} reviews={reviews} />
+  <div class="container">
+    <FaqAccordion faqs={faqs} title={t('nav.faq') || 'Frequently Asked Questions'} />
+  </div>
 </Layout>
