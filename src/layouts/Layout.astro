@@ -4,6 +4,7 @@ import Footer from '../components/Footer.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import ConsentHead from '../components/ConsentHead.astro';
 import ConsentBanner from '../components/ConsentBanner.astro';
+import { escapeJsonLd } from '../lib/schema';
 import { useTranslations, localeDir, type Locale } from '../i18n/ui';
 import '../styles/global.css';
 
@@ -96,7 +97,7 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     />
 
     {ldEntries.map((entry) => (
-      <script type="application/ld+json" set:html={JSON.stringify(entry)} />
+      <script type="application/ld+json" set:html={escapeJsonLd(JSON.stringify(entry))} />
     ))}
   </head>
   <body>
