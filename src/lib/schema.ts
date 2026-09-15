@@ -288,6 +288,46 @@ export function videoSchema(video: {
   };
 }
 
+export function reviewSchema(review: {
+  text: string;
+  author: string;
+  rating: number;
+  datePublished?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Review',
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: Math.round(review.rating),
+      bestRating: '5',
+      worstRating: '1',
+    },
+    author: {
+      '@type': 'Person',
+      name: review.author,
+    },
+    reviewBody: review.text,
+    ...(review.datePublished && { datePublished: review.datePublished }),
+  };
+}
+
+export function aggregateReviewSchema(reviews: {
+  ratingValue: number;
+  reviewCount: number;
+  bestRating?: number;
+  worstRating?: number;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'AggregateRating',
+    ratingValue: reviews.ratingValue,
+    reviewCount: reviews.reviewCount,
+    bestRating: reviews.bestRating ?? 5,
+    worstRating: reviews.worstRating ?? 1,
+  };
+}
+
 /**
  * AI-Optimized metadata helper
  * Adds markers for AI crawlers and summarization engines

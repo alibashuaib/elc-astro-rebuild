@@ -2,7 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import HomeExperience from '../../components/HomeExperience.astro';
 import FaqAccordion from '../../components/FaqAccordion.astro';
-import { organizationSchema, localBusinessSchema, faqPageSchema } from '../../lib/schema';
+import { organizationSchema, localBusinessSchema, faqPageSchema, reviewSchema, aggregateReviewSchema } from '../../lib/schema';
 import { fetchGoogleReviews } from '../../lib/googleReviews';
 import { localePaths, meta } from '../../i18n/pages';
 import { getFaqsByPage } from '../../i18n/faqs';
@@ -36,11 +36,24 @@ const localSchema = localBusinessSchema(locale, businessHours);
 const faqs = getFaqsByPage('home', locale);
 const faqSchema = faqs.length > 0 ? faqPageSchema(faqs) : null;
 
+// Review schema from Google reviews
+const reviewSchemas = reviews?.reviews?.slice(0, 3).map(review => reviewSchema({
+  text: review.text,
+  author: review.authorName,
+  rating: review.rating,
+  datePublished: review.publishTime,
+})) || [];
+
+const aggregateSchema = reviews ? aggregateReviewSchema({
+  ratingValue: reviews.overallRating,
+  reviewCount: reviews.totalReviewCount,
+}) : null;
+
 // Use the hero image for social sharing (og:image)
 const ogImage = '/images/og-home.png';
 ---
 
-<Layout locale={locale} path="/" title={title} description={description} jsonLd={[orgSchema, localSchema, ...(faqSchema ? [faqSchema] : [])]} ogImage={ogImage}>
+<Layout locale={locale} path="/" title={title} description={description} jsonLd={[orgSchema, localSchema, ...(faqSchema ? [faqSchema] : []), ...reviewSchemas, ...(aggregateSchema ? [aggregateSchema] : [])]} ogImage={ogImage}>
   <HomeExperience locale={locale} reviews={reviews} />
   <div class="container">
     <FaqAccordion faqs={faqs} title={t('nav.faq') || 'Frequently Asked Questions'} />
