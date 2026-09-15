@@ -288,16 +288,6 @@ export function videoSchema(video: {
   };
 }
 
-function sanitizeJson(str: string): string {
-  // Escape special JSON characters to prevent breakout from JSON-LD script tags
-  return str
-    .replace(/\\/g, '\\\\')  // backslash first
-    .replace(/"/g, '\\"')    // double quote
-    .replace(/\n/g, '\\n')   // newline
-    .replace(/\r/g, '\\r')   // carriage return
-    .replace(/\t/g, '\\t');  // tab
-}
-
 export function reviewSchema(review: {
   text: string;
   author: string;
@@ -315,11 +305,21 @@ export function reviewSchema(review: {
     },
     author: {
       '@type': 'Person',
-      name: sanitizeJson(review.author),
+      name: review.author,
     },
-    reviewBody: sanitizeJson(review.text),
+    reviewBody: review.text,
     ...(review.datePublished && { datePublished: review.datePublished }),
   };
+}
+
+// HTML-escape utility for JSON-LD script tags (call on stringified JSON in Layout)
+export function escapeJsonLd(jsonString: string): string {
+  return jsonString
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/ /g, '\\u2028')  // line separator
+    .replace(/ /g, '\\u2029'); // paragraph separator
 }
 
 export function aggregateReviewSchema(reviews: {
