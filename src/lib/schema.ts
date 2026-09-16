@@ -246,3 +246,41 @@ export function eventSchema(event: {
     ...(event.image && { image: event.image }),
   };
 }
+
+export function reviewSchema(review: {
+  author: string;
+  rating: number;
+  text: string;
+  datePublished: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Review',
+    author: { '@type': 'Person', name: review.author },
+    reviewRating: { '@type': 'Rating', ratingValue: review.rating, bestRating: 5 },
+    reviewBody: review.text,
+    datePublished: review.datePublished,
+  };
+}
+
+export function contactPointSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPoint',
+    contactType: 'Customer Service',
+    telephone: '+966591799917',
+    email: 'info@elc.com.sa',
+    availableLanguage: ['en', 'ar'],
+  };
+}
+
+export function aboutPageSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: 'About ELC',
+    description: 'Learn about ELC - Saudi Arabia\'s premier English language institute',
+    url: `${SITE_URL}/en/about/`,
+    publisher: organizationSchema(),
+  };
+}
