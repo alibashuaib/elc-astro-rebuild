@@ -20,20 +20,36 @@ classTimes:
     meridiem: PM
 imageAlt: Adult students in an English conversation class at ELC
 faqs:
-  - question: Who is the course for?
-    answer: It is designed for learners aged 13 and above. A placement test identifies the most appropriate starting point.
-  - question: How long is each course?
-    answer: Each course runs for one month and includes 40 learning hours, with two hours per day and five study days per week.
-  - question: How much class time is practical?
-    answer: Around 70% of class time is dedicated to student practice, conversation, activities, and real use of English, with the remaining time used for instruction, correction, and guidance.
-  - question: How is the pathway structured?
-    answer: The published program contains 15 courses across four main English levels and follows the CEFR framework.
+  - question: I have zero English. Can I start?
+    answer: Yes! Pre-Fundamentals is designed for complete beginners.
+  - question: How long until I'm fluent?
+    answer: Most reach conversational confidence (B1) in 12–16 weeks. Professional fluency (B2–C1) takes 4–6 months.
+  - question: What if my work schedule changes?
+    answer: Flexible scheduling—5–7pm and 7–9pm slots available. Recordings available if you miss a class.
+  - question: Is there a refund guarantee?
+    answer: See our Terms & Conditions for details on withdrawal and refund policies.
 draft: false
 ---
 
 Adults General English helps learners improve step by step, beginning at the level identified through a placement test. The course develops speaking, listening, reading, and writing with updated learning materials, practical teaching methods, and equipped classrooms.
 
 Student participation is central to the experience. Around 70% of class time is used for practice—including conversations, activities, exercises, and real-life English—while instructors use the remaining time for explanation, correction, and guidance.
+
+## What You'll Achieve
+
+- Speak confidently in business meetings
+- Write professional emails & reports
+- Master all four English skills
+- Achieve IELTS Band 5–7 readiness
+- Advance your career
+
+## Curriculum
+
+**Pre-Fundamentals:** Foundation for complete beginners (4 weeks)
+
+**Top Notch Fundamentals–3A/3B:** A1 to C1 progression
+
+**Reading & Writing Levels:** Parallel development + IELTS practice
 
 ## Program at a glance
 
