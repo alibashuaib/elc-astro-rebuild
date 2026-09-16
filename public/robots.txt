@@ -1,8 +1,13 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /placement-test/admin/
 
-# Explicitly open to AI crawlers — GEO requirement from the rebuild plan
+# AI Search Engines — Allow full access for Perplexity, GPT, Claude, Gemini
 User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
 Allow: /
 
 User-agent: ClaudeBot
@@ -11,7 +16,27 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
+User-agent: CCBot
+Allow: /
+
 User-agent: Google-Extended
 Allow: /
 
+User-agent: anthropic-ai
+Allow: /
+
+# Disallow staff-only and admin pages from all crawlers
+User-agent: GPTBot
+Disallow: /placement-test/admin/
+
+User-agent: ClaudeBot
+Disallow: /placement-test/admin/
+
+User-agent: PerplexityBot
+Disallow: /placement-test/admin/
+
+User-agent: Google-Extended
+Disallow: /placement-test/admin/
+
+# Sitemap for search engines
 Sitemap: https://elc.com.sa/sitemap-index.xml
