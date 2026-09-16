@@ -25,7 +25,7 @@ export default defineConfig({
     // mobile networks was the main delay before the headline painted.
     inlineStylesheets: 'always',
   },
-  compressHTML: true,
+  compressHTML: false,
   // Static-safe redirect: Astro emits a real HTML file with a meta-refresh + canonical
   // link for "/", since Astro.redirect() would need an SSR adapter we don't want here.
   redirects: {
