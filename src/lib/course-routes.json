@@ -1,0 +1,18 @@
+[
+  {"params": {"lang": "en", "slug": "kids-general"}},
+  {"params": {"lang": "en", "slug": "adults-general"}},
+  {"params": {"lang": "en", "slug": "womens-general-english"}},
+  {"params": {"lang": "en", "slug": "ielts-preparation"}},
+  {"params": {"lang": "en", "slug": "business-english"}},
+  {"params": {"lang": "en", "slug": "step-exam-preparation"}},
+  {"params": {"lang": "en", "slug": "special-courses"}},
+  {"params": {"lang": "en", "slug": "university-exam-prep"}},
+  {"params": {"lang": "ar", "slug": "kids-general"}},
+  {"params": {"lang": "ar", "slug": "adults-general"}},
+  {"params": {"lang": "ar", "slug": "womens-general-english"}},
+  {"params": {"lang": "ar", "slug": "ielts-preparation"}},
+  {"params": {"lang": "ar", "slug": "business-english"}},
+  {"params": {"lang": "ar", "slug": "step-exam-preparation"}},
+  {"params": {"lang": "ar", "slug": "special-courses"}},
+  {"params": {"lang": "ar", "slug": "university-exam-prep"}}
+]

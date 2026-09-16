@@ -6,8 +6,10 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "predev": "node scripts/compile-courses.mjs",
     "dev": "astro dev",
-    "build": "astro build",
+    "prebuild": "node scripts/compile-courses.mjs",
+    "build": "astro build ; node scripts/generate-static-courses.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "lhci": "lhci autorun",
@@ -15,12 +17,13 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "^7.2.4"
+    "astro": "^7.3.2"
   },
   "allowScripts": {
     "esbuild@0.28.2": true
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1"
+    "@playwright/test": "^1.62.1",
+    "marked": "^18.0.13"
   }
 }
