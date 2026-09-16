@@ -2,6 +2,8 @@
 title: IELTS Exam Preparation
 summary: Focused preparation for IELTS Academic and General Training, covering listening, reading, writing, speaking, and test strategy.
 category: exam-prep
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 imageAlt: Learner preparing for the IELTS exam at ELC
 faqs:
   - question: Does the course cover Academic and General Training IELTS?

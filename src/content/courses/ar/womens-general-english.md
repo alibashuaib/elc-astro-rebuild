@@ -2,6 +2,8 @@
 title: الإنجليزية العامة للسيدات
 summary: برنامج إنجليزي عام للسيدات من عمر 13 عامًا فأعلى، يبدأ باختبار مستوى ويُقدّم في قسم مستقل بإشراف مدربات مؤهلات.
 category: women
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 price: 1500
 currency: SAR
 durationWeeks: 4

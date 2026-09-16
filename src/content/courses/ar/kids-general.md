@@ -2,6 +2,8 @@
 title: إنجليزي عام للأطفال
 summary: تعلّم ممتع ومنظم للأطفال من عمر 6 إلى 13 عامًا، بدروس تناسب أعمارهم ضمن مسار متوافق مع الإطار الأوروبي CEFR.
 category: kids
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 price: 1500
 currency: SAR
 durationWeeks: 4

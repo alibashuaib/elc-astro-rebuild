@@ -2,6 +2,8 @@
 title: التحضير لما قبل الجامعة (PUP)
 summary: برنامج إنجليزي مكثف ومتوافق مع CEFR للمتعلمين من عمر 16 عامًا فأعلى، وخاصة خريجي الثانوية المستعدين للجامعة أو التدريب أو العمل.
 category: exam-prep
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 price: 4700
 currency: SAR
 hoursPerDay: 2.5

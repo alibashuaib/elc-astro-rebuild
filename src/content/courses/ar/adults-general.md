@@ -2,6 +2,8 @@
 title: إنجليزي عام للكبار
 summary: إنجليزية عملية تبدأ باختبار مستوى للمتعلمين من عمر 13 عامًا فأعلى، وتطوّر التحدث والاستماع والقراءة والكتابة بالممارسة الصفية.
 category: adults
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 price: 1500
 currency: SAR
 durationWeeks: 4

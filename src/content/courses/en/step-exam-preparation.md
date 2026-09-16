@@ -2,6 +2,8 @@
 title: STEP Exam Preparation
 summary: Focused preparation for Saudi Arabia's Standardized Test of English Proficiency, with guided language review, test strategy, and timed practice.
 category: exam-prep
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 imageAlt: Learner preparing for the STEP English proficiency exam at ELC
 faqs:
   - question: Who is this course for?

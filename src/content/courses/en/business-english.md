@@ -2,6 +2,8 @@
 title: Business English
 summary: Tailored workplace English built around real professional scenarios, from email and reports to meetings and presentations.
 category: business
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 imageAlt: Professionals in a business English workshop at ELC
 faqs:
   - question: How is the program designed?

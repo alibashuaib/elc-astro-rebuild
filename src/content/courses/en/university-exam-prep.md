@@ -2,6 +2,8 @@
 title: Pre-University Prep (PUP)
 summary: An intensive CEFR-aligned English program for learners aged 16+, especially high school graduates preparing for university, training, or work.
 category: exam-prep
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 price: 4700
 currency: SAR
 hoursPerDay: 2.5

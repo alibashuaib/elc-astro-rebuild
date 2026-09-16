@@ -2,6 +2,8 @@
 title: Special Courses
 summary: Focused English programs scheduled for specific learner groups, goals, and timetables outside the standard general-English pathway.
 category: adults
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 imageAlt: A focused small-group English session at ELC
 faqs:
   - question: Which special courses are currently available?

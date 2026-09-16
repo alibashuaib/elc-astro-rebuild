@@ -9,6 +9,8 @@ hoursPerWeek: 10
 hoursPerMonth: "40"
 hoursPerDay: 2
 scheduleDays: "5"
+datePublished: "2024-01-10"
+dateModified: "2026-09-16"
 classTimes:
   - label: First period
     start: "5:00"

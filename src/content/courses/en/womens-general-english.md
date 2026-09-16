@@ -2,6 +2,8 @@
 title: Women's General English
 summary: Placement-led General English for women aged 13+, delivered in a dedicated section with qualified female instructors and practical classroom learning.
 category: women
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
 price: 1500
 currency: SAR
 durationWeeks: 4
