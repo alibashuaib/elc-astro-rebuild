@@ -15,6 +15,8 @@ classTimes:
     end: "7:00"
     meridiem: PM
 imageAlt: Children in an English class at ELC
+datePublished: "2024-01-15"
+dateModified: "2026-09-16"
 faqs:
   - question: Who is the course for?
     answer: The program is designed for children aged 6 to 13. Boys and girls learn in dedicated sections supported by female trainers.

@@ -213,3 +213,36 @@ export function articleSchema(article: {
     ...(article.image && { image: article.image }),
   };
 }
+
+export function eventSchema(event: {
+  name: string;
+  description: string;
+  startDate: string;
+  url: string;
+  location?: string;
+  image?: string;
+  organizer?: string;
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: event.name,
+    description: event.description,
+    startDate: event.startDate,
+    url: event.url,
+    organizer: { '@type': 'Organization', name: event.organizer ?? 'ELC' },
+    ...(event.location && {
+      location: {
+        '@type': 'Place',
+        name: event.location,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
+          addressLocality: 'Jeddah',
+          addressCountry: 'SA',
+        },
+      },
+    }),
+    ...(event.image && { image: event.image }),
+  };
+}
