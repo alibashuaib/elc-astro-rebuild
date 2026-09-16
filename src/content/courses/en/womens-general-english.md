@@ -16,20 +16,36 @@ classTimes:
     meridiem: PM
 imageAlt: Women learning English with a female instructor in ELC's dedicated section
 faqs:
-  - question: Who is the course for?
-    answer: The course is designed for female learners aged 13 and above. A placement test identifies the most suitable starting point.
-  - question: Is there a dedicated section for women?
-    answer: Yes. ELC provides a dedicated women's section led by qualified female instructors to support privacy, comfort, and effective learning.
-  - question: How long is each course?
-    answer: Each course runs for one month and includes 40 learning hours, with two hours per day and five study days per week.
-  - question: Which skills are developed?
-    answer: The course develops speaking, listening, reading, and writing through practical classroom activities, conversation, exercises, and guided instruction.
+  - question: I have zero English. Can I start?
+    answer: Yes! Pre-Fundamentals is designed for complete beginners in a supportive women's community.
+  - question: How do I balance studies with work/family?
+    answer: Evening classes (7–9pm, 5 days/week) fit around work & family commitments.
+  - question: What if I miss a class due to family commitments?
+    answer: Recordings available for catch-up. See our Terms & Conditions for attendance policies.
+  - question: Will I meet other women in the course?
+    answer: Yes! Women's General is built around community. Study alongside women with similar goals.
 draft: false
 ---
 
 Women's General English follows ELC's structured adult pathway in a dedicated learning section for female learners. Each student begins at the level identified through a placement test and develops speaking, listening, reading, and writing through modern materials and practical classroom activities.
 
 Qualified female instructors guide the learning experience in an environment designed for privacy, comfort, participation, and steady progress. Around 70% of class time is dedicated to practice—including conversation, exercises, activities, and real-life English use.
+
+## What You'll Achieve
+
+- Speak confidently in professional settings
+- Advance your career internationally
+- Build connections with women learners
+- Master business English communication
+- Achieve C1 advanced proficiency
+
+## Why Women's General
+
+- Women-focused learning community
+- Evening scheduling (7–9pm)
+- Supportive, judgment-free environment
+- One-on-one coaching available
+- Flexible for working women & mothers
 
 ## Program at a glance
 
