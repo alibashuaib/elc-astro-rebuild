@@ -19,8 +19,8 @@ export function organizationSchema(
     name: locale === 'ar' ? 'معهد صرح المعرفة' : 'ELC',
     alternateName: locale === 'ar' ? 'ELC' : 'معهد صرح المعرفة',
     url: SITE_URL,
-    foundingDate: '2010', // real, from the live site's About page
-    email: 'info@elc.com.sa', // real
+    foundingDate: '2010',
+    email: 'info@elc.com.sa',
     telephone: '+966591799917',
     contactPoint: [
       { '@type': 'ContactPoint', telephone: '+966591799917', contactType: 'admissions' },
@@ -34,19 +34,76 @@ export function organizationSchema(
       addressLocality: 'Jeddah',
       addressRegion: 'Makkah Province',
       addressCountry: 'SA',
+      postalCode: '23231',
     },
     geo: {
       '@type': 'GeoCoordinates',
       latitude: 21.4971147,
       longitude: 39.2156796,
     },
-    // Real, from the live site's footer/social links plus YouTube/LinkedIn
-    // confirmed live and active during a later audit pass.
     sameAs: [
       'https://www.facebook.com/ELCJeddah',
       'https://twitter.com/elcjeddah',
       'https://www.instagram.com/elcjeddah',
       'https://www.snapchat.com/add/elcjeddah',
+      'https://www.youtube.com/c/ELCInst',
+      'https://www.linkedin.com/company/elcjeddah',
+    ],
+    ...(aggregateRating && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: aggregateRating.rating,
+        reviewCount: aggregateRating.reviewCount,
+      },
+    }),
+  };
+}
+
+export function localBusinessSchema(
+  aggregateRating?: { rating: number; reviewCount: number },
+  locale: 'en' | 'ar' = 'en'
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': `${SITE_URL}/#localbusiness`,
+    name: locale === 'ar' ? 'معهد صرح المعرفة' : 'ELC',
+    alternateName: locale === 'ar' ? 'ELC' : 'معهد صرح المعرفة',
+    url: SITE_URL,
+    email: 'info@elc.com.sa',
+    telephone: '+966591799917',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
+      addressLocality: 'Jeddah',
+      addressRegion: 'Makkah Province',
+      addressCountry: 'SA',
+      postalCode: '23231',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 21.4971147,
+      longitude: 39.2156796,
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '09:00',
+        closes: '21:00',
+      },
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: 'Saturday',
+        opens: '09:00',
+        closes: '17:00',
+      },
+    ],
+    priceRange: '$$',
+    sameAs: [
+      'https://www.facebook.com/ELCJeddah',
+      'https://twitter.com/elcjeddah',
+      'https://www.instagram.com/elcjeddah',
       'https://www.youtube.com/c/ELCInst',
       'https://www.linkedin.com/company/elcjeddah',
     ],

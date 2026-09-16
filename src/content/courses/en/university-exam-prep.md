@@ -28,13 +28,34 @@ Pre-University Prep (PUP) is an intensive English pathway for high school gradua
 
 The CEFR-aligned program combines the four main English skills with intensive conversation practice, reading and writing development, correct pronunciation, learning technology, and activities that encourage English use beyond the classroom.
 
-## Program at a glance
+## What You'll Achieve
+
+- Reach intermediate to advanced English proficiency
+- Develop academic English for university studies
+- Master professional communication for the workplace
+- Build confidence in speaking and writing
+- Prepare for higher education or employment
+- Gain internationally recognized language skills
+- Understand academic and professional English contexts
+
+## Program at a Glance
 
 - Up to 220 hours of practical English learning
-- Speaking, listening, reading, and writing
-- Conversation for everyday, social, and workplace situations
+- Speaking, listening, reading, and writing development
+- Conversation for everyday, social, academic, and workplace situations
 - Enriching activities, including educational trips and visits when scheduled
 - Additional instructor support when needed
 - Modern learning technology and interactive resources
+
+## What You'll Work On
+
+- Academic reading and writing for university-level work
+- Presentation and research skills
+- Professional communication and workplace English
+- Pronunciation and fluency development
+- Listening comprehension from varied sources
+- Critical thinking in English
+- Cross-cultural communication
+- Independent learning strategies
 
 Contact ELC for the current schedule and admission requirements.

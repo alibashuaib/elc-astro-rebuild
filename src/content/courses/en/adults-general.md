@@ -35,11 +35,40 @@ Adults General English helps learners improve step by step, beginning at the lev
 
 Student participation is central to the experience. Around 70% of class time is used for practice—including conversations, activities, exercises, and real-life English—while instructors use the remaining time for explanation, correction, and guidance.
 
+## What You'll Achieve
+
+- Communicate confidently in everyday situations
+- Participate in professional and social conversations
+- Read and understand varied English texts
+- Write clearly for personal and professional purposes
+- Build vocabulary and grammar for advanced fluency
+- Prepare for further English study or exams
+
 ## Program at a glance
 
 - For learners aged 13 and above
 - One month and 40 learning hours per course
 - 15 courses across four main CEFR-aligned English levels
 - Additional reading material to support vocabulary, reading, and writing
+
+## Course Levels
+
+**Elementary (A1–A2)** – Foundation and basic communication
+
+**Intermediate (B1)** – Fluency in familiar situations
+
+**Upper-Intermediate (B2)** – Independence and accuracy
+
+**Advanced (C1)** – Sophisticated and precise English use
+
+## What You'll Work On
+
+- Speaking practice in realistic conversations and role-plays
+- Listening comprehension from authentic materials
+- Reading strategies for different text types
+- Writing for various purposes and audiences
+- Grammar structures in practical contexts
+- Vocabulary expansion for academic and professional use
+- Critical thinking and language analysis
 
 Contact ELC to arrange a placement test and confirm the next intake.

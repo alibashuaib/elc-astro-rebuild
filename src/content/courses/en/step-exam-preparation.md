@@ -15,12 +15,30 @@ draft: false
 
 Prepare for STEP with a structured plan built around English proficiency, question familiarity, and confident performance under time limits.
 
-## What you will work on
+## What You'll Achieve
+
+- Master STEP exam formats and question types
+- Reach Band 3–5 proficiency levels
+- Communicate academically and professionally
+- Build regional and international credibility
+- Prepare for university and professional advancement
+
+## Course Progression
+
+**Band 2–3 (8 weeks)** – Foundation to intermediate STEP level
+
+**Band 3–4 (8 weeks)** – Intermediate to upper-intermediate STEP level
+
+**Band 4–5 (8 weeks)** – Upper-intermediate to advanced STEP level
+
+## What You'll Work On
 
 - Reading comprehension and efficient question handling
-- English language structure and usage
-- Listening comprehension practice
+- English language structure and usage in STEP format
+- Listening comprehension practice with STEP-style audio
 - Timed practice and test-taking strategy
 - Reviewing errors and strengthening weaker areas
+- Full-length mock exams and band prediction
+- Vocabulary and grammar for academic/professional contexts
 
 Contact ELC for current schedules, pricing, and placement guidance.

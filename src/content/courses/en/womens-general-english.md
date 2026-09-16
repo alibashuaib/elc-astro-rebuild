@@ -31,6 +31,15 @@ Women's General English follows ELC's structured adult pathway in a dedicated le
 
 Qualified female instructors guide the learning experience in an environment designed for privacy, comfort, participation, and steady progress. Around 70% of class time is dedicated to practice—including conversation, exercises, activities, and real-life English use.
 
+## What You'll Achieve
+
+- Build English fluency for work and social situations
+- Communicate with confidence and clarity
+- Master key listening and reading comprehension
+- Develop professional and personal writing skills
+- Strengthen grammar and vocabulary foundations
+- Advance toward higher English proficiency levels
+
 ## Program at a glance
 
 - For female learners aged 13 and above
@@ -38,5 +47,25 @@ Qualified female instructors guide the learning experience in an environment des
 - One month and 40 learning hours per course
 - Structured CEFR-aligned General English pathway
 - Speaking, listening, reading, and writing
+
+## Course Progression
+
+**Elementary (A1–A2)** – Foundation building
+
+**Intermediate (B1)** – Practical communication
+
+**Upper-Intermediate (B2)** – Advanced fluency
+
+**Advanced (C1)** – Sophisticated English mastery
+
+## What You'll Work On
+
+- Conversation practice in supportive group settings
+- Authentic listening materials from real-world sources
+- Reading comprehension strategies
+- Writing for academic, personal, and professional contexts
+- Grammar and vocabulary in practical use
+- Confidence building in English communication
+- Cultural context in language learning
 
 Contact ELC to book a placement test and confirm the next women's intake.

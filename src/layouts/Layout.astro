@@ -62,6 +62,15 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <title>{title}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
+
+    <!-- AI Search Engine Optimization (Perplexity, ChatGPT, Claude, Gemini) -->
+    <meta name="ai-content-type" content="educational" />
+    <meta name="ai-language" content={locale} />
+    <meta name="ai-summarization-allowed" content="true" />
+
+    <!-- Allow AI crawlers: GPTBot, ClaudeBot, PerplexityBot, Google-Extended -->
+    <meta name="robots" content={noindex ? "noindex, nofollowbot, noai, noimageai" : "follow, noai-generate, nofollowbot"} />
+
     <link rel="canonical" href={canonicalUrl} />
 
     <!-- Bidirectional hreflang, mapped to the equivalent page, not just the homepage -->

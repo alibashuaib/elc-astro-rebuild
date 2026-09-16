@@ -15,7 +15,17 @@ draft: false
 
 Business English helps individuals and teams communicate more professionally in the workplace. Programs are tailored through a needs assessment and use practical scenarios, expert instruction, and real-world resources.
 
-## Program approach
+## What You'll Achieve
+
+- Write clear, professional emails and formal reports
+- Lead and participate effectively in business meetings
+- Deliver confident presentations and pitches
+- Negotiate and manage difficult conversations
+- Use professional vocabulary in your field
+- Build cross-cultural business communication skills
+- Increase workplace confidence and credibility
+
+## Program Approach
 
 - Needs assessment and business-language placement
 - A practical curriculum aligned with participant and organization goals
@@ -23,5 +33,27 @@ Business English helps individuals and teams communicate more professionally in 
 - Professional vocabulary and real workplace communication
 - Hands-on delivery with expert instructors
 - A final progress report with strengths and development priorities
+
+## Key Focus Areas
+
+**Written Communication** – Emails, reports, proposals, business correspondence
+
+**Spoken Communication** – Meetings, presentations, negotiations, phone calls
+
+**Professional Vocabulary** – Industry-specific terms and business English
+
+**Cultural Competence** – Working across cultures and communication norms
+
+**Leadership Communication** – Delegation, feedback, and team communication
+
+## What You'll Work On
+
+- Practical email and report writing for your workplace
+- Participation and leadership in meetings
+- Presentation design and delivery
+- Negotiation and persuasion techniques
+- Professional networking and relationship building
+- Managing difficult conversations professionally
+- Industry-specific language and scenarios
 
 Contact ELC for a tailored proposal, schedule, and pricing.

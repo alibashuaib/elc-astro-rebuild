@@ -15,12 +15,34 @@ draft: false
 
 Build familiarity with the IELTS format and strengthen the four skills assessed by the test. Lessons combine guided practice, timed activities, feedback, and practical strategies for approaching common task types.
 
-## What you will work on
+## What You'll Achieve
 
-- Listening for detail, purpose, and key information
-- Reading strategies and time management
+- Understand the IELTS test format and requirements
+- Develop confident listening and reading comprehension
+- Master academic and general writing task types
+- Speak fluently and naturally under exam pressure
+- Apply test-taking strategies to maximize your score
+- Build stamina for full-length practice tests
+- Reach your target band score
+
+## Course Focus Areas
+
+**Listening** – Audio comprehension under exam conditions
+
+**Reading** – Speed, accuracy, and strategic scanning
+
+**Writing** – Task 1 (letters/reports) and Task 2 (essays)
+
+**Speaking** – Fluency, coherence, and lexical range
+
+## What You'll Work On
+
+- Listening for detail, purpose, and key information in varied accents
+- Reading strategies and time management for different question types
 - Structured responses for Academic or General Training writing tasks
-- Speaking fluency, organization, and confidence
-- Practice tasks with targeted feedback
+- Speaking fluency, organization, and confidence in three parts
+- Practice tasks with targeted feedback and error analysis
+- Timed full-length mock exams
+- Band-score prediction and progress tracking
 
 Contact ELC for current schedules, pricing, and placement guidance.

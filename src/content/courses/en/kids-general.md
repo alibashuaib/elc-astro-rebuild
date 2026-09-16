@@ -31,6 +31,14 @@ Kids General English is a fun, interactive program that helps young learners bui
 
 Students develop vocabulary, sentence building, listening, speaking, reading, and writing through activities that encourage participation and confidence. The structured pathway helps each child progress clearly from the basics toward more independent use of English.
 
+## What Your Child Will Achieve
+
+- Speak with confidence in English
+- Build vocabulary progressively
+- Develop reading and writing skills
+- Prepare for Cambridge YLE exams
+- Gain independence in using English
+
 ## Program at a glance
 
 - Ages 6–13
@@ -38,4 +46,26 @@ Students develop vocabulary, sentence building, listening, speaking, reading, an
 - 8 CEFR-aligned levels delivered across 12 courses
 - Dedicated sections for boys and girls, supported by female trainers
 
-Contact ELC to confirm the next intake and placement guidance.
+## Course Progression
+
+**Pre-Starters (Level 1)** – Foundation for complete beginners
+
+**Starters (Level 2)** – Basic vocabulary and sentence patterns
+
+**Super Minds 1A & 1B (Levels 3–4)** – Early elementary communication
+
+**Super Minds 2A & 2B (Levels 5–6)** – Intermediate language skills
+
+**Super Minds 3A & 3B (Levels 7–8)** – Upper-intermediate fluency
+
+## What You'll Work On
+
+- Interactive vocabulary building through games and activities
+- Speaking practice with supportive feedback
+- Reading comprehension using age-appropriate texts
+- Writing simple sentences and short paragraphs
+- Listening skills through engaging audio and video
+- Grammar foundations through communicative activities
+- Building confidence and positive attitudes toward English learning
+
+Contact ELC to confirm the next intake, placement testing, and class schedules.
