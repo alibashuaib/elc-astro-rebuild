@@ -4,6 +4,7 @@ import Footer from '../components/Footer.astro';
 import WhatsAppButton from '../components/WhatsAppButton.astro';
 import ConsentHead from '../components/ConsentHead.astro';
 import ConsentBanner from '../components/ConsentBanner.astro';
+import { escapeJsonLd } from '../lib/schema';
 import { useTranslations, localeDir, type Locale } from '../i18n/ui';
 import '../styles/global.css';
 
@@ -78,6 +79,14 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     {ogImage && <meta name="twitter:image" content={new URL(ogImage, site).toString()} />}
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!-- AI Search Optimization — Markers for AI crawlers (Perplexity, ChatGPT, Claude) -->
+    <meta name="ai-content-type" content="EducationalContent" />
+    <meta name="ai-language" content={locale === 'ar' ? 'ar' : 'en'} />
+    <meta name="ai-summarization-allowed" content="true" />
+    <meta name="robots-noai" content="false" />
+    <!-- Apple Intelligence & future AI agents -->
+    <meta name="apple-mobile-web-app-capable" content="true" />
+
     <!-- Preload the locale's critical local font so branded text is ready for first paint. -->
     <link
       rel="preload"
@@ -88,7 +97,7 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     />
 
     {ldEntries.map((entry) => (
-      <script type="application/ld+json" set:html={JSON.stringify(entry)} />
+      <script type="application/ld+json" set:html={escapeJsonLd(JSON.stringify(entry))} />
     ))}
   </head>
   <body>

@@ -1,0 +1,125 @@
+---
+import type { Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  variant?: 'primary' | 'secondary';
+  href?: string;
+  label?: string;
+  subtext?: string;
+  icon?: 'arrow' | 'check' | 'phone';
+  class?: string;
+}
+
+const { locale, variant = 'primary', href = '#', label, subtext, icon, class: className } = Astro.props;
+
+const defaultLabels = locale === 'ar' ? {
+  placementTest: 'ابدأ اختبار تحديد المستوى مجانًا',
+  consultation: 'احجز استشارة مجانية',
+  enroll: 'سجّل الآن',
+  contact: 'تواصل معنا',
+} : {
+  placementTest: 'Take Free Placement Test',
+  consultation: 'Book Free Consultation',
+  enroll: 'Enroll Now',
+  contact: 'Contact Us',
+};
+
+const finalLabel = label || defaultLabels.placementTest;
+
+const iconContent = icon === 'arrow' ? '→' : icon === 'check' ? '✓' : '📞';
+---
+
+<a href={href} class={`cta-button cta-${variant} ${className || ''}`} role="button">
+  <span class="cta-text">
+    <span class="cta-label">{finalLabel}</span>
+    {subtext && <span class="cta-subtext">{subtext}</span>}
+  </span>
+  {icon && <span class="cta-icon" aria-hidden="true">{iconContent}</span>}
+</a>
+
+<style>
+  .cta-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    min-height: 44px;
+  }
+
+  .cta-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    text-align: left;
+  }
+
+  .cta-label {
+    font-size: 1rem;
+  }
+
+  .cta-subtext {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    font-weight: 400;
+  }
+
+  .cta-icon {
+    font-size: 1.25rem;
+  }
+
+  /* Primary Button */
+  .cta-primary {
+    background: var(--brand-primary);
+    color: white;
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--brand-primary) 40%, transparent);
+  }
+
+  .cta-primary:hover {
+    background: color-mix(in srgb, var(--brand-primary) 90%, #000);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-primary) 50%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .cta-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Secondary Button */
+  .cta-secondary {
+    background: transparent;
+    color: var(--brand-primary);
+    border: 2px solid var(--brand-primary);
+  }
+
+  .cta-secondary:hover {
+    background: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+  }
+
+  /* Mobile Optimization */
+  @media (max-width: 599px) {
+    .cta-button {
+      min-height: 48px;
+      padding: 1rem 1.25rem;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .cta-text {
+      text-align: center;
+    }
+
+    .cta-label {
+      font-size: 0.95rem;
+    }
+
+    .cta-subtext {
+      font-size: 0.7rem;
+    }
+  }
+</style>

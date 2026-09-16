@@ -1,25 +1,61 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import HomeExperience from '../../components/HomeExperience.astro';
-import { organizationSchema } from '../../lib/schema';
+import FaqAccordion from '../../components/FaqAccordion.astro';
+import { organizationSchema, localBusinessSchema, faqPageSchema, reviewSchema, aggregateReviewSchema } from '../../lib/schema';
 import { fetchGoogleReviews } from '../../lib/googleReviews';
 import { localePaths, meta } from '../../i18n/pages';
-import type { Locale } from '../../i18n/ui';
+import { getFaqsByPage } from '../../i18n/faqs';
+import { useTranslations, type Locale } from '../../i18n/ui';
 
 export const getStaticPaths = localePaths;
 
 const locale = Astro.params.lang as Locale;
 const { title, description } = meta('home', locale);
+const t = useTranslations(locale);
 
 const reviews = await fetchGoogleReviews(locale);
 const orgSchema = organizationSchema(
   reviews ? { rating: reviews.overallRating, reviewCount: reviews.totalReviewCount } : undefined,
   locale
 );
+
+// GBP Optimization: Add LocalBusiness schema with business hours
+const businessHours = [
+  { day: 'Monday', open: '09:00', close: '21:00' },
+  { day: 'Tuesday', open: '09:00', close: '21:00' },
+  { day: 'Wednesday', open: '09:00', close: '21:00' },
+  { day: 'Thursday', open: '09:00', close: '21:00' },
+  { day: 'Friday', open: '09:00', close: '21:00' },
+  { day: 'Saturday', open: '09:00', close: '17:00' },
+];
+
+const localSchema = localBusinessSchema(locale, businessHours);
+
+// FAQs for home page
+const faqs = getFaqsByPage('home', locale);
+const faqSchema = faqs.length > 0 ? faqPageSchema(faqs) : null;
+
+// Review schema from Google reviews
+const reviewSchemas = reviews?.reviews?.slice(0, 3).map(review => reviewSchema({
+  text: review.text,
+  author: review.authorName,
+  rating: review.rating,
+  datePublished: review.publishTime,
+})) || [];
+
+const aggregateSchema = reviews ? aggregateReviewSchema({
+  ratingValue: reviews.overallRating,
+  reviewCount: reviews.totalReviewCount,
+}) : null;
+
 // Use the hero image for social sharing (og:image)
 const ogImage = '/images/og-home.png';
 ---
 
-<Layout locale={locale} path="/" title={title} description={description} jsonLd={orgSchema} ogImage={ogImage}>
+<Layout locale={locale} path="/" title={title} description={description} jsonLd={[orgSchema, localSchema, ...(faqSchema ? [faqSchema] : []), ...reviewSchemas, ...(aggregateSchema ? [aggregateSchema] : [])]} ogImage={ogImage}>
   <HomeExperience locale={locale} reviews={reviews} />
+  <div class="container">
+    <FaqAccordion faqs={faqs} title={t('nav.faq') || 'Frequently Asked Questions'} />
+  </div>
 </Layout>

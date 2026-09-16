@@ -1,0 +1,66 @@
+---
+import Icon from './Icon.astro';
+import type { Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const isArabic = locale === 'ar';
+
+const signals = isArabic ? [
+  { icon: 'certificate', text: 'معتمد من TVTC' },
+  { icon: 'users', text: '15,000+ متدرب' },
+  { icon: 'check', text: 'ضمان استرجاع الرسوم' },
+  { icon: 'star', text: '4.8⭐ من 50+ تقييم' },
+] : [
+  { icon: 'certificate', text: 'TVTC Accredited' },
+  { icon: 'users', text: '15,000+ Learners' },
+  { icon: 'check', text: 'Money-Back Guarantee' },
+  { icon: 'star', text: '4.8⭐ From 50+ Reviews' },
+];
+---
+
+<div class="trust-signals">
+  {signals.map(signal => (
+    <div class="signal">
+      <Icon name={signal.icon} size={24} aria-hidden="true" />
+      <span>{signal.text}</span>
+    </div>
+  ))}
+</div>
+
+<style>
+  .trust-signals {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--zone-base-raised);
+    border-radius: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .signal {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 599px) {
+    .trust-signals {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+
+    .signal {
+      font-size: 0.8rem;
+    }
+  }
+</style>

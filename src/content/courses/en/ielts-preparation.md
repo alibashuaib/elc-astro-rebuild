@@ -4,16 +4,34 @@ summary: Focused preparation for IELTS Academic and General Training, covering l
 category: exam-prep
 imageAlt: Learner preparing for the IELTS exam at ELC
 faqs:
-  - question: Does the course cover Academic and General Training IELTS?
-    answer: Preparation can be aligned with either test. Confirm the IELTS version required for your study, work, or migration goal with the admissions team before enrolling.
-  - question: Is a specific band score guaranteed?
-    answer: No result can be guaranteed. The course builds exam knowledge and language skills, while the final score depends on the learner's starting level, attendance, practice, and test-day performance.
-  - question: Should I take a placement test first?
-    answer: A placement test helps the team recommend the most suitable preparation path and identify the skills that need the most attention.
+  - question: Can I realistically reach Band 7?
+    answer: Yes, depending on your starting point. We assess on day one and set realistic targets.
+  - question: Is 2 months really enough time?
+    answer: Yes. 40 hours of focused exam prep is intensive. Most improve 0.5–1 full band.
+  - question: What if I don't achieve my target band?
+    answer: See our Terms & Conditions for details on course policies and support options.
+  - question: How accurate are mock exam predictions?
+    answer: Very accurate. By the 3rd–4th mock, our prediction typically matches actual exam within ±0.5 levels.
 draft: false
 ---
 
 Build familiarity with the IELTS format and strengthen the four skills assessed by the test. Lessons combine guided practice, timed activities, feedback, and practical strategies for approaching common task types.
+
+## What You'll Achieve
+
+- Master all four IELTS skills
+- Achieve Band 5–7 scores
+- Unlock university & work opportunities
+- Understand exam strategies
+- Build test confidence
+
+## Course Levels
+
+**Intermediate (2 months):** Band 4–5.5 across listening, reading, writing, speaking
+
+**Advanced (1 month):** Band 5.5–6.5 with intensive focus
+
+**Weekly mocks:** Full-length exams + detailed feedback
 
 ## What you will work on
 

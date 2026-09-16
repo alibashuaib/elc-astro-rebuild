@@ -1,11 +1,13 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import FaqAccordion from '../../../components/FaqAccordion.astro';
 import RegistrationForm from '../../../components/placement-test/RegistrationForm.astro';
 import TestRunner from '../../../components/placement-test/TestRunner.astro';
 import ResultBooking from '../../../components/placement-test/ResultBooking.astro';
 import { useTranslations, type Locale } from '../../../i18n/ui';
-import { breadcrumbSchema } from '../../../lib/schema';
+import { breadcrumbSchema, faqPageSchema } from '../../../lib/schema';
 import { localePaths, meta, trail } from '../../../i18n/pages';
+import { getFaqsByPage } from '../../../i18n/faqs';
 
 export const getStaticPaths = localePaths;
 
@@ -15,6 +17,12 @@ const { title, description } = meta('placementTest', locale);
 
 // Real center WhatsApp number, same as WhatsAppButton.astro's live wa.me link.
 const WHATSAPP_NUMBER = '966546656000';
+
+// FAQs for placement test page
+const faqs = getFaqsByPage('placementTest', locale);
+const faqSchema = faqs.length > 0 ? faqPageSchema(faqs) : null;
+
+const breadcrumbSchema_ = breadcrumbSchema(trail(locale, ['placementTest']));
 ---
 
 <Layout
@@ -22,7 +30,7 @@ const WHATSAPP_NUMBER = '966546656000';
   path="/placement-test"
   title={title}
   description={description}
-  jsonLd={breadcrumbSchema(trail(locale, ['placementTest']))}
+  jsonLd={[breadcrumbSchema_, ...(faqSchema ? [faqSchema] : [])]}
 >
   <header class="test-hero">
     <div class="container test-hero-inner">
@@ -50,6 +58,7 @@ const WHATSAPP_NUMBER = '966546656000';
       <TestRunner t={t} />
       <ResultBooking t={t} locale={locale} whatsappNumber={WHATSAPP_NUMBER} />
     </div>
+    <FaqAccordion faqs={faqs} title={t('nav.faq') || 'Frequently Asked Questions'} />
   </main>
 </Layout>
 
