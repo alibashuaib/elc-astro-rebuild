@@ -4,6 +4,7 @@ summary: Focused English programs scheduled for specific learner groups, goals, 
 category: adults
 datePublished: "2024-01-12"
 dateModified: "2026-09-16"
+image: /images/courses/special-courses.jpg
 imageAlt: A focused small-group English session at ELC
 faqs:
   - question: Which special courses are currently available?
@@ -41,5 +42,3 @@ Programs vary by demand and may include:
 - Flexible scheduling outside standard course times
 - Real-world application and practice
 - Progress tracking and feedback
-
-Because topics and schedules change, contact ELC for the current course list, dates, entry requirements, and pricing.

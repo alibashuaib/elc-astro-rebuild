@@ -3,22 +3,25 @@ title: Pre-University Prep (PUP)
 summary: An intensive CEFR-aligned English program for learners aged 16+, especially high school graduates preparing for university, training, or work.
 category: exam-prep
 datePublished: "2024-01-12"
-dateModified: "2026-09-16"
-price: 4700
+dateModified: "2026-09-21"
+image: /images/courses/university-exam-prep.jpg
+imageAlt: High school graduate preparing for university placement exams
+price: 3000
 currency: SAR
-hoursPerDay: 2.5
-hoursPerLevel: "220"
+durationWeeks: 8
+durationUnit: per level
+hoursPerDay: 2
+hoursPerLevel: "80"
 classTimes:
   - label: Morning class
     start: "10:00"
-    end: "12:30"
+    end: "12:00"
     meridiem: AM
-imageAlt: Students preparing for an English proficiency exam at ELC
 faqs:
   - question: Who is PUP for?
     answer: The program is designed for learners aged 16 and above, especially high school graduates preparing for university, training programs, or future employment.
   - question: How intensive is the program?
-    answer: PUP includes up to 220 hours of practical English learning. Admissions can confirm the current timetable and intake dates.
+    answer: Each PUP level runs for 8 weeks and includes 80 hours of practical English learning. Admissions can confirm the current timetable and intake dates.
   - question: Which skills are covered?
     answer: The program develops speaking, listening, reading, and writing, with intensive conversation practice, pronunciation work, and activities for academic and workplace situations.
   - question: Is extra learning support available?
@@ -42,7 +45,7 @@ The CEFR-aligned program combines the four main English skills with intensive co
 
 ## Program at a Glance
 
-- Up to 220 hours of practical English learning
+- 8 weeks and 80 hours of practical English learning per level
 - Speaking, listening, reading, and writing development
 - Conversation for everyday, social, academic, and workplace situations
 - Enriching activities, including educational trips and visits when scheduled
@@ -59,5 +62,3 @@ The CEFR-aligned program combines the four main English skills with intensive co
 - Critical thinking in English
 - Cross-cultural communication
 - Independent learning strategies
-
-Contact ELC for the current schedule and admission requirements.

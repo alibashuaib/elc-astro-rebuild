@@ -3,7 +3,8 @@ title: Business English
 summary: Tailored workplace English built around real professional scenarios, from email and reports to meetings and presentations.
 category: business
 datePublished: "2024-01-12"
-dateModified: "2026-09-16"
+dateModified: "2026-09-21"
+image: /images/courses/business-english.jpg
 imageAlt: Professionals in a business English workshop at ELC
 faqs:
   - question: How is the program designed?
@@ -17,7 +18,7 @@ draft: false
 
 Business English helps individuals and teams communicate more professionally in the workplace. Programs are tailored through a needs assessment and use practical scenarios, expert instruction, and real-world resources.
 
-## What You'll Achieve
+## What You'll Learn
 
 - Write clear, professional emails and formal reports
 - Lead and participate effectively in business meetings
@@ -27,7 +28,7 @@ Business English helps individuals and teams communicate more professionally in 
 - Build cross-cultural business communication skills
 - Increase workplace confidence and credibility
 
-## Program Approach
+### Program Approach
 
 - Needs assessment and business-language placement
 - A practical curriculum aligned with participant and organization goals
@@ -36,7 +37,7 @@ Business English helps individuals and teams communicate more professionally in 
 - Hands-on delivery with expert instructors
 - A final progress report with strengths and development priorities
 
-## Key Focus Areas
+### Key Focus Areas
 
 **Written Communication** – Emails, reports, proposals, business correspondence
 
@@ -48,7 +49,7 @@ Business English helps individuals and teams communicate more professionally in 
 
 **Leadership Communication** – Delegation, feedback, and team communication
 
-## What You'll Work On
+### What You'll Work On
 
 - Practical email and report writing for your workplace
 - Participation and leadership in meetings
@@ -58,4 +59,37 @@ Business English helps individuals and teams communicate more professionally in 
 - Managing difficult conversations professionally
 - Industry-specific language and scenarios
 
-Contact ELC for a tailored proposal, schedule, and pricing.
+## How We Tailor the Program
+
+Every organization is unique. ELC begins with a detailed needs assessment to understand your roles, industry, common scenarios, and language challenges. Then we design a customized curriculum and select materials that match your workplace context. This ensures training is relevant from day one.
+
+### Common Customizations
+- **By industry** — healthcare, finance, technology, hospitality, human resources
+- **By role** — management, customer-facing, technical/specialized, sales
+- **By scenario** — presentations, negotiations, customer service, email/documentation
+
+## Our Instructors
+
+ELC's Business English instructors are TEFL/CELTA certified and bring real professional experience. Many have worked in business themselves and understand workplace communication challenges. They deliver engaging, practical training that participants can apply immediately.
+
+## Delivery Options
+
+- **In-company training** — at your office or preferred location
+- **Group classes** — mixed professional participants, evening or weekend scheduling
+- **One-on-one coaching** — personalized for individual goals and schedules
+- **Workshops** — intensive half-day or full-day sessions on specific skills (presentations, negotiations, etc.)
+
+## Sample Timeline
+
+1. **Needs assessment** — interview with key stakeholders
+2. **Program design** — tailored curriculum and materials
+3. **Training delivery** — typically 8–12 weeks for in-company groups
+4. **Progress report** — summary of participant growth and recommendations
+
+## Who Should Enroll
+
+- Job seekers aiming to advance professionally
+- Professionals working in international environments
+- Teams needing to communicate confidently across cultures
+- Individuals preparing for career transitions
+- Anyone whose career advancement depends on professional English

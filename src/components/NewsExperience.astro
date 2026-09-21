@@ -12,11 +12,11 @@ const { locale, posts } = Astro.props;
 const isArabic = locale === 'ar';
 const [featured, ...remaining] = posts;
 const copy = isArabic ? {
-  latest: 'أحدث قصة',
-  insight: 'رؤى تعليمية',
+  latest: 'أحدث مقال',
+  insight: 'نصائح للتعلّم',
   read: 'اقرأ المقال',
-  more: 'المزيد من الأخبار والرؤى',
-  empty: 'ستُنشر أخبار ومقالات جديدة قريبًا.',
+  more: 'المزيد من الأخبار والنصائح',
+  empty: 'لا توجد مقالات جديدة حاليًا.',
 } : {
   latest: 'Latest story',
   insight: 'Learning insight',
@@ -48,7 +48,7 @@ const postHref = (post: CollectionEntry<'blog'>) => localizePath(locale, `/blog/
         <div class="featured-visual" aria-hidden="true">
           <span class="visual-orbit orbit-one"></span>
           <span class="visual-orbit orbit-two"></span>
-          <span class="visual-glyph">{isArabic ? 'أب' : 'Aa'}</span>
+          <span class="visual-glyph">Aa</span>
           <span class="visual-card visual-card-top"><Icon name="chat" size={20} />{isArabic ? 'تعلّم' : 'Learn'}</span>
           <span class="visual-card visual-card-bottom"><Icon name="pathway" size={20} />{isArabic ? 'تقدّم' : 'Grow'}</span>
           <span class="visual-number numeric">01</span>

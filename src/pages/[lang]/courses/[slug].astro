@@ -25,9 +25,18 @@ const { slug } = Astro.params;
 const locale = Astro.params.lang as Locale;
 const { Content } = await render(course);
 const t = useTranslations(locale);
-const { title, summary, category, level, price, currency, durationWeeks, hoursPerWeek, hoursPerMonth, hoursPerLevel, hoursPerDay, scheduleDays, classTimes, faqs } = course.data;
+const { title, summary, category, level, price, priceUnit, currency, durationWeeks, durationUnit, hoursPerWeek, hoursPerMonth, hoursPerLevel, hoursPerDay, scheduleDays, classTimes, faqs, intakeSchedule } = course.data;
 const formattedPrice = price?.toLocaleString('en-US');
 const scheduleDaysIsNumeric = /^\d+$/.test(scheduleDays ?? '');
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const nextIntake = intakeSchedule?.find(({ startDate }) => startDate >= today);
+
+// Format intake dates
+const formatIntakeDate = (date: Date) => {
+  const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+  return date.toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US', opts);
+};
 
 const url = `${SITE}/${locale}/courses/${slug}`;
 
@@ -73,8 +82,8 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
     </header>
 
     <dl class:list={['stats', { numeric: locale !== 'ar' }]}>
-        {price !== undefined && <div class="price-stat"><dt>{t('courses.price')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{formattedPrice}</strong><span>{currency}</span></dd></div>}
-        {durationWeeks !== undefined && <div class="duration-stat"><dt>{t('courseDetail.duration')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{durationWeeks}</strong><span>{t('courses.weeks')}</span></dd></div>}
+        {price !== undefined && <div class="price-stat"><dt>{t('courses.price')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{formattedPrice}</strong><span>{currency}{priceUnit ? ` · ${priceUnit}` : ''}</span></dd></div>}
+        {durationWeeks !== undefined && <div class="duration-stat"><dt>{t('courseDetail.duration')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{durationWeeks}</strong><span>{t('courses.weeks')}{durationUnit ? ` · ${durationUnit}` : ''}</span></dd></div>}
         {hoursPerLevel ? (
           <div class="monthly-stat"><dt>{t('courseDetail.levelHours')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{hoursPerLevel}</strong><span>{t('courseDetail.hoursPerLevel')}</span></dd></div>
         ) : hoursPerMonth ? (
@@ -85,23 +94,62 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
         {hoursPerDay !== undefined && <div class="daily-stat"><dt>{t('courseDetail.dailyHours')}</dt><dd><strong class:list={[{ numeric: locale === 'ar' }]}>{hoursPerDay}</strong><span>{t('courseDetail.hoursPerDay')}</span></dd></div>}
         {scheduleDays && <div class="days-stat"><dt>{t('courseDetail.studyDays')}</dt><dd>{scheduleDaysIsNumeric ? <><strong class:list={[{ numeric: locale === 'ar' }]}>{scheduleDays}</strong><span>{t('courseDetail.daysPerWeek')}</span></> : <span class="days-text">{scheduleDays}</span>}</dd></div>}
     </dl>
-    {classTimes && classTimes.length > 0 && (
+    {((classTimes && classTimes.length > 0) || nextIntake) && (
       <section class="course-schedule" aria-labelledby="course-schedule-title">
-          <div class:list={['time-options', { single: classTimes.length === 1 }]}>
-            <div class="times-heading"><strong id="course-schedule-title">{t('courseDetail.classTimes')}</strong><span>{classTimes.length > 1 ? t('courseDetail.choosePeriod') : t('courseDetail.currentPeriod')}</span></div>
-            <div class="time-grid">
-              {classTimes.map((period) => (
-                <div class="time-card"><span class="time-icon"><Icon name="clock" size={20} /></span><span><small>{period.label}</small>
-                  {/* Arabic reads the range as "from X to Y" rather than an en-dash span, so the two locales lay the value out differently. */}
-                  {locale === 'ar' ? (
-                    <strong class="time-value" dir="rtl"><span>{t('courseDetail.from')}</span><bdi class="numeric" dir="ltr">{period.start}</bdi><span>{t('courseDetail.to')}</span><bdi class="numeric" dir="ltr">{period.end}</bdi><span>{period.meridiem}</span></strong>
-                  ) : (
-                    <strong class="time-value" dir="ltr"><bdi class="numeric" dir="ltr">{period.start}–{period.end}</bdi><span>{period.meridiem}</span></strong>
-                  )}
-                </span></div>
-              ))}
+          {classTimes && classTimes.length > 0 && (
+            <div class:list={['time-options', { single: classTimes.length === 1 }]}>
+              <div class="times-heading"><strong id="course-schedule-title">{t('courseDetail.classTimes')}</strong><span>{classTimes.length > 1 ? t('courseDetail.choosePeriod') : t('courseDetail.currentPeriod')}</span></div>
+              <div class="time-grid">
+                {classTimes.map((period) => (
+                  <div class="time-card"><span class="time-icon"><Icon name="clock" size={20} /></span><span><small>{period.label}</small>
+                    {/* Arabic reads the range as "from X to Y" rather than an en-dash span, so the two locales lay the value out differently. */}
+                    {locale === 'ar' ? (
+                      <strong class="time-value" dir="rtl"><span>{t('courseDetail.from')}</span><bdi class="numeric" dir="ltr">{period.start}</bdi><span>{t('courseDetail.to')}</span><bdi class="numeric" dir="ltr">{period.end}</bdi><span>{period.meridiem}</span></strong>
+                    ) : (
+                      <strong class="time-value" dir="ltr"><bdi class="numeric" dir="ltr">{period.start}–{period.end}</bdi><span>{period.meridiem}</span></strong>
+                    )}
+                  </span></div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+          {nextIntake && (
+            <div class="intake-schedule">
+              <strong class="schedule-title">{locale === 'ar' ? 'الدفعة القادمة' : 'Next available intake'}</strong>
+              <div class="intake-card">
+                <div class="intake-date-badge">{formatIntakeDate(nextIntake.startDate)}</div>
+                {nextIntake.times && nextIntake.times.length > 0 && (
+                  <div class="intake-times">
+                    {nextIntake.times.map((time) => (
+                      <span class="time-badge">{time}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {intakeSchedule && intakeSchedule.length > 1 && (
+                <div class="view-all-wrapper">
+                  <button class="view-all-btn" aria-expanded="false">
+                    {locale === 'ar' ? 'عرض جميع الدفعات' : 'View all intakes'}
+                    <Icon name="chevron-down" size={18} />
+                  </button>
+                  <div class="all-intakes-grid" hidden>
+                    {intakeSchedule.map((intake) => (
+                      <div class="intake-card">
+                        <div class="intake-date-badge">{formatIntakeDate(intake.startDate)}</div>
+                        {intake.times && intake.times.length > 0 && (
+                          <div class="intake-times">
+                            {intake.times.map((time) => (
+                              <span class="time-badge">{time}</span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         <p>{t('courseDetail.admissionsNote')}</p>
       </section>
     )}
@@ -114,6 +162,24 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
     <FaqAccordion faqs={faqs} title={t('courseDetail.faqs')} />
   </article>
 </Layout>
+
+<script>
+  // Handle "View all intakes" expand/collapse
+  document.querySelectorAll('.view-all-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+      const grid = btn.nextElementSibling;
+
+      if (isExpanded) {
+        btn.setAttribute('aria-expanded', 'false');
+        grid?.setAttribute('hidden', '');
+      } else {
+        btn.setAttribute('aria-expanded', 'true');
+        grid?.removeAttribute('hidden');
+      }
+    });
+  });
+</script>
 
 <style>
   .course-detail { --course-accent: var(--color-primary); --course-soft: var(--color-blue-soft); --course-bg-start: var(--color-bg-raised); --course-bg-end: var(--color-blue-soft); width: 100%; max-width: var(--max-width); padding-block: var(--space-6); }
@@ -203,5 +269,23 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
   .course-detail .time-value { display: flex; align-items: baseline; gap: .35rem; }
   .course-detail .time-value > span { font-family: var(--font-body); font-size: .72em; }
   .course-detail .course-schedule > p { margin: .85rem 0 0; color: var(--color-ink-muted); font-size: .75rem; }
-  @media (max-width: 620px) { .course-detail .time-grid { grid-template-columns: 1fr; } .course-detail .times-heading { align-items: flex-start; flex-direction: column; gap: .15rem; } }
+  .course-detail .intake-schedule { margin: 1.5rem 0 0; }
+  .course-detail .schedule-title { display: block; color: var(--color-navy); font-size: .75rem; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+  .course-detail .intake-card { display: flex; flex-direction: column; gap: .5rem; margin-top: .65rem; padding: 1rem; border: 1px solid color-mix(in srgb, var(--course-accent) 24%, var(--color-border)); border-radius: .9rem; background: color-mix(in srgb, var(--course-soft) 40%, var(--color-bg-raised)); transition: all var(--motion-fast) var(--ease); }
+  .course-detail .intake-card:hover { border-color: var(--course-accent); background: color-mix(in srgb, var(--course-soft) 60%, var(--color-bg-raised)); box-shadow: 0 4px 12px color-mix(in srgb, var(--course-accent) 12%, transparent); }
+  .course-detail .intake-date-badge { color: var(--course-accent); font-size: .9rem; font-weight: 750; }
+  .course-detail .intake-times { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .course-detail .time-badge { display: inline-block; padding: .3rem .6rem; border-radius: .5rem; background: var(--course-accent); color: #fff; font-size: .7rem; font-weight: 700; }
+  .course-detail .view-all-wrapper { margin-top: 1.25rem; }
+  .course-detail .view-all-btn { display: flex; width: 100%; align-items: center; justify-content: center; gap: .6rem; padding: .75rem 1rem; border: 1px solid color-mix(in srgb, var(--course-accent) 30%, var(--color-border)); border-radius: .8rem; color: var(--course-accent); background: color-mix(in srgb, var(--course-soft) 20%, transparent); cursor: pointer; font-size: .85rem; font-weight: 700; font-family: inherit; transition: all var(--motion-fast) var(--ease); }
+  .course-detail .view-all-btn:hover { border-color: var(--course-accent); background: color-mix(in srgb, var(--course-soft) 40%, transparent); }
+  .course-detail .view-all-btn :global(svg) { transition: transform var(--motion-fast) var(--ease); }
+  .course-detail .view-all-btn[aria-expanded="true"] :global(svg) { transform: rotate(180deg); }
+  .course-detail .all-intakes-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .65rem; margin-top: 1rem; max-height: 0; overflow: hidden; transition: max-height var(--motion-base) var(--ease); }
+  .course-detail .view-all-btn[aria-expanded="true"] ~ .all-intakes-grid { max-height: 1500px; }
+  .course-detail h2 { margin-top: var(--space-6); margin-bottom: var(--space-3); padding-top: var(--space-4); border-top: 2px solid var(--course-accent); color: var(--color-navy); font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 850; }
+  .course-detail h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+  .course-detail h3 { margin-top: var(--space-3); margin-bottom: var(--space-2); color: var(--color-navy); font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 750; }
+  @media (max-width: 620px) { .course-detail .time-grid { grid-template-columns: 1fr; } .course-detail .times-heading { align-items: flex-start; flex-direction: column; gap: .15rem; } .course-detail .all-intakes-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .course-detail .all-intakes-grid { grid-template-columns: 1fr; } }
 </style>

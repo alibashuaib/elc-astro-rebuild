@@ -4,6 +4,7 @@ summary: Focused preparation for Saudi Arabia's Standardized Test of English Pro
 category: exam-prep
 datePublished: "2024-01-12"
 dateModified: "2026-09-16"
+image: /images/courses/step-exam-preparation.jpg
 imageAlt: Learner preparing for the STEP English proficiency exam at ELC
 faqs:
   - question: Who is this course for?
@@ -25,7 +26,7 @@ Prepare for STEP with a structured plan built around English proficiency, questi
 - Build regional and international credibility
 - Prepare for university and professional advancement
 
-## Course Progression
+## Course Diagram
 
 **Band 2–3 (8 weeks)** – Foundation to intermediate STEP level
 
@@ -42,5 +43,3 @@ Prepare for STEP with a structured plan built around English proficiency, questi
 - Reviewing errors and strengthening weaker areas
 - Full-length mock exams and band prediction
 - Vocabulary and grammar for academic/professional contexts
-
-Contact ELC for current schedules, pricing, and placement guidance.
