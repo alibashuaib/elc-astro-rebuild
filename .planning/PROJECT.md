@@ -2,7 +2,7 @@
 
 ## What This Is
 
-The bilingual (Arabic/English) Astro rebuild of the English Learning Center (ELC) Jeddah website, plus two Cloudflare Workers: the placement-test/bookings API (D1) and the CMS OAuth worker. This project takes the existing build from "mostly there" to hardened and feature-complete: fix the security and reliability concerns found in the codebase map, and finish the half-built features (placement test, student application, registration wizard, CMS editing, mobile polish, design-review fixes). Going live is a later, separate milestone.
+The bilingual (Arabic/English) Astro rebuild of the English Learning Center (ELC) Jeddah website, plus two Cloudflare Workers: the placement-test/bookings API (D1) and the CMS OAuth worker. This project takes the existing build from "mostly there" to hardened and feature-complete: fix the security and reliability concerns found in the codebase map, and finish the half-built features (placement test, student application, registration wizard, CMS editing, mobile polish, design-review fixes). Everything is built and tested locally first; uploading to the domain is the final phase.
 
 ## Core Value
 
@@ -47,10 +47,12 @@ Applicant data and the admin side are safe: no stored XSS, no brute-forceable or
 - [ ] Mobile polish: current uncommitted tweaks (course `h3`, WhatsApp FAB, course title) landed; every page checked at phone width in AR + EN
 - [ ] Full UI design review run (AR + EN, mobile + desktop) and its findings fixed
 
+**Deployment (last step)**
+- [ ] After everything passes locally: remote D1 migrated, workers deployed, site uploaded to the domain, live smoke check passes (incl. Safari admin login)
+
 ### Out of Scope
 
-- Go-live / WordPress cutover, production deploy pipeline, redirects — separate later milestone
-- Turning the weekly review rebuild / push-triggered deploys back on — tied to go-live
+- Turning the weekly review rebuild / push-triggered deploys back on — manual upload is enough for now
 - New marketing features or content beyond the specs above — not part of harden & finish
 
 ## Context
@@ -68,12 +70,16 @@ Applicant data and the admin side are safe: no stored XSS, no brute-forceable or
 - **Bilingual**: Every UI change must work in Arabic (RTL) and English — ELC serves both audiences
 - **Hosting**: Static site + Cloudflare Workers/D1 — keep the existing platform, no new backend
 - **Admin data**: Applicant data includes personal IDs — security fixes come before feature work on admin screens
+- **Workflow**: Build and verify everything locally (`astro dev`/`preview` + `wrangler dev --local` D1) first; only then upload to the domain. "Done" for each phase = passes locally. Production-only checks (Safari cross-site admin cookie, Workers plan CPU limit for bcrypt, remote D1 migration) belong to the final Deployment phase.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Harden + finish now; go-live later | Ship a safe, complete build before cutover risk | — Pending |
+| Build and test locally; deploy as the final phase | Owner's workflow: verify locally, then upload | — Pending |
+| Applicant deletion = manual delete button in admin | Owner choice for PDPL; auto-retention deferred | — Pending |
+| Arabic pages use Gregorian dates only | Owner choice | — Pending |
+| Admin extras (CSV, notes, WhatsApp link…) deferred to v2 | Owner: "will come to it later" | — Pending |
 | Run a fresh design review as a phase | No prior review findings exist | — Pending |
 | Student application + registration wizard are unfinished | Per user; finish against existing specs | — Pending |
 | "Done" = concerns fixed, tests green in CI, phone-width correct AR+EN | User-defined exit criteria | — Pending |
