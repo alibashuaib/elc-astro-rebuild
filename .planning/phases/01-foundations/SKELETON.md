@@ -9,6 +9,8 @@ This is a brownfield project: the site, both Workers and the D1 schema (21 migra
 
 A student opens the freshly built bilingual site, takes the placement test, books a slot that the test harness created 30 days ahead, and submits an application, all against the local placement-test Worker and its local D1, proven by one command: `npm run test:all`.
 
+Built by: 01-01 (tracer: the one command, smoke on its own slot, LF + ignores), 01-02 (worker tests on real local D1, exact worker pins), 01-03 (mobile tweaks committed, exact root pins, `check:pins` first in `test:all` and CI), 01-04 (malformed JSON is a 400 everywhere).
+
 ## Architectural Decisions
 
 | Decision | Choice | Rationale |

@@ -461,15 +461,19 @@ Root scripts to add:
 | A4 | Programmatic `build()` from `astro` would also work; the research uses the CLI build via `execFileSync` instead, which was tested | Pattern 3 | None (CLI path is the verified one) |
 | A5 | CI (Ubuntu, Node 22) behaves like the local run for `preview()`, plugin and webServer | Pattern 3 | Medium: first CI run is the check; plugin and wrangler are cross-platform, `preview()` is plain Node |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Delete `scripts/local-dev.ts` + `dev:fallback` in Phase 1?**
    - Known: already broken (wrong arity, missing 0016, `vite` not installed); the branch edits it by one line.
    - Recommendation: delete it now; accept a one-file modify/delete resolution in Phase 3. If the user wants zero Phase 3 friction, leave the files and keep `better-sqlite3`. Planner should pick the delete.
+   - **RESOLVED (user decision UD-01):** deleted in Phase 1, together with the unused `scripts/vite.local.config.ts` and the `dev:fallback` script (plan 01-02 Task 2). The Phase 3 merge resolves the modify/delete conflict by keeping the deletion; the note is in that commit's body.
 2. **Pin astro/sitemap to lock versions (7.2.4 / 3.7.3) or bump to current?**
    - Recommendation: lock versions now. Dependabot already has open PRs (`astro-7.2.8`) for later.
+   - **RESOLVED (user decision UD-02, locked):** pinned to the lockfile versions astro 7.2.4 and @astrojs/sitemap 3.7.3, with @playwright/test 1.64.1 (plan 01-03 Task 2). Bumps are out of scope for Phase 1.
 3. **First CI run of the new smoke job is untested on Ubuntu.** Plan a task that watches the first PR run; fallback if `preview()` misbehaves there is none needed on Linux (the `webServer` with `astro preview` works on Linux), but keep the Windows-safe path as default.
+   - **RESOLVED (accepted risk + post-push check):** nothing is pushed during the phase, so the executor cannot observe the run. Recorded as accepted risk T-01-11 in plan 01-03; the user's next push triggers the end-of-phase human check in 01-03 Task 2 (all three CI jobs green). The Windows-safe in-process `preview()` stays the default.
 4. **Playwright projects (mobile Chromium/WebKit, AR/EN)** belong to Phase 7 (MOB-02); do not add them now. Keep the config extensible only by not hard-coding a single project name.
+   - **RESOLVED (deferred to Phase 7, MOB-02):** no `projects` key is added in Phase 1; plan 01-01's acceptance criteria assert its absence.
 
 ## Environment Availability
 

@@ -38,12 +38,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Sending a malformed JSON body to any worker endpoint returns 400 with a JSON error, never 500.
   4. One command runs worker tests plus Playwright smoke green locally, and the smoke tests pass with no 2027-01-01 slot in the database because they create their own future slot.
   5. `git status` shows no CRLF-only changes and no `preview.log`/`preview.pid`/`.dev.vars`, and the pending mobile tweaks (course `h3`, WhatsApp button, course title) are committed.
-**Plans:** 3 plans
+**Plans:** 4 plans
 
 Plans:
 - [ ] 01-01-PLAN.md — Tracer: `npm run test:all` (worker tests + Playwright smoke on its own +30-day slot, CI on the same path), LF `.gitattributes` + ignores, one blocking checkpoint (install versions + mobile files final)
-- [ ] 01-02-PLAN.md — Commit the mobile tweaks as-is; exact pins + `save-exact` in root and worker; worker tests on real local D1 via `@cloudflare/vitest-plugin`; `check:pins` in `test:all` and CI
-- [ ] 01-03-PLAN.md — TDD: shared `readJson()` so malformed JSON is a 400 on all 9 body-reading routes
+- [ ] 01-02-PLAN.md — Worker tests on real local D1 via `@cloudflare/vitest-plugin` with exact worker pins; dead local fallback removed
+- [ ] 01-03-PLAN.md — Commit the mobile tweaks exactly as approved; exact root pins + `save-exact`; `check:pins` in `test:all` and CI
+- [ ] 01-04-PLAN.md — TDD: shared `readJson()` so malformed JSON is a 400 on all 9 body-reading routes
 
 ### Phase 2: Design Review
 **Goal**: The owner has a written, prioritised list of what looks or works wrong across the site, so later phases fix the right things while they are touching those screens.
@@ -148,7 +149,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundations | 0/3 | Planned | - |
+| 1. Foundations | 0/4 | Planned | - |
 | 2. Design Review | 0/TBD | Not started | - |
 | 3. Registration Wizard & Application | 0/TBD | Not started | - |
 | 4. Secure Admin | 0/TBD | Not started | - |
