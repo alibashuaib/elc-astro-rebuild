@@ -118,12 +118,63 @@ All requirements except Deployment are verified **locally** (`astro dev`/`previe
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (filled by roadmap) | | |
+| FND-01 | Phase 1 | Pending |
+| FND-02 | Phase 1 | Pending |
+| FND-03 | Phase 1 | Pending |
+| FND-04 | Phase 1 | Pending |
+| FND-05 | Phase 1 | Pending |
+| FND-06 | Phase 1 | Pending |
+| WIZ-01 | Phase 3 | Pending |
+| WIZ-02 | Phase 3 | Pending |
+| WIZ-03 | Phase 3 | Pending |
+| WIZ-04 | Phase 3 | Pending |
+| WIZ-05 | Phase 3 | Pending |
+| WIZ-06 | Phase 3 | Pending |
+| AUTH-01 | Phase 4 | Pending |
+| AUTH-02 | Phase 4 | Pending |
+| AUTH-03 | Phase 4 | Pending |
+| AUTH-04 | Phase 4 | Pending |
+| AUTH-05 | Phase 4 | Pending |
+| AUTH-06 | Phase 4 | Pending |
+| AUTH-07 | Phase 4 | Pending |
+| AUTH-08 | Phase 6 | Pending |
+| ADM-01 | Phase 4 | Pending |
+| ADM-02 | Phase 4 | Pending |
+| ADM-03 | Phase 4 | Pending |
+| ADM-04 | Phase 4 | Pending |
+| ADM-05 | Phase 6 | Pending |
+| ADM-06 | Phase 6 | Pending |
+| ADM-07 | Phase 6 | Pending |
+| ADM-08 | Phase 6 | Pending |
+| ADM-09 | Phase 6 | Pending |
+| PT-01 | Phase 6 | Pending |
+| PT-02 | Phase 6 | Pending |
+| PT-03 | Phase 6 | Pending |
+| CMS-01 | Phase 5 | Pending |
+| CMS-02 | Phase 5 | Pending |
+| CMS-03 | Phase 5 | Pending |
+| CMS-04 | Phase 5 | Pending |
+| CMS-05 | Phase 5 | Pending |
+| CMS-06 | Phase 5 | Pending |
+| CMS-07 | Phase 5 | Pending |
+| MOB-01 | Phase 1 | Pending |
+| MOB-02 | Phase 7 | Pending |
+| MOB-03 | Phase 7 | Pending |
+| MOB-04 | Phase 7 | Pending |
+| MOB-05 | Phase 7 | Pending |
+| DSGN-01 | Phase 2 | Pending |
+| DSGN-02 | Phase 7 | Pending |
+| DEP-01 | Phase 8 | Pending |
+| DEP-02 | Phase 8 | Pending |
+| DEP-03 | Phase 8 | Pending |
+| DEP-04 | Phase 8 | Pending |
+| DEP-05 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 51 total
-- Mapped to phases: 0 (pending roadmap)
+- Mapped to phases: 51
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-11-04*
-*Last updated: 2026-11-04 after initial definition*
+*Last updated: 2026-11-04 after roadmap adjustment (design review moved to Phase 2; 8 phases)*
