@@ -1,5 +1,5 @@
 ---
-status: partial
+status: complete
 phase: 01-foundations
 source: [01-VERIFICATION.md]
 started: 2026-11-05T00:00:00Z
@@ -18,14 +18,15 @@ result: pass — PR #37 run 42047460636 (2026-11-05): build-and-audit, placement
 
 ### 2. Before any hand upload of dist/ (Phase 8), rebuild with the production PUBLIC_PLACEMENT_API_URL
 expected: dist/ does not contain http://localhost:8787 (review WR-01: the smoke global-setup builds dist/ against localhost)
-result: [pending]
+result: deferred — check at Phase 8 upload time. Rebuild dist/ with the production PUBLIC_PLACEMENT_API_URL before any hand upload; grep dist/ for localhost:8787 first. Tracks WR-01 in 01-REVIEW-DISPOSITION.md.
 
 ## Summary
 
 total: 2
 passed: 1
 issues: 0
-pending: 1
+pending: 0
+deferred: 1
 skipped: 0
 blocked: 0
 
