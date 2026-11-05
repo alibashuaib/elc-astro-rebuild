@@ -1,4 +1,5 @@
 import type { Env } from '../types';
+import { readJson } from '../http';
 import { listOpenSlots, bookSlotAtomic } from '../db';
 
 function json(data: unknown, status = 200): Response {
@@ -11,7 +12,7 @@ export async function handleListSlots(_req: Request, env: Env): Promise<Response
 }
 
 export async function handleCreateBooking(req: Request, env: Env): Promise<Response> {
-  const body = await req.json<{ sessionId: string; slotId: string }>();
+  const body = await readJson<{ sessionId: string; slotId: string }>(req);
   if (!body.sessionId || !body.slotId) return json({ error: 'sessionId and slotId are required' }, 400);
   const bookingId = await bookSlotAtomic(env, body.slotId, body.sessionId);
   if (!bookingId) return json({ error: 'slot_full' }, 409);

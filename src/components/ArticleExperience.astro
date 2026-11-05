@@ -20,10 +20,10 @@ const formattedDate = publishDate.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US
   <header class="article-header">
     <span class="article-orb orb-one" aria-hidden="true"></span>
     <span class="article-orb orb-two" aria-hidden="true"></span>
-    <div class="article-meta"><span>{isArabic ? 'رؤى معهد صرح المعرفة' : 'ELC insights'}</span><time class:list={[{ numeric: !isArabic }]} datetime={publishDate.toISOString()}>{formattedDate}</time></div>
+    <div class="article-meta"><span>{isArabic ? 'نصائح معهد صرح المعرفة' : 'ELC insights'}</span><time class:list={[{ numeric: !isArabic }]} datetime={publishDate.toISOString()}>{formattedDate}</time></div>
     <h1>{title}</h1>
     <p>{summary}</p>
-    <span class="article-mark" aria-hidden="true">{isArabic ? 'أب' : 'Aa'}</span>
+      <span class="article-mark" aria-hidden="true">Aa</span>
   </header>
   <div class="article-body prose"><slot /></div>
   <footer class="article-footer"><a href={`/${locale}/blog`}><span aria-hidden="true">←</span>{isArabic ? 'العودة إلى الأخبار' : 'Back to news'}</a></footer>

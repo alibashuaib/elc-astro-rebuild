@@ -1,4 +1,5 @@
 import type { Env, StudentInput } from '../types';
+import { readJson } from '../http';
 import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countSessionQuestions, countBandCorrect, countBandAnswered, listAnsweredQuestionIds, setCurrentQuestion, getQuestion } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 import { ADULT_BANDS, BELOW_FIRST_BAND, bandForSequence, isLastBand, evaluateBand, placementLevel, canStillPass, previousBand } from '../bands';
@@ -102,7 +103,7 @@ async function nextQuestionPayload(env: Env, sessionId: string, track: string, l
 }
 
 export async function handleStartSession(req: Request, env: Env): Promise<Response> {
-  const body = await req.json<StudentInput>();
+  const body = await readJson<StudentInput>(req);
   if (!body.name || !body.phone || !body.dob || !body.locale) {
     return json({ error: 'name, phone, dob, and locale are required' }, 400);
   }
@@ -125,7 +126,7 @@ export async function handleAnswer(req: Request, env: Env, sessionId: string): P
   if (!session || session.status !== 'in_progress') {
     return json({ error: 'session not found or already completed' }, 404);
   }
-  const body = await req.json<{ questionId: string; selectedIndex?: number; answerText?: string; skip?: boolean }>();
+  const body = await readJson<{ questionId: string; selectedIndex?: number; answerText?: string; skip?: boolean }>(req);
 
   // Grade only the question this session is actually on. Without this check the
   // handler graded whatever `questionId` the client sent, so a student could

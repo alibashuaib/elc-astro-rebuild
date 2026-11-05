@@ -2,21 +2,26 @@
 title: Pre-University Prep (PUP)
 summary: An intensive CEFR-aligned English program for learners aged 16+, especially high school graduates preparing for university, training, or work.
 category: exam-prep
-price: 4700
+datePublished: "2024-01-12"
+dateModified: "2026-09-21"
+image: /images/courses/university-exam-prep.jpg
+imageAlt: High school graduate preparing for university placement exams
+price: 3000
 currency: SAR
-hoursPerDay: 2.5
-hoursPerLevel: "220"
+durationWeeks: 8
+durationUnit: per level
+hoursPerDay: 2
+hoursPerLevel: "80"
 classTimes:
   - label: Morning class
     start: "10:00"
-    end: "12:30"
+    end: "12:00"
     meridiem: AM
-imageAlt: Students preparing for an English proficiency exam at ELC
 faqs:
   - question: Who is PUP for?
     answer: The program is designed for learners aged 16 and above, especially high school graduates preparing for university, training programs, or future employment.
   - question: How intensive is the program?
-    answer: PUP includes up to 220 hours of practical English learning. Admissions can confirm the current timetable and intake dates.
+    answer: Each PUP level runs for 8 weeks and includes 80 hours of practical English learning. Admissions can confirm the current timetable and intake dates.
   - question: Which skills are covered?
     answer: The program develops speaking, listening, reading, and writing, with intensive conversation practice, pronunciation work, and activities for academic and workplace situations.
   - question: Is extra learning support available?
@@ -28,13 +33,32 @@ Pre-University Prep (PUP) is an intensive English pathway for high school gradua
 
 The CEFR-aligned program combines the four main English skills with intensive conversation practice, reading and writing development, correct pronunciation, learning technology, and activities that encourage English use beyond the classroom.
 
-## Program at a glance
+## What You'll Achieve
 
-- Up to 220 hours of practical English learning
-- Speaking, listening, reading, and writing
-- Conversation for everyday, social, and workplace situations
+- Reach intermediate to advanced English proficiency
+- Develop academic English for university studies
+- Master professional communication for the workplace
+- Build confidence in speaking and writing
+- Prepare for higher education or employment
+- Gain internationally recognized language skills
+- Understand academic and professional English contexts
+
+## Program at a Glance
+
+- 8 weeks and 80 hours of practical English learning per level
+- Speaking, listening, reading, and writing development
+- Conversation for everyday, social, academic, and workplace situations
 - Enriching activities, including educational trips and visits when scheduled
 - Additional instructor support when needed
 - Modern learning technology and interactive resources
 
-Contact ELC for the current schedule and admission requirements.
+## What You'll Work On
+
+- Academic reading and writing for university-level work
+- Presentation and research skills
+- Professional communication and workplace English
+- Pronunciation and fluency development
+- Listening comprehension from varied sources
+- Critical thinking in English
+- Cross-cultural communication
+- Independent learning strategies

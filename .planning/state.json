@@ -1,0 +1,53 @@
+{
+  "contract": "1.0.0",
+  "flavor": "core",
+  "milestone": "v1.0 — Harden & Finish",
+  "phases": [
+    {
+      "number": "1",
+      "name": "Foundations",
+      "status": "in_progress"
+    },
+    {
+      "number": "2",
+      "name": "Design Review",
+      "status": "pending"
+    },
+    {
+      "number": "3",
+      "name": "Registration Wizard & Application",
+      "status": "pending"
+    },
+    {
+      "number": "4",
+      "name": "Secure Admin",
+      "status": "pending"
+    },
+    {
+      "number": "5",
+      "name": "CMS Hardening & Editing",
+      "status": "pending"
+    },
+    {
+      "number": "6",
+      "name": "Placement Test End to End & Admin Tools",
+      "status": "pending"
+    },
+    {
+      "number": "7",
+      "name": "Mobile, RTL & Design Fixes",
+      "status": "pending"
+    },
+    {
+      "number": "8",
+      "name": "Deployment",
+      "status": "pending"
+    }
+  ],
+  "next": {
+    "command": "/gsd-progress --next",
+    "label": "Advance to the next step (verify)",
+    "reason": "Phase 1 of 8 · ready to verify"
+  },
+  "updated_at": "2026-11-05T13:36:26.583Z"
+}

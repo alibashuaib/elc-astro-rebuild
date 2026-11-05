@@ -17,6 +17,7 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm run check:pins
       - run: npm run build
         env:
           # Optional — build succeeds without them (fetchGoogleReviews returns null
@@ -76,38 +77,8 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix placement-test-worker
 
-      - name: Create the local D1 database
-        run: npm run db:migrate:local --prefix placement-test-worker
-
-      - name: Seed a bookable slot for the smoke tests
-        # listOpenSlots (src/db.ts) requires starts_at in the future and
-        # booked_count < capacity -- migrations don't seed any slot rows, so
-        # application.spec.ts's booking step has nothing to click without this.
-        run: npx wrangler d1 execute placement-test --local --command "INSERT INTO slots (id, starts_at, capacity, booked_count) VALUES ('e2e-smoke-slot', '2027-01-01T10:00:00.000Z', 5, 0)"
-        working-directory: placement-test-worker
-
-      - name: Start the Worker
-        run: |
-          npm run dev --prefix placement-test-worker > /tmp/wrangler.log 2>&1 &
-          timeout 90 bash -c 'until curl -sf -o /dev/null http://localhost:8787/api/slots; do sleep 2; done'
-
-      - name: Build and serve the site
-        run: |
-          npx astro build
-          npx astro preview --port 4322 > /tmp/preview.log 2>&1 &
-          timeout 90 bash -c 'until curl -sf -o /dev/null http://localhost:4322/en/placement-test/; do sleep 2; done'
-        env:
-          # Must match the Worker started above, not the deployed origin.
-          PUBLIC_PLACEMENT_API_URL: http://localhost:8787
-
       - run: npx playwright install --with-deps chromium
       - run: npm run smoke
-        env:
-          SMOKE_BASE_URL: http://localhost:4322
-
-      - name: Worker log on failure
-        if: failure()
-        run: tail -50 /tmp/wrangler.log /tmp/preview.log || true
 
       - uses: actions/upload-artifact@v4
         if: failure()

@@ -2,16 +2,17 @@
 title: STEP Exam Preparation
 summary: Focused preparation for Saudi Arabia's Standardized Test of English Proficiency, with guided language review, test strategy, and timed practice.
 category: exam-prep
+datePublished: "2024-01-12"
+dateModified: "2026-09-16"
+image: /images/courses/step-exam-preparation.jpg
 imageAlt: Learner preparing for the STEP English proficiency exam at ELC
 faqs:
-  - question: What's the difference between STEP and IELTS?
-    answer: STEP is region-specific & focuses on academic/professional English. IELTS is globally recognized. Both use the same CEFR framework.
-  - question: Can I go from Band 3 to Band 5 in 2 months?
-    answer: Typical progression is 1–1.5 bands per 3 months. Band 3 to Band 5 in 2 months requires 3–4 hours/week of additional self-study.
-  - question: Do you offer weekend classes?
-    answer: Yes. Weekend intensives available. Check with ELC for current Saturday/Sunday schedule.
-  - question: Is STEP recognized outside Saudi Arabia?
-    answer: Yes. STEP aligns with CEFR levels. International universities recognize STEP B2–C1 equivalent to IELTS Band 5.5–7.
+  - question: Who is this course for?
+    answer: It is designed for learners preparing to take STEP for an academic, training, or professional requirement in Saudi Arabia.
+  - question: Does the course guarantee a target score?
+    answer: No result can be guaranteed. Preparation focuses on stronger language skills, familiarity with test-style questions, time management, and focused practice.
+  - question: How is my preparation plan selected?
+    answer: Your current level and target help the team identify the most useful starting point and areas for focused practice.
 draft: false
 ---
 
@@ -19,26 +20,26 @@ Prepare for STEP with a structured plan built around English proficiency, questi
 
 ## What You'll Achieve
 
-- Master STEP exam formats
-- Reach Band 3–5 proficiency
-- Communicate academically & professionally
-- Build regional & international credibility
-- Prepare for university & work
+- Master STEP exam formats and question types
+- Reach Band 3–5 proficiency levels
+- Communicate academically and professionally
+- Build regional and international credibility
+- Prepare for university and professional advancement
 
-## Course Levels
+## Course Diagram
 
-**Band 2–3 (8 weeks):** Foundation to intermediate
+**Band 2–3 (8 weeks)** – Foundation to intermediate STEP level
 
-**Band 3–4 (8 weeks):** Intermediate to upper-intermediate
+**Band 3–4 (8 weeks)** – Intermediate to upper-intermediate STEP level
 
-**Band 4–5 (8 weeks):** Upper-intermediate to advanced
+**Band 4–5 (8 weeks)** – Upper-intermediate to advanced STEP level
 
-## What you will work on
+## What You'll Work On
 
 - Reading comprehension and efficient question handling
-- English language structure and usage
-- Listening comprehension practice
+- English language structure and usage in STEP format
+- Listening comprehension practice with STEP-style audio
 - Timed practice and test-taking strategy
 - Reviewing errors and strengthening weaker areas
-
-Contact ELC for current schedules, pricing, and placement guidance.
+- Full-length mock exams and band prediction
+- Vocabulary and grammar for academic/professional contexts

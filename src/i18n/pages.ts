@@ -37,122 +37,130 @@ export const heroKicker: Record<Locale, string | undefined> = {
 export const pageMeta = {
   home: {
     en: {
-      title: 'English Courses in Jeddah | Kids, Adults, IELTS | 15,000+ Learners | ELC',
-      description: '✓ Accredited English courses ✓ Certified instructors ✓ Free placement test ✓ A1-C2 levels ✓ SAR 1,500+ ✓ Mon-Fri 9-9, Sat 9-5 • +966591799917',
+      title: 'ELC — English Language Courses in Saudi Arabia',
+      description: 'Accredited English courses for kids, adults, and business. Book a free placement test.',
       crumb: 'Home',
     },
     ar: {
-      title: 'دورات اللغة الإنجليزية في جدة | معهد صرح المعرفة | معتمد من TVTC',
-      description: '✓ دورات معتمدة من المؤسسة العامة للتدريب ✓ مدرّبون مؤهلون ✓ اختبار تحديد مستوى مجاني ✓ من A1 إلى C2 ✓ من 1,500 ريال ✓ 15,000+ متدرب',
+      title: 'معهد صرح المعرفة — دورات اللغة الإنجليزية في السعودية',
+      description: 'دورات إنجليزية معتمدة للأطفال والكبار والشركات. احجز اختبار تحديد المستوى مجانًا.',
       crumb: 'الرئيسية',
     },
   },
   about: {
     en: {
-      title: 'About ELC | Accredited English School | Est. 2010 | Jeddah, Saudi Arabia',
-      description: '✓ TVTC-accredited ✓ 14+ years experience ✓ 15,000+ trained learners ✓ Qualified instructors ✓ Modern classrooms ✓ Money-back guarantee • Learn more',
+      title: 'About ELC — Why Learn With Us',
+      description:
+        'Meet ELC and discover why learners choose our TVTC-accredited programs, qualified teachers, modern classrooms, and goal-focused curricula.',
       crumb: 'About ELC',
     },
     ar: {
-      title: 'معهد صرح المعرفة | معتمد من TVTC | منذ 2010 | جدة',
-      description: '✓ معتمد من المؤسسة العامة للتدريب ✓ 14+ سنة خبرة ✓ 15,000+ متدرب ✓ مدرّبون مؤهلون ✓ بيئة تعليمية حديثة ✓ ضمان استرجاع الرسوم',
+      title: 'من نحن ولماذا معهد صرح المعرفة',
+      description:
+        'تعرّف على معهد صرح المعرفة وبرامجه المعتمدة ومدرّبيه المؤهلين وطريقة بناء المسار المناسب لكل متعلم.',
       crumb: 'من نحن',
     },
   },
   contact: {
     en: {
-      title: 'Contact ELC Jeddah | English Courses | Phone, WhatsApp, Email | Saudi Arabia',
-      description: '📞 +966591799917 | 💬 WhatsApp: +966546656000 | 📧 info@elc.com.sa | Hours: Mon-Fri 9-9, Sat 9-5 | Abdullah Al-Suleiman St, Jeddah',
+      title: 'Contact ELC in Jeddah',
+      description:
+        'Call, WhatsApp, email, or visit ELC in Jeddah for English course information, placement testing, and registration support.',
       crumb: 'Contact',
     },
     ar: {
-      title: 'تواصل مع معهد صرح المعرفة | جدة | هاتف، واتساب، بريد إلكتروني',
-      description: '📞 +966591799917 | 💬 واتساب: +966546656000 | 📧 info@elc.com.sa | الساعات: الاثنين-الجمعة 9 صباحًا-9 مساءً، السبت 9-5',
+      title: 'تواصل مع معهد صرح المعرفة في جدة',
+      description:
+        'اتصل أو تواصل عبر واتساب أو البريد الإلكتروني أو زُر معهد صرح المعرفة في جدة للاستفسار عن دورات الإنجليزية واختبار تحديد المستوى والتسجيل.',
       crumb: 'اتصل بنا',
     },
   },
   register: {
     en: {
-      title: 'Enroll Now | English Courses in Jeddah | Free Placement Test | ELC',
-      description: '✓ Easy registration ✓ Next intake: Sept 25 ✓ Free placement test ✓ Money-back guarantee ✓ Payment plans available • Enroll today',
+      title: 'Register — ELC English Courses in Jeddah',
+      description:
+        'Enroll at ELC in Jeddah or book a free English placement test. Fast registration for kids, adults, and business English courses.',
       crumb: 'Register',
       hero: { title: 'Register', subtitle: 'Streamlined enrollment — book your spot or a free placement test.' },
     },
     ar: {
-      title: 'التسجيل الآن | دورات إنجليزية في جدة | اختبار مستوى مجاني | معهد صرح المعرفة',
-      description: '✓ تسجيل سهل ✓ الدفعة القادمة: سبتمبر 25 ✓ اختبار مستوى مجاني ✓ ضمان استرجاع الرسوم ✓ خطط دفع متاحة',
+      title: 'التسجيل — معهد صرح المعرفة',
+      description: 'سجّل في معهد صرح المعرفة أو احجز اختبار تحديد مستوى مجاني.',
       crumb: 'التسجيل',
-      hero: { title: 'التسجيل', subtitle: 'تسجيل مبسّط — احجز مكانك أو اختبار تحديد مستوى مجاني.' },
+      hero: { title: 'التسجيل', subtitle: 'أرسل طلبك أو ابدأ باختبار تحديد مستوى مجاني.' },
     },
   },
   courses: {
     en: {
-      title: 'English Courses | Kids, Adults, IELTS, Business, STEP | A1-C2 Levels | ELC Jeddah',
-      description: '✓ 7 courses available ✓ A1-C2 proficiency levels ✓ From SAR 1,500 ✓ 6-8 students per class ✓ Certified instructors ✓ Free placement test',
+      title: 'English Courses in Jeddah — ELC',
+      description:
+        "Browse ELC's full course catalog: Kids, Adults, Women's General English, Business English, and Exam Prep. See price, duration, and level at a glance.",
       crumb: 'Courses',
       hero: { title: 'Courses', subtitle: 'Find the right course by level, duration, and price.' },
     },
     ar: {
       title: 'الدورات — معهد صرح المعرفة',
       description:
-        'تصفّح كتالوج دورات معهد صرح المعرفة الكامل: أطفال، كبار، إنجليزي عام للسيدات، إنجليزي أعمال، وتحضير اختبارات.',
+        'تصفّح دورات الإنجليزية للأطفال والكبار والسيدات، وبرامج الأعمال والتحضير للاختبارات في معهد صرح المعرفة.',
       crumb: 'الدورات',
-      hero: { title: 'الدورات', subtitle: 'اختر الدورة المناسبة حسب المستوى والمدة والسعر.' },
+      hero: { title: 'الدورات', subtitle: 'قارن البرامج واختر ما يناسب مستواك ووقتك وهدفك.' },
     },
   },
   blog: {
     en: {
-      title: 'English Learning Tips | IELTS Guide | Course News | ELC Blog',
-      description: '✓ IELTS tips & strategies ✓ English grammar lessons ✓ Course announcements ✓ Student stories ✓ Free resources • ELC blog',
+      title: 'News — English Learning Tips & Updates from ELC',
+      description: "Placement test tips, course announcements, and English-learning advice from ELC's team in Jeddah.",
       crumb: 'News',
       hero: { title: 'News', subtitle: 'Articles, tips, and updates from ELC.' },
     },
     ar: {
-      title: 'نصائح تعلّم الإنجليزية | نصائح IELTS | أخبار الدورات | مدونة معهد صرح المعرفة',
-      description: '✓ نصائح IELTS ✓ دروس القواعد ✓ تحديثات الدورات ✓ قصص النجاح ✓ موارد مجانية',
+      title: 'الأخبار — معهد صرح المعرفة',
+      description: 'نصائح اختبار تحديد المستوى، وتحديثات الدورات، ونصائح تعلّم الإنجليزية من فريق معهد صرح المعرفة في جدة.',
       crumb: 'الأخبار',
-      hero: { title: 'الأخبار', subtitle: 'مقالات ونصائح وتحديثات من معهد صرح المعرفة.' },
+      hero: { title: 'الأخبار', subtitle: 'نصائح عملية لتعلّم الإنجليزية وآخر أخبار البرامج.' },
     },
   },
   placementTest: {
     en: {
-      title: 'Free English Placement Test | Instant Results | Adaptive Test | ELC',
-      description: '✓ Free online test ✓ 15 minutes ✓ Instant results ✓ Personalized level ✓ No registration needed ✓ Next step: Book consultation',
+      title: 'Placement Test — ELC English Courses in Jeddah',
+      description:
+        "Take ELC's free adaptive English placement test online, get your estimated level instantly, and book your oral test slot.",
       crumb: 'Placement Test',
     },
     ar: {
-      title: 'اختبار اللغة الإنجليزية المجاني | نتائج فورية | اختبار متكيف | معهد صرح المعرفة',
-      description: '✓ اختبار مجاني ✓ 15 دقيقة فقط ✓ نتائج فورية ✓ مستوى مخصص ✓ لا تسجيل مطلوب ✓ الخطوة التالية: احجز استشارة',
+      title: 'اختبار تحديد المستوى — معهد صرح المعرفة',
+      description:
+        'أجرِ اختبار تحديد المستوى المجاني عبر الإنترنت، واعرف مستواك التقديري، ثم احجز موعد الاختبار الشفوي.',
       crumb: 'اختبار تحديد المستوى',
     },
   },
   apply: {
     en: {
-      title: 'Enroll Now | Complete Your Application | ELC English Courses',
-      description: '✓ Quick application ✓ Secure payment ✓ Payment plans available ✓ Money-back guarantee ✓ Start date: Sept 25',
+      title: 'Apply — ELC English Courses in Jeddah',
+      description: 'Complete your ELC enrollment application after your placement test result.',
       crumb: 'Apply',
       hero: { title: 'Apply', subtitle: 'Confirm your course and finish your enrollment application.' },
     },
     ar: {
-      title: 'التسجيل النهائي | أكمل طلبك | معهد صرح المعرفة',
-      description: '✓ تطبيق سريع ✓ دفع آمن ✓ خطط دفع متاحة ✓ ضمان استرجاع الرسوم ✓ تاريخ البدء: سبتمبر 25',
+      title: 'التقديم — معهد صرح المعرفة',
+      description: 'أكمل طلب التسجيل في معهد صرح المعرفة بعد نتيجة اختبار تحديد المستوى.',
       crumb: 'التقديم',
-      hero: { title: 'التقديم', subtitle: 'أكّد دورتك وأكمل طلب التسجيل.' },
+      hero: { title: 'التقديم', subtitle: 'اختر دورتك وأرسل بيانات التسجيل.' },
     },
   },
   terms: {
-    en: { title: 'Terms & Conditions | ELC English Courses', description: '✓ Course policies ✓ Refund policy ✓ Payment terms ✓ Student rights', crumb: 'Terms & Conditions' },
+    en: { title: 'Terms & Conditions — ELC', description: "ELC's course terms and conditions.", crumb: 'Terms & Conditions' },
     ar: {
-      title: 'الشروط والأحكام | معهد صرح المعرفة',
-      description: '✓ سياسات الدورات ✓ سياسة الاسترجاع ✓ شروط الدفع ✓ حقوق الطالب',
+      title: 'الشروط والأحكام — معهد صرح المعرفة',
+      description: 'شروط وأحكام الدورات في معهد صرح المعرفة.',
       crumb: 'الشروط والأحكام',
     },
   },
   privacy: {
-    en: { title: 'Privacy Policy | Data Protection | ELC', description: '✓ Data privacy ✓ How we use information ✓ Security ✓ Your rights', crumb: 'Privacy Policy' },
+    en: { title: 'Privacy Policy — ELC', description: 'How ELC collects and uses personal data.', crumb: 'Privacy Policy' },
     ar: {
-      title: 'سياسة الخصوصية | حماية البيانات | معهد صرح المعرفة',
-      description: '✓ خصوصية البيانات ✓ كيفية استخدام المعلومات ✓ الأمان ✓ حقوقك',
+      title: 'سياسة الخصوصية — معهد صرح المعرفة',
+      description: 'كيف يجمع معهد صرح المعرفة البيانات الشخصية ويستخدمها.',
       crumb: 'سياسة الخصوصية',
     },
   },

@@ -1,4 +1,5 @@
 import type { Env } from './types';
+import { BadRequestError } from './http';
 import { handleStartSession, handleAnswer } from './routes/session';
 import { handleListSlots, handleCreateBooking } from './routes/booking';
 import {
@@ -91,6 +92,7 @@ export default {
       }
       return respond(await matched.route.handler(req, env, matched.params));
     } catch (err) {
+      if (err instanceof BadRequestError) return respond(new Response(JSON.stringify({ error: err.message }), { status: 400, headers: { 'content-type': 'application/json' } }));
       console.error('placement API request failed', err);
       const localMessage = env.LOCAL_DEV === 'true' && err instanceof Error ? err.message : 'internal_error';
       return respond(new Response(JSON.stringify({ error: localMessage }), { status: 500, headers: { 'content-type': 'application/json' } }));

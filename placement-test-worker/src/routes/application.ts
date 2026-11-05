@@ -1,4 +1,5 @@
 import type { Env, IdType } from '../types';
+import { readJson } from '../http';
 import { getSession, getApplicationBySession, insertApplication, listApplicationsWithDetails, setApplicationStatus } from '../db';
 import { getSessionAdminId } from '../auth';
 
@@ -10,14 +11,14 @@ function json(data: unknown, status = 200): Response {
 }
 
 export async function handleSubmitApplication(req: Request, env: Env): Promise<Response> {
-  const body = await req.json<{
+  const body = await readJson<{
     sessionId: string;
     course: string;
     guardianName?: string;
     idNumber: string;
     idType: string;
     email: string;
-  }>();
+  }>(req);
   if (!body.sessionId || !body.course || !body.idNumber || !body.email) {
     return json({ error: 'sessionId, course, idNumber and email are required' }, 400);
   }
@@ -53,7 +54,7 @@ export async function handleAdminListApplications(req: Request, env: Env): Promi
 }
 
 export async function handleAdminSetApplicationStatus(req: Request, env: Env, applicationId: string): Promise<Response> {
-  const { status } = await req.json<{ status: string }>();
+  const { status } = await readJson<{ status: string }>(req);
   if (status !== 'approved' && status !== 'rejected') return json({ error: 'invalid_status' }, 400);
   const adminId = await getSessionAdminId(req, env);
   if (!adminId) return json({ error: 'unauthorized' }, 401); // defence in depth -- index.ts's requireAdmin already gates this route

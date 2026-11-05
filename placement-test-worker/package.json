@@ -1,27 +1,23 @@
 {
   "name": "placement-test-worker",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "wrangler dev --var LOCAL_DEV:true",
-    "dev:fallback": "vite build --config scripts/vite.local.config.ts && node .local-dev/server.mjs",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit",
     "db:migrate:local": "wrangler d1 migrations apply placement-test --local",
     "db:migrate:remote": "wrangler d1 migrations apply placement-test --remote"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "latest",
-    "@cloudflare/workers-types": "latest",
-    "@types/better-sqlite3": "^9.6.0",
-    "@types/node": "^26.3.0",
-    "better-sqlite3": "^13.0.3",
-    "typescript": "latest",
-    "vitest": "latest",
-    "wrangler": "latest"
+    "@cloudflare/vitest-plugin": "1.5.1",
+    "@cloudflare/workers-types": "5.20261104.1",
+    "@types/node": "26.3.0",
+    "typescript": "7.0.2",
+    "vitest": "4.1.12",
+    "wrangler": "4.157.0"
   },
   "dependencies": {
-    "bcryptjs": "latest"
-  },
-  "allowScripts": {
-    "better-sqlite3@13.0.3": true
+    "bcryptjs": "3.0.3"
   }
 }

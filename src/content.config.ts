@@ -10,8 +10,10 @@ const courseSchema = z.object({
   category: z.enum(['kids', 'adults', 'women', 'business', 'exam-prep']),
   level: z.enum(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']).optional(),
   price: z.number().optional(),
+  priceUnit: z.string().optional(),
   currency: z.string().default('SAR'),
   durationWeeks: z.number().optional(),
+  durationUnit: z.string().optional(),
   hoursPerWeek: z.number().optional(),
   hoursPerMonth: z.string().optional(),
   hoursPerLevel: z.string().optional(),
@@ -20,6 +22,11 @@ const courseSchema = z.object({
   classTimes: z.array(z.object({ label: z.string(), start: z.string(), end: z.string(), meridiem: z.string() })).optional(),
   image: z.string().optional(),
   imageAlt: z.string().optional(), // required in practice via CMS field config — see admin/config.yml
+  // Yearly intake schedule with multiple start dates
+  intakeSchedule: z.array(z.object({
+    startDate: z.date(),
+    times: z.array(z.string()).optional() // e.g., ["Morning", "Evening"]
+  })).optional(),
   // Structured FAQs, not markdown headings — lets the page render a real accordion
   // AND emit FAQPage schema from the same data, so they can never drift apart.
   faqs: z

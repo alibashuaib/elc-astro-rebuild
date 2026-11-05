@@ -11,14 +11,14 @@ const { locale, courses } = Astro.props;
 const isArabic = locale === 'ar';
 const copy = isArabic ? {
   heading: 'أرسل طلب التسجيل عبر واتساب',
-  intro: 'أدخل بيانات التواصل الأساسية واختر الدورة. سنفتح رسالة واتساب جاهزة لإرسالها إلى فريق القبول.',
+  intro: 'اكتب بياناتك واختر الدورة، وسنجهز لك رسالة واتساب ترسلها مباشرة إلى فريق القبول.',
   name: 'الاسم الكامل',
   email: 'البريد الإلكتروني',
   phone: 'رقم الهاتف',
   course: 'الدورة',
   choose: 'اختر دورة',
   submit: 'متابعة عبر واتساب',
-  privacy: 'لا تُخزن هذه البيانات في الموقع؛ تُضاف فقط إلى رسالة واتساب التي ترسلها بنفسك.',
+  privacy: 'الموقع لا يحفظ بياناتك. تُضاف فقط إلى رسالة واتساب، ولن تُرسل إلا عندما تختار إرسالها.',
 } : {
   heading: 'Send your registration request on WhatsApp',
   intro: 'Add your basic contact details and choose a course. We’ll open a ready-to-send WhatsApp message to admissions.',

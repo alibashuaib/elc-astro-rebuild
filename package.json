@@ -6,24 +6,24 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "predev": "node scripts/compile-courses.mjs",
     "dev": "astro dev",
-    "prebuild": "node scripts/compile-courses.mjs",
-    "build": "astro build ; node scripts/generate-static-courses.mjs",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lhci": "lhci autorun",
-    "smoke": "playwright test"
+    "smoke": "playwright test",
+    "test:worker": "npm test --prefix placement-test-worker && npm run typecheck --prefix placement-test-worker",
+    "check:pins": "node scripts/check-pins.mjs",
+    "test:all": "npm run check:pins && npm run test:worker && npm run smoke"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.3",
-    "astro": "^7.3.2"
+    "@astrojs/sitemap": "3.7.3",
+    "astro": "7.2.4"
   },
   "allowScripts": {
     "esbuild@0.28.2": true
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
-    "marked": "^18.0.13"
+    "@playwright/test": "1.64.1"
   }
 }
