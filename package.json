@@ -11,7 +11,9 @@
     "preview": "astro preview",
     "astro": "astro",
     "lhci": "lhci autorun",
-    "smoke": "playwright test"
+    "smoke": "playwright test",
+    "test:worker": "npm test --prefix placement-test-worker && npm run typecheck --prefix placement-test-worker",
+    "test:all": "npm run test:worker && npm run smoke"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
