@@ -1,4 +1,5 @@
 import type { Env } from '../types';
+import { readJson } from '../http';
 import { getAdminByUsername, listSlotsAll, createSlot, deleteSlot, listBookingsWithDetails, listQuestions, insertQuestion, setQuestionActive } from '../db';
 import { checkPassword, issueSessionCookie, verifyAdminSession } from '../auth';
 
@@ -12,7 +13,7 @@ export async function requireAdmin(req: Request, env: Env): Promise<Response | n
 }
 
 export async function handleAdminLogin(req: Request, env: Env): Promise<Response> {
-  const { username, password } = await req.json<{ username: string; password: string }>();
+  const { username, password } = await readJson<{ username: string; password: string }>(req);
   const admin = await getAdminByUsername(env, username);
   if (!admin || !(await checkPassword(password, admin.password_hash))) {
     return json({ error: 'invalid credentials' }, 401);
@@ -26,7 +27,7 @@ export async function handleAdminListSlots(_req: Request, env: Env): Promise<Res
 }
 
 export async function handleAdminCreateSlot(req: Request, env: Env): Promise<Response> {
-  const { startsAt, capacity } = await req.json<{ startsAt: string; capacity: number }>();
+  const { startsAt, capacity } = await readJson<{ startsAt: string; capacity: number }>(req);
   const id = await createSlot(env, startsAt, capacity);
   return json({ id }, 201);
 }
@@ -46,7 +47,7 @@ export async function handleAdminListQuestions(_req: Request, env: Env): Promise
 }
 
 export async function handleAdminCreateQuestion(req: Request, env: Env): Promise<Response> {
-  const body = await req.json<{ track: 'kids' | 'adults'; level: string; prompt: string; options: string[]; correctIndex: number }>();
+  const body = await readJson<{ track: 'kids' | 'adults'; level: string; prompt: string; options: string[]; correctIndex: number }>(req);
   const id = await insertQuestion(env, {
     track: body.track,
     level: body.level as any,
@@ -66,7 +67,7 @@ export async function handleAdminCreateQuestion(req: Request, env: Env): Promise
 }
 
 export async function handleAdminSetQuestionActive(req: Request, env: Env, questionId: string): Promise<Response> {
-  const { active } = await req.json<{ active: boolean }>();
+  const { active } = await readJson<{ active: boolean }>(req);
   await setQuestionActive(env, questionId, active);
   return json({ ok: true });
 }

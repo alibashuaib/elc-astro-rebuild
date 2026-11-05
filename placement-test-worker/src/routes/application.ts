@@ -54,7 +54,7 @@ export async function handleAdminListApplications(req: Request, env: Env): Promi
 }
 
 export async function handleAdminSetApplicationStatus(req: Request, env: Env, applicationId: string): Promise<Response> {
-  const { status } = await req.json<{ status: string }>();
+  const { status } = await readJson<{ status: string }>(req);
   if (status !== 'approved' && status !== 'rejected') return json({ error: 'invalid_status' }, 400);
   const adminId = await getSessionAdminId(req, env);
   if (!adminId) return json({ error: 'unauthorized' }, 401); // defence in depth -- index.ts's requireAdmin already gates this route
