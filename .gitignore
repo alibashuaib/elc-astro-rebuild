@@ -12,3 +12,8 @@ graphify-out/
 # Playwright smoke-test output
 /test-results/
 /playwright-report/
+
+# Local preview server output and Wrangler secrets
+preview.log
+preview.pid
+.dev.vars
