@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createFakeD1 } from './test-utils/fakeD1';
+import { issueSessionCookie } from './auth';
 import worker from './index';
 
 const BAD_BODIES = ['', '{bad', 'null', '[]', '"s"'];
@@ -53,4 +54,34 @@ describe('malformed JSON bodies on student routes', () => {
       await expectInvalidJson(await send(makeEnv(), 'POST', '/api/apply', bad));
     });
   }
+});
+
+describe('malformed JSON bodies on admin routes', () => {
+  const ADMIN_ROUTES: [string, string][] = [
+    ['POST', '/api/admin/slots'],
+    ['POST', '/api/admin/questions'],
+    ['PATCH', '/api/admin/questions/q1'],
+    ['PATCH', '/api/admin/applications/app1'],
+  ];
+
+  for (const bad of BAD_BODIES) {
+    const label = JSON.stringify(bad);
+
+    it(`POST /api/admin/login ${label} -> 400`, async () => {
+      await expectInvalidJson(await send(makeEnv(), 'POST', '/api/admin/login', bad));
+    });
+
+    for (const [method, path] of ADMIN_ROUTES) {
+      it(`${method} ${path} ${label} -> 400`, async () => {
+        const env = makeEnv();
+        const cookie = (await issueSessionCookie(env as any, 'a1')).split(';')[0];
+        await expectInvalidJson(await send(env, method, path, bad, cookie));
+      });
+    }
+  }
+
+  it('POST /api/admin/slots with a malformed body and no cookie -> 401 (auth first)', async () => {
+    const res = await send(makeEnv(), 'POST', '/api/admin/slots', '{bad');
+    expect(res.status).toBe(401);
+  });
 });
