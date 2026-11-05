@@ -17,6 +17,7 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm run check:pins
       - run: npm run build
         env:
           # Optional — build succeeds without them (fetchGoogleReviews returns null
