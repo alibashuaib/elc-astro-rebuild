@@ -39,6 +39,16 @@ const phone = '966546656000';
   }
   .whatsapp-fab:hover { background: #1ebc59; }
 
+  @media (max-width: 560px) {
+    .whatsapp-fab {
+      width: 3rem;
+      height: 3rem;
+      inset-inline-end: 1rem;
+      bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+    .whatsapp-fab svg { width: 25px; height: 25px; }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .whatsapp-fab { transition: transform var(--motion-fast) var(--ease); }
     .whatsapp-fab:hover { transform: scale(1.06); }

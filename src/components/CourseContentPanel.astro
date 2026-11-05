@@ -220,6 +220,7 @@ const isArabic = locale === 'ar';
   .adult-diagram .course-prose :global(> p.progression-card:hover) { transform: none; border-color: color-mix(in srgb, var(--progression-accent) 34%, var(--color-border)); box-shadow: 0 14px 28px color-mix(in srgb, var(--progression-accent) 9%, transparent); }
   .adult-diagram .course-prose :global(> .progression-divider) { color: var(--color-navy); font-size: .85rem; letter-spacing: .03em; }
   .course-prose :global(> h2) { grid-column: 1 / -1; margin: .65rem 0 0; padding-inline-start: .85rem; border-inline-start: 4px solid var(--color-coral); color: var(--color-navy); font-size: clamp(1.25rem, 2.5vw, 1.65rem); }
+  .course-prose :global(> h3) { grid-column: 1 / -1; margin: 1.15rem 0 0; color: var(--color-navy); font-size: clamp(1rem, 2vw, 1.2rem); }
   .course-prose :global(> h2.tab-hidden) { display: none; }
   .course-prose :global(> ul), .course-prose :global(> ol) { display: grid; grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; margin: 0; padding: 0; list-style: none; }
   .course-prose :global(> ul.tab-hidden), .course-prose :global(> ol.tab-hidden) { display: none; }
@@ -230,7 +231,7 @@ const isArabic = locale === 'ar';
     .tabs-nav { gap: .35rem; margin-bottom: 1.5rem; }
     .tabs-nav :global(.tab-button) { padding: .7rem 1.1rem; font-size: clamp(.8rem, 2vw, .9rem); }
     .course-prose { grid-template-columns: 1fr; }
-    .course-prose :global(> p), .course-prose :global(> h2), .course-prose :global(> ul), .course-prose :global(> ol) { grid-column: 1; }
+    .course-prose :global(> p), .course-prose :global(> h2), .course-prose :global(> h3), .course-prose :global(> ul), .course-prose :global(> ol) { grid-column: 1; }
     .course-prose :global(> ul), .course-prose :global(> ol) { grid-template-columns: 1fr; }
     .step-diagram .course-prose { grid-template-columns: 1fr; }
     .step-diagram .course-prose :global(> p.progression-card) { min-height: 8rem; }
