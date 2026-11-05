@@ -16,7 +16,7 @@ The bilingual ELC site and its two Cloudflare Workers already mostly exist. This
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundations** - Exact pins, real local D1 tests, one green local test command, clean working tree
+- [x] **Phase 1: Foundations** - Exact pins, real local D1 tests, one green local test command, clean working tree
 - [ ] **Phase 2: Design Review** - Full UI review written up early (AR + EN, mobile + desktop) with must-fix vs later items
 - [ ] **Phase 3: Registration Wizard & Application** - Merge the wizard branch (migration 0022) and fix guardian, slug, and Arabic-digit issues
 - [ ] **Phase 4: Secure Admin** - Server-side sessions, logout, throttle, CSRF/Origin guard, and XSS-safe admin client (migration 0023)
