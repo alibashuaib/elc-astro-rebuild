@@ -6,26 +6,25 @@ in the main repo for the full design.
 
 ## Testing Setup
 
-This project's test suite (`npm test` inside `placement-test-worker/`) uses
-`src/test-utils/fakeD1.ts`, an in-memory SQLite shim, instead of
-`@cloudflare/vitest-pool-workers` or Miniflare. That choice dates from a
-sandboxed build environment where `workerd` would not start; it is kept because
-the shim runs the real schema in milliseconds with no native runtime to install.
+`npm test` (inside `placement-test-worker/`) runs Vitest inside workerd through
+`@cloudflare/vitest-plugin`, against a real local D1. Every file in
+`migrations/` is replayed on an empty D1 for each test file (`test/apply-migrations.ts`),
+and a global `beforeEach` empties every table except the seeded `questions`
+and `passages`, so each test starts clean. `test/migrations.test.ts` checks that
+every migration file was applied.
 
-**`wrangler dev` works fine outside that sandbox** — `npm run dev` starts real
-`workerd` against a local D1, and `npm run db:migrate:local` sets that database
-up.
+`createFakeD1()` in `src/test-utils/fakeD1.ts` keeps its old name so existing
+tests import it unchanged, but it now returns the real D1 binding.
 
-**The shim has been validated against real D1.** Every kids scoring boundary
-(0, 7, 8, 14, 15, 21, 22, 29, 30, 36, 37, 44 correct of 44) was run through a
-live `wrangler dev` worker and matched the shim's placement exactly, as did the
-adults band walk-through. The earlier note asking a deployer to repeat that pass
-by hand has been removed; it is done.
+workerd runs on this machine. The "Workers runtime crashed ... (crash #1)" line
+printed when `wrangler dev` starts is expected; the runtime restarts and the
+Worker answers.
 
-`npm run smoke` in the repo root goes further, driving the built site in a real
-browser against a real worker — see `tests/e2e/`. CI runs it on every PR, and it
+`npm run test:all` in the repo root is the full local suite: these worker
+tests, the typecheck, and the Playwright smoke run in `tests/e2e/` against the
+built site and a real local Worker. CI runs the same smoke on every PR; it
 exists because the unit suites and the build cannot see runtime faults inside
-Astro client scripts; one such fault reached `main` with both green.
+Astro client scripts.
 
 **Recommendation (future improvement, not required for launch):** the admin
 session cookie currently has to use `SameSite=None; Secure` because the Worker
