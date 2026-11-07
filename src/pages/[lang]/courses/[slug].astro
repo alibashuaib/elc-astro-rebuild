@@ -205,13 +205,9 @@ const ldEntries = [ldCourse, breadcrumbs, ...(faqs.length > 0 ? [faqPageSchema(f
     border-radius: 999px;
     background: var(--color-bg);
     border: 1px solid var(--color-border);
-    color: #5a5d63; /* darker than --color-ink-muted to meet 4.5:1 contrast */
+    color: var(--color-ink-subtle);
   }
   .badge-level { color: var(--color-crimson-text); border-color: var(--color-crimson-text); }
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme="light"])) .badge { color: var(--color-ink-muted); }
-  }
-  :global(:root[data-theme="dark"]) .badge { color: var(--color-ink-muted); }
   .lead { position: relative; z-index: 1; max-width: 62ch; margin: 0; font-size: var(--fs-lg); color: var(--color-ink); }
   .stats {
     display: grid;

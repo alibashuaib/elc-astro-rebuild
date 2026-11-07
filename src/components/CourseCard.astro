@@ -33,30 +33,16 @@ const formattedPrice = price?.toLocaleString('en-US');
   .course-card[data-course] .fact-label {
     color: var(--course-accent) !important;
   }
-  /* Same palette as the homepage tiles — one course, one color in either view. */
-  .course-card[data-course='kids-general'] { --course-accent: #41670e !important; --course-soft: #eef7df !important; --course-bg-start: #eef7df; --course-bg-end: #dfedc9; }
-  .course-card[data-course='adults-general'] { --course-accent: #29497d !important; --course-soft: #edf2fb !important; --course-bg-start: #edf2fb; --course-bg-end: #dde7f6; }
-  .course-card[data-course='business-english'] { --course-accent: #0d623a !important; --course-soft: #e7f3eb !important; --course-bg-start: #e7f3eb; --course-bg-end: #cee6d7; }
-  .course-card[data-course='university-exam-prep'] { --course-accent: #824500 !important; --course-soft: #fff2dd !important; --course-bg-start: #fff2dd; --course-bg-end: #f4dfbc; }
-  .course-card[data-course='womens-general-english'] { --course-accent: #8b1647 !important; --course-soft: #fcebf1 !important; --course-bg-start: #fcebf1; --course-bg-end: #f3d8e3; }
-  .course-card[data-course='ielts-preparation'] { --course-accent: #a71938 !important; --course-soft: #fbe9ed !important; --course-bg-start: #fbe9ed; --course-bg-end: #f2ced6; }
-  .course-card[data-course='step-exam-preparation'] { --course-accent: #3d5d99 !important; --course-soft: #e8eefb !important; }
-  :root[data-theme='dark'] .course-card[data-course='step-exam-preparation'] { --course-accent: #b8caef !important; --course-soft: #384967 !important; --course-bg-start: #384967; --course-bg-end: #181d2c; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) .course-card[data-course='kids-general'] { --course-accent: #c3ed79 !important; --course-soft: #3d5427 !important; --course-bg-start: #3d5427; --course-bg-end: #17200f; }
-    :root:not([data-theme='light']) .course-card[data-course='adults-general'] { --course-accent: #b8caef !important; --course-soft: #384967 !important; --course-bg-start: #384967; --course-bg-end: #181d2c; }
-    :root:not([data-theme='light']) .course-card[data-course='business-english'] { --course-accent: #82e4a5 !important; --course-soft: #28583d !important; --course-bg-start: #28583d; --course-bg-end: #102718; }
-    :root:not([data-theme='light']) .course-card[data-course='university-exam-prep'] { --course-accent: #ffc879 !important; --course-soft: #573715 !important; --course-bg-start: #573715; --course-bg-end: #25130a; }
-    :root:not([data-theme='light']) .course-card[data-course='womens-general-english'] { --course-accent: #ff9fbe !important; --course-soft: #592e46 !important; --course-bg-start: #592e46; --course-bg-end: #29111f; }
-    :root:not([data-theme='light']) .course-card[data-course='ielts-preparation'] { --course-accent: #ff9aaa !important; --course-soft: #592633 !important; --course-bg-start: #592633; --course-bg-end: #260e16; }
-    :root:not([data-theme='light']) .course-card[data-course='step-exam-preparation'] { --course-accent: #b8caef !important; --course-soft: #384967 !important; --course-bg-start: #384967; --course-bg-end: #181d2c; }
-  }
-  :root[data-theme='dark'] .course-card[data-course='kids-general'] { --course-accent: #c3ed79 !important; --course-soft: #3d5427 !important; --course-bg-start: #3d5427; --course-bg-end: #17200f; }
-  :root[data-theme='dark'] .course-card[data-course='adults-general'] { --course-accent: #b8caef !important; --course-soft: #384967 !important; --course-bg-start: #384967; --course-bg-end: #181d2c; }
-  :root[data-theme='dark'] .course-card[data-course='business-english'] { --course-accent: #82e4a5 !important; --course-soft: #28583d !important; --course-bg-start: #28583d; --course-bg-end: #102718; }
-  :root[data-theme='dark'] .course-card[data-course='university-exam-prep'] { --course-accent: #ffc879 !important; --course-soft: #573715 !important; --course-bg-start: #573715; --course-bg-end: #25130a; }
-  :root[data-theme='dark'] .course-card[data-course='womens-general-english'] { --course-accent: #ff9fbe !important; --course-soft: #592e46 !important; --course-bg-start: #592e46; --course-bg-end: #29111f; }
-  :root[data-theme='dark'] .course-card[data-course='ielts-preparation'] { --course-accent: #ff9aaa !important; --course-soft: #592633 !important; --course-bg-start: #592633; --course-bg-end: #260e16; }
+  /* One course, one colour: the card uses the course-page tokens from tokens.css (accent as is,
+     tints mixed toward the raised surface, so they flip with the theme). */
+  .course-card[data-course='kids-general'] { --card-accent: var(--course-kids-accent); --card-tint: var(--course-kids-soft); }
+  .course-card[data-course='adults-general'] { --card-accent: var(--course-adults-accent); --card-tint: var(--course-adults-soft); }
+  .course-card[data-course='step-exam-preparation'] { --card-accent: var(--course-adults-accent); --card-tint: var(--course-adults-soft); }
+  .course-card[data-course='womens-general-english'] { --card-accent: var(--course-women-accent); --card-tint: var(--course-women-soft); }
+  .course-card[data-course='university-exam-prep'] { --card-accent: var(--course-pup-accent); --card-tint: var(--course-pup-soft); }
+  .course-card[data-course='ielts-preparation'] { --card-accent: var(--course-ielts-accent); --card-tint: var(--course-ielts-soft); }
+  .course-card[data-course='business-english'] { --card-accent: var(--course-business-accent); --card-tint: var(--course-business-soft); }
+  .course-card:is([data-course='kids-general'], [data-course='adults-general'], [data-course='step-exam-preparation'], [data-course='womens-general-english'], [data-course='university-exam-prep'], [data-course='ielts-preparation'], [data-course='business-english']) { --course-accent: var(--card-accent) !important; --course-soft: color-mix(in srgb, var(--card-tint) 50%, var(--color-bg-raised)) !important; --course-bg-start: var(--course-soft); --course-bg-end: color-mix(in srgb, var(--card-tint) 75%, var(--color-bg-raised)); }
 </style>
 
 <article class="course-card" data-category={category} data-course={slug}>
@@ -152,17 +138,13 @@ const formattedPrice = price?.toLocaleString('en-US');
     border-radius: 999px;
     background: var(--color-surface-soft);
     border: 1px solid var(--color-border);
-    color: #5a5d63; /* darker than --color-ink-muted to meet 4.5:1 contrast on --color-surface-soft */
+    color: var(--color-ink-subtle);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .badge { color: var(--color-ink-muted); }
-  }
-  :root[data-theme="dark"] .badge { color: var(--color-ink-muted); }
   .badge-level { color: var(--course-accent); border-color: color-mix(in srgb, var(--course-accent) 32%, var(--color-border)); background: var(--course-soft); }
   h2 { margin: 0; font-size: clamp(1.25rem, 2vw, 1.45rem); line-height: 1.3; }
   h2 a { color: var(--color-navy); }
   h2 a:hover { color: var(--course-accent); text-decoration: none; }
-  .course-card > p { color: var(--color-ink-muted); font-size: .95rem; line-height: 1.7; }
+  .course-card > p { color: var(--color-ink-subtle); font-size: .95rem; line-height: 1.7; }
   .meta { display: grid; gap: .75rem; margin-top: auto; padding: .9rem; border: 1px solid color-mix(in srgb, var(--course-accent) 15%, var(--color-border)); border-radius: 1rem; background: linear-gradient(145deg, color-mix(in srgb, var(--color-bg-raised) 94%, var(--course-soft)), var(--course-soft)); }
   .price-row { position: relative; display: flex; min-height: 3.6rem; align-items: center; justify-content: space-between; gap: .75rem; padding-bottom: .7rem; border-bottom: 1px solid var(--color-border); }
   .fact-label { display: inline-flex; min-width: 0; align-items: center; gap: .38rem; color: var(--color-ink-muted); font-size: .64rem; font-weight: 750; text-transform: uppercase; letter-spacing: .04em; }
