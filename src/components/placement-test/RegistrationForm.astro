@@ -51,8 +51,8 @@ const { locale, t } = Astro.props;
   const estimatedAgeNote = document.getElementById('estimated-age-note') as HTMLElement;
   const isAr = form.dataset.locale === 'ar';
 
-  function isUnderEleven(dob: string): boolean {
-    return computeAge(dob) < 11;
+  function isKidsAge(dob: string): boolean {
+    return computeAge(dob) <= 12;
   }
 
   function updateEstimatedAge() {
@@ -69,12 +69,12 @@ const { locale, t } = Astro.props;
   }
 
   function enforceAgeTrack() {
-    const forcedKids = isUnderEleven(dobInput.value);
+    const forcedKids = isKidsAge(dobInput.value);
     adultsInput.disabled = forcedKids;
     ageRule.hidden = !forcedKids;
     ageRule.textContent = isAr
-      ? 'يتم اختيار اختبار الأطفال تلقائيًا للطلاب دون سن 11 عامًا.'
-      : 'Students under 11 are automatically assigned to the Kids test.';
+      ? 'يتم اختيار اختبار الأطفال تلقائيًا للطلاب بعمر 12 سنة فأقل.'
+      : 'Students aged 12 and under are automatically assigned to the Kids test.';
     if (forcedKids) kidsInput.checked = true;
     updateEstimatedAge();
   }

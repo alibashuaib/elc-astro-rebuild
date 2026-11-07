@@ -24,7 +24,7 @@ async function startKidsTest(page: Page) {
   await page.getByLabel('Grandfather’s name').fill('Kids');
   await page.getByLabel('Family name').fill('User');
   await page.getByLabel('WhatsApp number').fill('+966500000000');
-  // Under 11, so the form assigns the kids track on its own.
+  // 12 or under, so the form assigns the kids track on its own.
   await page.getByLabel('Date of birth').fill('2018-01-01');
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByLabel('National ID / Iqama / passport number').fill('1234567890');
@@ -156,7 +156,7 @@ test('kids counting question accepts a dragged number in the empty slot', async 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });
 
-test('the registration form assigns under-11 students to the kids track', async ({ page }) => {
+test('the registration form assigns students aged 12 and under to the kids track', async ({ page }) => {
   const errors = failOnConsoleErrors(page);
 
   await page.goto('/en/placement-test/');
@@ -166,7 +166,7 @@ test('the registration form assigns under-11 students to the kids track', async 
   await page.getByLabel('Family name').fill('Track');
   await page.getByLabel('WhatsApp number').fill('+966500000001');
   await page.getByLabel('Date of birth').fill('2018-01-01');
-  await expect(page.getByText('Students under 11 are automatically assigned to the Kids test.')).toBeVisible();
+  await expect(page.getByText('Students aged 12 and under are automatically assigned to the Kids test.')).toBeVisible();
   await page.getByRole('button', { name: 'Next' }).click();
 
   await expect(page.getByLabel('Guardian name')).toBeVisible();

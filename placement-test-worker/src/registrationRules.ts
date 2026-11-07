@@ -13,7 +13,7 @@ export const REFERRAL_SOURCES = ['friend', 'paper_ad', 'sms', 'internet', 'road_
 export const SOCIAL_CHANNELS = ['facebook', 'twitter', 'youtube', 'tiktok', 'instagram', 'snapchat'] as const;
 export const GUARDIAN_RELATIONSHIPS = ['father', 'mother', 'sibling', 'grandparent', 'legal_guardian', 'other'] as const;
 
-// computeAge lives in db.ts (computeTrack/isUnderEleven need the same exact
+// computeAge lives in db.ts (computeTrack/isKidsAge need the same exact
 // calendar-year math) -- re-exported here so callers only need to import
 // from registrationRules.ts for everything registration-related.
 export { computeAge } from './db';

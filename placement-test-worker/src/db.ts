@@ -28,7 +28,7 @@ function newId(): string {
 // approximation put a student turning 12 exactly today on the wrong side of
 // the cutoff, since "now" is always some hours past midnight while `dob`
 // parses to midnight, nudging the approximate age fractionally past 12.
-// Shared by computeTrack/isUnderEleven below and by registrationRules.ts's
+// Shared by computeTrack/isKidsAge below and by registrationRules.ts's
 // age-range validation, so the math lives in exactly one place.
 export function computeAge(dob: string): number {
   const birth = new Date(dob);
@@ -47,9 +47,9 @@ export function computeTrack(dob: string): Track {
   return computeAge(dob) <= 12 ? 'kids' : 'adults';
 }
 
-export function isUnderEleven(dob: string): boolean {
+export function isKidsAge(dob: string): boolean {
   const age = computeAge(dob);
-  return !Number.isNaN(age) && age < 11;
+  return !Number.isNaN(age) && age <= 12;
 }
 
 export async function insertStudent(env: Env, input: StudentInput): Promise<string> {
