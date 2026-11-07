@@ -204,6 +204,7 @@ export const ui = {
     'registration.consentMedia': 'I agree (as the trainee or their guardian) to the trainee being photographed or filmed for the institute’s promotional or educational purposes, with the assurance that adult female students will not be photographed or have any related content used.',
     'registration.submit': 'Start test',
     'registration.error': 'Something went wrong — please check your details and try again.',
+    'registration.fixFields': 'Please check these fields:',
   },
   ar: {
     'nav.home': 'الرئيسية',
@@ -390,6 +391,7 @@ export const ui = {
     'registration.consentMedia': 'أوافق (بصفتي المتدرب/ة أو ولي الأمر) على تصوير المتدرب/ة بالصور أو مقاطع الفيديو لأغراض دعائية أو تعليمية للمعهد، مع التأكيد على عدم تصوير البنات البالغات أو استخدام أي محتوى يخصهن.',
     'registration.submit': 'ابدأ الاختبار',
     'registration.error': 'حدث خطأ ما — يرجى مراجعة بياناتك والمحاولة مرة أخرى.',
+    'registration.fixFields': 'يرجى مراجعة الحقول التالية:',
   },
 } as const;
 

@@ -196,13 +196,20 @@ const terms = locale === 'ar' ? termsAr : termsEn;
   .badge.required { color: #7a1c1c; background: rgb(182 23 51 / 0.12); }
   .badge.optional { color: #1a6f48; background: rgb(53 168 111 / 0.12); }
   .chip-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-  .chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem; border: 1px solid var(--color-border); border-radius: 999px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
-  .chip:has(input:checked) { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
+  /* #step-details prefix: the generic `#step-details label/input` rules above
+     outrank plain `.chip` and turned chips into big stacked radios (UI-33). */
+  #step-details label.chip { position: relative; display: inline-flex; flex-direction: row; align-items: center; gap: 0.4rem; min-height: 2.75rem; padding: 0.5rem 0.9rem; border: 1px solid var(--color-border-strong); border-radius: 999px; color: var(--color-ink); cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+  #step-details .chip input { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; margin: 0; padding: 0; opacity: 0; cursor: pointer; }
+  #step-details label.chip:has(input:checked) { border-color: var(--color-primary); background: var(--color-primary); color: #fff; }
+  #step-details label.chip:has(input:focus-visible) { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+  #step-details .chip-group:has(input[aria-invalid='true']) label.chip { border-color: var(--color-primary); }
+  #step-details input[aria-invalid='true'], #step-details select[aria-invalid='true'] { border-color: var(--color-primary); border-width: 2px; }
   .terms-box { max-height: 16rem; overflow-y: auto; margin: 0.75rem 0; padding: 1rem 1.5rem; border: 1px solid var(--color-border); border-radius: 0.85rem; background: var(--color-surface-soft); font-size: 0.85rem; line-height: 1.7; display: grid; gap: 0.5rem; }
   .terms-translation-note { margin: 0 0 0.75rem; font-size: 0.78rem; font-style: italic; color: var(--color-ink-muted); }
   .terms-warning { margin: 0 0 1rem; padding: 0.65rem 0.8rem; border-radius: 0.8rem; color: var(--color-primary-text); background: rgb(182 23 51 / 0.09); font-size: 0.85rem; font-weight: 800; text-align: center; }
-  .consent-check { display: flex; align-items: flex-start; gap: 0.6rem; margin-top: 0.75rem; font-size: 0.85rem; font-weight: 600; color: var(--color-ink); }
-  .consent-check input { width: auto; min-height: auto; margin-top: 0.2rem; }
+  #step-details label.consent-check { display: flex; flex-direction: row; align-items: flex-start; gap: 0.6rem; margin-top: 0.75rem; font-size: 0.85rem; font-weight: 600; color: var(--color-ink); cursor: pointer; }
+  #step-details .consent-check input { flex: none; width: 1.5rem; height: 1.5rem; min-height: 0; margin: 0; padding: 0; accent-color: var(--color-primary); }
+  #step-details .consent-check input[aria-invalid='true'] { outline: 2px solid var(--color-primary); outline-offset: 2px; }
   .step2-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 0.75rem; margin-top: 1.5rem; }
   .step2-actions .btn { justify-content: center; min-height: 3.5rem; }
   @media (max-width: 580px) {

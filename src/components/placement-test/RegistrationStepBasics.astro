@@ -83,9 +83,11 @@ const { t } = Astro.props;
     font-weight: 700;
     text-align: center;
   }
-  .card label.track-pill:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+  /* Scoped to #step-basics, not .card: .card is RegistrationForm's element, so a
+     scoped `.card ...` selector never matched here (UI-32). */
+  #step-basics label.track-pill:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
   .track-toggle { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-  .card label.track-pill {
+  #step-basics label.track-pill {
     position: relative;
     flex: 1;
     display: flex;
@@ -104,14 +106,15 @@ const { t } = Astro.props;
     cursor: pointer;
     transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease), color var(--motion-fast) var(--ease);
   }
-  .track-pill input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
-  .card label.track-pill:has(input:checked) {
+  #step-basics .track-pill input { position: absolute; inset: 0; width: 100%; height: 100%; min-height: 0; margin: 0; padding: 0; opacity: 0; cursor: pointer; }
+  #step-basics label.track-pill:has(input:checked) {
     border-color: var(--color-primary);
     background: var(--color-primary);
     color: #fff;
     box-shadow: 0 8px 20px rgb(182 23 51 / 0.18);
   }
-  .card label.track-pill:has(input:focus-visible) { outline: 3px solid rgb(182 23 51 / 0.12); outline-offset: 2px; }
+  #step-basics label.track-pill:has(input:focus-visible) { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+  #step-basics input[aria-invalid='true'] { border-color: var(--color-primary); border-width: 2px; }
   @media (max-width: 580px) {
     .form-grid { grid-template-columns: 1fr; }
     .track-toggle { grid-template-columns: 1fr; }

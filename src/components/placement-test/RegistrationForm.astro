@@ -30,6 +30,7 @@ const { locale, t } = Astro.props;
     role="alert"
     hidden
     data-default-message={t('registration.error')}
+    data-fix-fields={t('registration.fixFields')}
   >{t('registration.error')}</p>
 </form>
 
@@ -135,18 +136,71 @@ const { locale, t } = Astro.props;
     });
   });
 
-  // --- Step navigation ---
-  function namePartsValid(): boolean {
-    return ['firstName', 'fatherName', 'grandfatherName', 'familyName'].every((name) => {
-      const input = form.querySelector<HTMLInputElement>(`input[name="${name}"]`)!;
-      return NAME_RE.test(input.value);
-    });
+  // --- Field-level errors (WCAG 3.3.1): mark every invalid field and name them in the alert ---
+  const input = (name: string) => form.querySelector<HTMLInputElement>(`[name="${name}"]`)!;
+
+  function fieldLabel(el: HTMLElement): string {
+    const type = (el as HTMLInputElement).type;
+    if (type === 'radio' || type === 'checkbox') {
+      const legend = el.closest('fieldset')?.querySelector('legend');
+      return legend?.firstChild?.textContent?.trim() ?? '';
+    }
+    return el.closest('label')?.querySelector('span')?.textContent?.trim() ?? '';
   }
 
-  function step1Valid(): boolean {
-    const phone = form.querySelector<HTMLInputElement>('input[name="phone"]')!;
+  function showFieldErrors(invalid: HTMLElement[]): boolean {
+    form.querySelectorAll('[aria-invalid]').forEach((el) => {
+      el.removeAttribute('aria-invalid');
+      el.removeAttribute('aria-describedby');
+    });
+    if (!invalid.length) {
+      errorEl.hidden = true;
+      return true;
+    }
+    invalid.forEach((el) => {
+      el.setAttribute('aria-invalid', 'true');
+      el.setAttribute('aria-describedby', errorEl.id);
+    });
+    const names = [...new Set(invalid.map(fieldLabel).filter(Boolean))];
+    errorEl.textContent = `${errorEl.dataset.fixFields} ${names.join(isAr ? '، ' : ', ')}`;
+    errorEl.hidden = false;
+    invalid[0].focus();
+    return false;
+  }
+
+  // Clear the mark as soon as the visitor edits the field (whole group for radios/checkboxes).
+  const clearMark = (event: Event) => {
+    const el = event.target as HTMLInputElement;
+    if (!el.name) return;
+    form.querySelectorAll(`[name="${el.name}"][aria-invalid]`).forEach((m) => m.removeAttribute('aria-invalid'));
+  };
+  form.addEventListener('input', clearMark);
+  form.addEventListener('change', clearMark);
+
+  // Native validation (step 2 submit) fires `invalid` on every invalid control; collect them all.
+  // setTimeout, not a microtask: microtasks run between the individual `invalid` events.
+  let invalidBatch: HTMLElement[] = [];
+  form.addEventListener('invalid', (event) => {
+    invalidBatch.push(event.target as HTMLElement);
+    if (invalidBatch.length === 1) {
+      setTimeout(() => {
+        showFieldErrors(invalidBatch);
+        invalidBatch = [];
+      });
+    }
+  }, true);
+
+  // --- Step navigation ---
+  function step1Invalid(): HTMLElement[] {
+    const invalid: HTMLElement[] = [];
+    if (!(form.querySelector('input[name="track"]:checked'))) invalid.push(adultsInput);
+    for (const name of ['firstName', 'fatherName', 'grandfatherName', 'familyName']) {
+      if (!NAME_RE.test(input(name).value)) invalid.push(input(name));
+    }
+    if (!PHONE_RE.test(input('phone').value)) invalid.push(input('phone'));
     const age = computeAge(dobInput.value);
-    return namePartsValid() && PHONE_RE.test(phone.value) && Number.isFinite(age) && age >= 4 && age <= 100;
+    if (!(Number.isFinite(age) && age >= 4 && age <= 100)) invalid.push(dobInput);
+    return invalid;
   }
 
   const step1Next = document.getElementById('step1-next') as HTMLButtonElement;
@@ -154,12 +208,7 @@ const { locale, t } = Astro.props;
   const step2Submit = document.getElementById('step2-submit') as HTMLButtonElement;
 
   step1Next.addEventListener('click', () => {
-    if (!step1Valid()) {
-      errorEl.hidden = false;
-      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى ملء جميع الحقول بشكل صحيح' : 'Please fill all fields correctly';
-      return;
-    }
-    errorEl.hidden = true;
+    if (!showFieldErrors(step1Invalid())) return;
     stepBasics.hidden = true;
     stepDetails.hidden = false;
     step2Submit.disabled = false;
@@ -180,19 +229,11 @@ const { locale, t } = Astro.props;
     event.preventDefault();
     errorEl.hidden = true;
 
-    const idNumberInput = form.querySelector<HTMLInputElement>('input[name="idNumber"]')!;
-    const nationalityInput = form.querySelector<HTMLInputElement>('input[name="nationality"]')!;
-    if (!ID_NUMBER_RE.test(idNumberInput.value) || !nationalityInput.value.trim()) {
-      errorEl.hidden = false;
-      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى ملء رقم الهوية والجنسية بشكل صحيح' : 'Please enter ID number and nationality correctly';
-      return;
-    }
-    const emailInput = form.querySelector<HTMLInputElement>('input[name="email"]')!;
-    if (emailInput.value && !EMAIL_RE.test(emailInput.value)) {
-      errorEl.hidden = false;
-      errorEl.textContent = form.dataset.locale === 'ar' ? 'يرجى إدخال بريد إلكتروني صحيح' : 'Please enter a valid email';
-      return;
-    }
+    const invalid: HTMLElement[] = [];
+    if (!ID_NUMBER_RE.test(input('idNumber').value)) invalid.push(input('idNumber'));
+    if (!input('nationality').value.trim()) invalid.push(input('nationality'));
+    if (input('email').value && !EMAIL_RE.test(input('email').value)) invalid.push(input('email'));
+    if (!showFieldErrors(invalid)) return;
 
     const formData = new FormData(form);
     const referralSocialChannels = formData.getAll('referralSocialChannels');
