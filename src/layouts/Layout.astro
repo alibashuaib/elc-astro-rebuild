@@ -18,9 +18,11 @@ interface Props {
   ogImage?: string;
   /** suppress search-engine indexing (e.g. internal/staff-only pages) */
   noindex?: boolean;
+  /** Staff-only pages (admin) hide the visitor WhatsApp button. */
+  staff?: boolean;
 }
 
-const { locale, path, title, description, jsonLd, ogImage, noindex } = Astro.props;
+const { locale, path, title, description, jsonLd, ogImage, noindex, staff } = Astro.props;
 const t = useTranslations(locale);
 const dir = localeDir[locale];
 
@@ -108,6 +110,6 @@ const ldEntries = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       <slot />
     </main>
     <Footer locale={locale} />
-    <WhatsAppButton label={t('whatsapp.label')} />
+    {!staff && <WhatsAppButton label={t('whatsapp.label')} />}
   </body>
 </html>

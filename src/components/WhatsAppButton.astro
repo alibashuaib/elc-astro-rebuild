@@ -21,7 +21,14 @@ const phone = '966591799917';
   </svg>
 </a>
 
+<script>
+  const fab = document.querySelector<HTMLElement>('.whatsapp-fab');
+  document.addEventListener('placement:started', () => fab?.setAttribute('hidden', ''));
+  document.addEventListener('placement:done', () => fab?.removeAttribute('hidden'));
+</script>
+
 <style>
+  .whatsapp-fab[hidden] { display: none; }
   .whatsapp-fab {
     position: fixed;
     inset-inline-end: var(--space-4);
