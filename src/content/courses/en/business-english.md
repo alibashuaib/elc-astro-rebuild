@@ -70,7 +70,7 @@ Every organization is unique. ELC begins with a detailed needs assessment to und
 
 ## Our Instructors
 
-ELC's Business English instructors are TEFL/CELTA certified and bring real professional experience. Many have worked in business themselves and understand workplace communication challenges. They deliver engaging, practical training that participants can apply immediately.
+ELC's Business English instructors are certified, experienced teachers who bring real professional experience. Many have worked in business themselves and understand workplace communication challenges. They deliver engaging, practical training that participants can apply immediately.
 
 ## Delivery Options
 

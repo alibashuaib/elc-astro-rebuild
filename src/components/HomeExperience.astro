@@ -31,7 +31,7 @@ const copy = isArabic ? {
   secondaryCta: 'استكشف الدورات',
   proof: [`مسار واضح من ${rtlA1} إلى ${rtlC2}`, 'مدرّبون معتمدون', 'تعلم يناسب هدفك'],
   stats: [
-    { value: '15,000', label: 'تم تدريب أكثر من' },
+    { value: '15,000', label: 'متدرب تم تدريبهم' },
     { value: String(courseCount), label: 'دورات تعليمية' },
     { value: '2010', label: 'تاريخ التأسيس' },
   ],
@@ -176,7 +176,6 @@ const basePath = `/${locale}`;
     {copy.stats.map((stat) => (
       <div class="stat"><AnimatedNumber class="numeric" value={stat.value} /><span>{stat.label}</span></div>
     ))}
-    <div class="stat"><AnimatedNumber class="numeric" value="100%" /><span>{isArabic ? 'تعليم حضوري' : 'in-person learning'}</span></div>
   </div>
 </section>
 
@@ -299,7 +298,7 @@ const basePath = `/${locale}`;
   .floating-top { inset-inline-end: -1rem; top: .35rem; transform: rotate(-2deg); }
   .floating-bottom { inset-inline-start: -.9rem; bottom: 1.5rem; transform: rotate(2deg); }
   .mini-chart { display: grid !important; place-items: center; width: 2rem; height: 2rem; border-radius: .65rem; color: var(--color-coral) !important; background: var(--color-coral-soft); font-size: 1rem !important; font-weight: 900; }
-  .stats-panel { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(4, 1fr); align-items: stretch; gap: 1rem; margin-top: 4rem; padding-block: 1.4rem; }
+  .stats-panel { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; gap: 1rem; margin-top: 4rem; padding-block: 1.4rem; }
   .stat { position: relative; display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: .45rem; padding: 1.25rem 1.35rem; overflow: hidden; border: 1px solid rgb(77 69 65 / .12); border-radius: 1.25rem; background: rgb(255 255 255 / .78); box-shadow: 0 14px 35px rgb(62 48 42 / .08); transition: transform var(--motion-base) var(--ease), box-shadow var(--motion-base) var(--ease); }
   .stat::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; background: linear-gradient(90deg, var(--color-primary), var(--color-coral)); transform-origin: left; }
   :global(:dir(rtl)) .stat::before { transform-origin: right; }
@@ -449,7 +448,7 @@ const basePath = `/${locale}`;
     .hero-copy { max-width: 47rem; }
     .hero-visual { max-width: 38rem; margin-inline: auto; width: 100%; }
     .feature-grid, .course-grid { grid-template-columns: repeat(2, 1fr); }
-    .stats-panel { grid-template-columns: repeat(4, 1fr); }
+    .stats-panel { grid-template-columns: repeat(3, 1fr); }
   }
   @media (max-width: 680px) {
     .hero { padding-top: 3.5rem; }
@@ -463,6 +462,7 @@ const basePath = `/${locale}`;
     /* On a phone-width card these overlap the card's own text. */
     .floating-card { display: none; }
     .stats-panel { grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; padding-block: 1.2rem; }
+    .stat:first-child { grid-column: 1 / -1; }
     .stat { min-height: 7.5rem; padding: 1rem; gap: .4rem; }
     .stat :global(strong) { font-size: clamp(1.65rem, 9vw, 2.25rem); }
     .stat span { font-size: .7rem; }

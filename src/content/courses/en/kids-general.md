@@ -124,7 +124,7 @@ Learning English should be fun and engaging for children. Our instructors use pl
 
 ### Classroom Features
 
-- **Small class sizes** — maximum 12 students per class for individual attention
+- **Small class sizes** — small groups for individual attention
 - **Age-appropriate materials** — textbooks and activities designed specifically for children
 - **Interactive games and activities** — vocabulary games, storytelling, arts and crafts
 - **Supportive teachers** — patient, energetic instructors trained in child development
