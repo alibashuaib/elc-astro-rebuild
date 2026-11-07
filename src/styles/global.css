@@ -49,6 +49,8 @@ html, body { margin: 0; padding: 0; }
 html {
   background: var(--color-bg);
   scroll-behavior: smooth;
+  /* Keep focused or scrolled-to elements clear of the sticky header (5.25rem). */
+  scroll-padding-top: 6.5rem;
 }
 
 body {

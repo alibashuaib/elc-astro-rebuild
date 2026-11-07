@@ -173,7 +173,7 @@ The public website is a fully static build with no server runtime (`astro.config
 
 ### Hardcoded WhatsApp and phone numbers in multiple places
 
-**What happens:** The WhatsApp number `966546656000` is hard-coded in `src/pages/[lang]/placement-test/index.astro` and again in `src/components/WhatsAppButton.astro`. Organization phone numbers are repeated in `src/lib/schema.ts`.
+**What happens:** The WhatsApp number `966591799917` is hard-coded in `src/pages/[lang]/placement-test/index.astro` and again in `src/components/WhatsAppButton.astro`. Organization phone numbers are repeated in `src/lib/schema.ts`.
 **Why it's wrong:** A number change requires editing several files, and the JSON-LD and visible UI can drift.
 **Do this instead:** Centralize contact constants in one module under `src/lib/` and import them into `schema.ts`, the placement page, and `WhatsAppButton.astro`.
 
