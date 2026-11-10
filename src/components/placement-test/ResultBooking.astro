@@ -30,6 +30,7 @@ const { t, locale, whatsappNumber } = Astro.props;
     <span aria-hidden="true">02</span>
     <h3>{t('placementTest.bookingHeading')}</h3>
   </div>
+  <p id="pt-slots-error" class="pt-slots-error" role="alert" hidden>{t('placementTest.slotTaken')}</p>
   <ul id="pt-slots" class="pt-slots"></ul>
   <a id="pt-whatsapp" class="btn btn-primary" hidden target="_blank" rel="noopener">
     {t('placementTest.whatsappConfirm')}
@@ -45,6 +46,7 @@ const { t, locale, whatsappNumber } = Astro.props;
   const section = document.getElementById('placement-result') as HTMLElement;
   const levelEl = document.getElementById('pt-level') as HTMLElement;
   const slotsEl = document.getElementById('pt-slots') as HTMLElement;
+  const slotsErrorEl = document.getElementById('pt-slots-error') as HTMLElement;
   const waLink = document.getElementById('pt-whatsapp') as HTMLAnchorElement;
   const applyLink = document.getElementById('pt-apply') as HTMLAnchorElement;
   const whatsappNumber = section.dataset.whatsappNumber ?? '';
@@ -84,7 +86,8 @@ const { t, locale, whatsappNumber } = Astro.props;
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'btn btn-outline';
-      btn.textContent = new Intl.DateTimeFormat(locale, {
+      btn.textContent = new Intl.DateTimeFormat(`${locale}-u-nu-latn-ca-gregory`, {
+        timeZone: 'Asia/Riyadh',
         weekday: 'short',
         month: 'short',
         day: 'numeric',
@@ -94,7 +97,7 @@ const { t, locale, whatsappNumber } = Astro.props;
       btn.addEventListener('click', async () => {
         const result = await createBooking(detail.sessionId, slot.id);
         if ('error' in result) {
-          alert('That slot just filled up — please pick another.');
+          slotsErrorEl.hidden = false;
           // The design spec requires re-fetching the slot list so the student picks
           // from an up-to-date set rather than clicking the now-stale, already-full slot again.
           await renderSlots(detail);
@@ -103,7 +106,7 @@ const { t, locale, whatsappNumber } = Astro.props;
         const message = messageTemplate
           .replace('{name}', studentName)
           .replace('{level}', formatLevel(detail))
-          .replace('{time}', new Date(slot.starts_at).toLocaleString(`${locale}-u-nu-latn`));
+          .replace('{time}', new Date(slot.starts_at).toLocaleString(`${locale}-u-nu-latn-ca-gregory`, { timeZone: 'Asia/Riyadh' }));
         const text = encodeURIComponent(message);
         waLink.href = `https://wa.me/${whatsappNumber}?text=${text}`;
         waLink.hidden = false;
@@ -125,6 +128,11 @@ const { t, locale, whatsappNumber } = Astro.props;
 </script>
 
 <style>
+  .pt-slots-error {
+    margin: 0;
+    color: var(--color-primary-text);
+    font-weight: 600;
+  }
   .card {
     display: grid;
     gap: 1.5rem;

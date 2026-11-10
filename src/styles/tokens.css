@@ -25,7 +25,32 @@
   --color-navy: #292b2f;
   --color-ink: #37393d;
   --color-ink-muted: #6c6f74;
+  /* Muted text on tinted surfaces (course info cards), where ink-muted drops
+     below 4.5:1. Same value as --color-mint-ink, but it flips for dark mode. */
+  --color-ink-subtle: #5b5e62;
   --color-border: #e4dfda;
+
+  /* Course palettes (course detail pages): accent text, soft tint (also the
+     hero gradient start) and hero gradient end. Ends are kept light enough
+     for --color-ink text to stay at or above 4.5:1. */
+  --course-kids-accent: #41670e;
+  --course-kids-soft: #dff5ae;
+  --course-kids-end: #a9d96b;
+  --course-adults-accent: #29497d;
+  --course-adults-soft: #dce8ff;
+  --course-adults-end: #abc4f0;
+  --course-women-accent: #8b1647;
+  --course-women-soft: #f9d1df;
+  --course-women-end: #e889ad;
+  --course-pup-accent: #824500;
+  --course-pup-soft: #ffe0a8;
+  --course-pup-end: #f4ad54;
+  --course-ielts-accent: #8d112b;
+  --course-ielts-soft: #f8c9d1;
+  --course-ielts-end: #ec8a9b;
+  --course-business-accent: #0d623a;
+  --course-business-soft: #cbeed9;
+  --course-business-end: #84d0a4;
   --color-border-strong: #cec8c1;
   --color-header-bg: rgb(255 255 255 / .9);
 
@@ -119,6 +144,25 @@
     --color-mint-soft: #303236;
     --color-yellow-soft: #392f20;
     --color-blue-soft: #35262b;
+    --color-ink-subtle: #a3a6ab;
+    --course-kids-accent: #c3ed79;
+    --course-kids-soft: #3d5427;
+    --course-kids-end: #17200f;
+    --course-adults-accent: #b8caef;
+    --course-adults-soft: #384967;
+    --course-adults-end: #181d2c;
+    --course-women-accent: #ff9fbe;
+    --course-women-soft: #592e46;
+    --course-women-end: #29111f;
+    --course-pup-accent: #ffc879;
+    --course-pup-soft: #573715;
+    --course-pup-end: #25130a;
+    --course-ielts-accent: #ff9aaa;
+    --course-ielts-soft: #592633;
+    --course-ielts-end: #260e16;
+    --course-business-accent: #82e4a5;
+    --course-business-soft: #28583d;
+    --course-business-end: #102718;
   }
 }
 :root[data-theme="dark"] {
@@ -141,4 +185,23 @@
   --color-mint-soft: #303236;
   --color-yellow-soft: #392f20;
   --color-blue-soft: #35262b;
+  --color-ink-subtle: #a3a6ab;
+  --course-kids-accent: #c3ed79;
+  --course-kids-soft: #3d5427;
+  --course-kids-end: #17200f;
+  --course-adults-accent: #b8caef;
+  --course-adults-soft: #384967;
+  --course-adults-end: #181d2c;
+  --course-women-accent: #ff9fbe;
+  --course-women-soft: #592e46;
+  --course-women-end: #29111f;
+  --course-pup-accent: #ffc879;
+  --course-pup-soft: #573715;
+  --course-pup-end: #25130a;
+  --course-ielts-accent: #ff9aaa;
+  --course-ielts-soft: #592633;
+  --course-ielts-end: #260e16;
+  --course-business-accent: #82e4a5;
+  --course-business-soft: #28583d;
+  --course-business-end: #102718;
 }

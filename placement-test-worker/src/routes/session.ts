@@ -1,6 +1,6 @@
 import type { Env, StudentInput } from '../types';
 import { readJson } from '../http';
-import { computeTrack, isUnderEleven, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countSessionQuestions, countBandCorrect, countBandAnswered, listAnsweredQuestionIds, setCurrentQuestion, getQuestion } from '../db';
+import { computeTrack, isKidsAge, insertStudent, insertSession, getSession, updateSessionScoring, completeSession, pickNextQuestion, insertResponse, getPassage, countSessionQuestions, countBandCorrect, countBandAnswered, listAnsweredQuestionIds, setCurrentQuestion, getQuestion } from '../db';
 import { initialState, applyAnswer, isDone, finalLevel, finalLevelName, LEVELS_BY_TRACK, STAGE_NAMES_BY_TRACK } from '../scoring';
 import { ADULT_BANDS, BELOW_FIRST_BAND, bandForSequence, isLastBand, evaluateBand, placementLevel, canStillPass, previousBand } from '../bands';
 import { kidsLevelIndex, KIDS_YLE_BY_INDEX } from '../kids';
@@ -113,7 +113,7 @@ export async function handleStartSession(req: Request, env: Env): Promise<Respon
     return json({ error: 'phone must be a Saudi mobile number (05xxxxxxxx)' }, 400);
   }
   const requestedTrack = body.track === 'kids' || body.track === 'adults' ? body.track : computeTrack(body.dob);
-  const track = isUnderEleven(body.dob) ? 'kids' : requestedTrack;
+  const track = isKidsAge(body.dob) ? 'kids' : requestedTrack;
   const studentId = await insertStudent(env, body);
   const sessionId = await insertSession(env, studentId, track);
   const state = initialState();

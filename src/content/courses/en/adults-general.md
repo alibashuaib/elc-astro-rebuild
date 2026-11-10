@@ -133,7 +133,7 @@ Our instructors use communicative language teaching (CLT), where real-world comm
 
 ### Our Instructors
 
-ELC's teaching team holds TEFL/CELTA or equivalent certifications and brings years of experience teaching adult learners across multiple proficiency levels. Instructors understand the adult learning context—time constraints, professional goals, and practical language needs—and tailor instruction accordingly. Our teachers are passionate about helping you reach your English goals.
+ELC's teaching team is made up of certified teachers who bring years of experience teaching adult learners across multiple proficiency levels. Instructors understand the adult learning context—time constraints, professional goals, and practical language needs—and tailor instruction accordingly. Our teachers are passionate about helping you reach your English goals.
 
 ## Why ELC
 
@@ -141,7 +141,7 @@ ELC's teaching team holds TEFL/CELTA or equivalent certifications and brings yea
 - **Small class sizes** — Personalized attention and more speaking opportunities per student
 - **Flexible scheduling** — Morning and evening classes to fit your schedule
 - **Interactive methodology** — 70% active practice, not lecture-based
-- **Qualified instructors** — TEFL/CELTA certified with professional teaching experience
+- **Qualified instructors** — Certified teachers with professional teaching experience
 - **Year-round intakes** — Start your next course when convenient
 
 ## Get Started

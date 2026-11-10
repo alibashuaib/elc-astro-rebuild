@@ -200,7 +200,6 @@ const isArabic = locale === 'ar';
   .course-prose :global(> .progression-divider[data-stage='6']) { --progression-accent: #8b28c8; }
   .course-prose :global(> .progression-divider[data-stage='7']) { --progression-accent: #5429b9; }
   .course-prose :global(> p.progression-card strong) { display: block; margin-bottom: .35rem; color: var(--progression-accent); font-size: 1.02rem; }
-  :global(:dir(rtl)) .program-section:not(.adult-diagram) .course-prose :global(> p.progression-card strong) { direction: ltr; text-align: right; }
   .course-prose :global(> p.progression-card .progression-image) { position: absolute; width: 4.8rem; height: 4.8rem; inset-inline-start: .85rem; top: 1.05rem; object-fit: contain; filter: drop-shadow(0 10px 12px color-mix(in srgb, var(--progression-accent) 18%, transparent)); transition: transform var(--motion-fast) var(--ease); }
   .course-prose :global(> p.progression-card::after) { content: ''; position: absolute; width: 5rem; height: 5rem; inset-inline-end: -2.5rem; bottom: -2.75rem; border-radius: 50%; background: color-mix(in srgb, var(--progression-accent) 12%, transparent); }
   .course-prose :global(> p.progression-card:hover) { transform: translateY(-3px); border-color: var(--progression-accent); box-shadow: 0 18px 34px color-mix(in srgb, var(--progression-accent) 16%, transparent); }

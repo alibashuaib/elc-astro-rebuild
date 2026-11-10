@@ -5,8 +5,8 @@ interface Props {
   label: string;
 }
 const { label } = Astro.props;
-// Real number, pulled from the live elc.com.sa contact page (0546656000).
-const phone = '966546656000';
+// ELC WhatsApp (0591799917), the number used site-wide since 2026-11-03.
+const phone = '966591799917';
 ---
 
 <a
@@ -21,7 +21,14 @@ const phone = '966546656000';
   </svg>
 </a>
 
+<script>
+  const fab = document.querySelector<HTMLElement>('.whatsapp-fab');
+  document.addEventListener('placement:started', () => fab?.setAttribute('hidden', ''));
+  document.addEventListener('placement:done', () => fab?.removeAttribute('hidden'));
+</script>
+
 <style>
+  .whatsapp-fab[hidden] { display: none; }
   .whatsapp-fab {
     position: fixed;
     inset-inline-end: var(--space-4);

@@ -10,7 +10,7 @@ interface Props {
 
 const { locale, title, summary, publishDate } = Astro.props;
 const isArabic = locale === 'ar';
-const formattedDate = publishDate.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', numberingSystem: 'latn' });
+const formattedDate = publishDate.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric', numberingSystem: 'latn', calendar: 'gregory' });
 ---
 
 <article class="container article-page">
@@ -53,7 +53,7 @@ const formattedDate = publishDate.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US
   .article-body :global(ul), .article-body :global(ol) { padding-inline-start: 1.35rem; }
   .article-body :global(li) { margin-bottom: .65rem; padding-inline-start: .35rem; }
   .article-footer { max-width: 48rem; margin: 4rem auto 0; padding-top: 1.5rem; border-top: 1px solid var(--color-border); }
-  .article-footer a { display: inline-flex; align-items: center; gap: .65rem; color: var(--color-primary-text); font-size: .85rem; font-weight: 800; }
+  .article-footer a { display: inline-flex; min-height: 2.75rem; align-items: center; gap: .65rem; color: var(--color-primary-text); font-size: .85rem; font-weight: 800; }
   :global(:dir(rtl)) .article-footer a span { transform: scaleX(-1); }
   @media (max-width: 560px) { .article-header { border-radius: 1.5rem; } .article-meta { align-items: flex-start; flex-direction: column; margin-bottom: 1.7rem; } }
 </style>

@@ -21,7 +21,7 @@ async function startKidsTest(page: Page) {
   await page.goto('/en/placement-test/');
   await page.getByLabel('Full name').fill('Smoke Test');
   await page.getByLabel('Mobile number').fill('0500000000');
-  // Under 11, so the form assigns the kids track on its own.
+  // 12 or under, so the form assigns the kids track on its own.
   await page.getByLabel('Date of birth').fill('2018-01-01');
   await page.getByLabel('Guardian name').fill('Guardian');
   await page.getByRole('button', { name: 'Start test' }).click();
@@ -140,13 +140,13 @@ test('kids counting question accepts a dragged number in the empty slot', async 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);
 });
 
-test('the registration form assigns under-11 students to the kids track', async ({ page }) => {
+test('the registration form assigns students aged 12 and under to the kids track', async ({ page }) => {
   const errors = failOnConsoleErrors(page);
 
   await page.goto('/en/placement-test/');
   await page.getByLabel('Date of birth').fill('2018-01-01');
 
-  await expect(page.getByText('Students under 11 are automatically assigned to the Kids test.')).toBeVisible();
+  await expect(page.getByText('Students aged 12 and under are automatically assigned to the Kids test.')).toBeVisible();
   await expect(page.getByLabel('Guardian name')).toBeVisible();
 
   expect(errors, `console errors:\n${errors.join('\n')}`).toEqual([]);

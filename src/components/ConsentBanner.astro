@@ -64,7 +64,7 @@ const gtmId = import.meta.env.PUBLIC_GTM_ID as string | undefined;
     position: fixed;
     inset-inline: var(--space-3);
     bottom: var(--space-3);
-    z-index: 60;
+    z-index: 61; /* above the WhatsApp button (60), so it never covers Accept */
     display: flex;
     flex-wrap: wrap;
     align-items: center;

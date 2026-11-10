@@ -38,7 +38,7 @@ export function computeTrack(dob: string): Track {
   return age <= 12 ? 'kids' : 'adults';
 }
 
-export function isUnderEleven(dob: string): boolean {
+export function isKidsAge(dob: string): boolean {
   const birth = new Date(dob);
   if (Number.isNaN(birth.getTime())) return false;
   const today = new Date();
@@ -47,7 +47,7 @@ export function isUnderEleven(dob: string): boolean {
     today.getUTCMonth() > birth.getUTCMonth() ||
     (today.getUTCMonth() === birth.getUTCMonth() && today.getUTCDate() >= birth.getUTCDate());
   if (!hadBirthdayThisYear) age--;
-  return age < 11;
+  return age <= 12;
 }
 
 export async function insertStudent(env: Env, input: StudentInput): Promise<string> {

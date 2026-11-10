@@ -122,7 +122,7 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     margin: 0;
     padding: 0;
   }
-  .main-nav a {
+  .main-nav a:not(.btn) {
     display: inline-flex;
     padding: .55rem .72rem;
     border-radius: 999px;
@@ -130,7 +130,7 @@ const languageLabel = otherLocale === 'ar' ? 'العربية' : 'English';
     font-size: .84rem;
     font-weight: 650;
   }
-  .main-nav a:hover, .main-nav a[aria-current='page'] { color: var(--color-primary-text); background: var(--color-blue-soft); text-decoration: none; }
+  .main-nav a:not(.btn):hover, .main-nav a:not(.btn)[aria-current='page'] { color: var(--color-primary-text); background: var(--color-blue-soft); text-decoration: none; }
   .mobile-nav-action { display: none; }
   .header-actions {
     display: flex;

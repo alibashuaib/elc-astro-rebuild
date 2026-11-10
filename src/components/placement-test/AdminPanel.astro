@@ -14,6 +14,7 @@
     <input id="admin-password" type="password" autocomplete="current-password" />
   </label>
   <button id="admin-login-btn" type="button" class="btn btn-primary">Log in</button>
+  <p id="admin-login-error" class="admin-error" role="alert" hidden>Wrong username or password. Please try again.</p>
 </section>
 
 <section id="admin-dashboard" class="dashboard" hidden>
@@ -21,7 +22,7 @@
     <h2>Slots</h2>
     <form id="slot-form" class="slot-form">
       <label>
-        Starts at
+        Starts at (Riyadh time)
         <input id="slot-starts-at" type="datetime-local" required />
       </label>
       <label>
@@ -38,6 +39,19 @@
     <ul id="booking-list" class="admin-list"></ul>
   </div>
 
+  <div class="card">
+    <h2>Applications</h2>
+    <label>
+      Filter by status
+      <select id="application-status-filter">
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </label>
+    <ul id="application-list" class="admin-list"></ul>
+  </div>
   <div class="card">
     <h2>Question bank</h2>
     <form id="question-form" class="question-form">
@@ -86,19 +100,6 @@
     <ul id="question-list" class="admin-list"></ul>
   </div>
 
-  <div class="card">
-    <h2>Applications</h2>
-    <label>
-      Filter by status
-      <select id="application-status-filter">
-        <option value="">All</option>
-        <option value="pending">Pending</option>
-        <option value="approved">Approved</option>
-        <option value="rejected">Rejected</option>
-      </select>
-    </label>
-    <ul id="application-list" class="admin-list"></ul>
-  </div>
 </section>
 
 <script>
@@ -117,15 +118,24 @@
   document.getElementById('admin-login-btn')!.addEventListener('click', async () => {
     const username = (document.getElementById('admin-username') as HTMLInputElement).value;
     const password = (document.getElementById('admin-password') as HTMLInputElement).value;
+    document.getElementById('admin-login-error')!.hidden = true;
     try {
       await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ username, password }) });
       document.getElementById('admin-login')!.setAttribute('hidden', '');
       document.getElementById('admin-dashboard')!.removeAttribute('hidden');
       await loadAll();
     } catch {
-      alert('Login failed');
+      const error = document.getElementById('admin-login-error')!;
+      error.hidden = false;
+      (document.getElementById('admin-password') as HTMLInputElement).focus();
     }
   });
+
+  // UI-23: the centre runs on Riyadh time (UTC+3, no DST), whatever the staff device is set to.
+  const riyadh = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Riyadh', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const when = (iso: string) => riyadh.format(new Date(iso));
+  // UI-25 / ADM-03: show only the last 4 characters of an ID number.
+  const maskId = (id: string) => (id.length > 4 ? `${'•'.repeat(id.length - 4)}${id.slice(-4)}` : id);
 
   async function loadAll() {
     const [{ slots }, { bookings }, { questions }, { applications }] = await Promise.all([
@@ -139,12 +149,13 @@
     slotList.innerHTML = '';
     slots.forEach((s: any) => {
       const li = document.createElement('li');
-      li.textContent = `${new Date(s.starts_at).toLocaleString()} — ${s.booked_count}/${s.capacity} `;
+      li.textContent = `${when(s.starts_at)} — ${s.booked_count}/${s.capacity} booked `;
       const del = document.createElement('button');
       del.type = 'button';
       del.className = 'btn btn-outline';
       del.textContent = 'Delete';
       del.addEventListener('click', async () => {
+        if (!confirm(`Delete the slot on ${when(s.starts_at)}?`)) return;
         const res = await fetch(`${BASE}/api/admin/slots/${s.id}`, { method: 'DELETE', credentials: 'include' });
         if (res.status === 409) {
           alert('This slot has confirmed bookings and cannot be deleted.');
@@ -164,7 +175,7 @@
     bookingList.innerHTML = '';
     bookings.forEach((b: any) => {
       const li = document.createElement('li');
-      li.textContent = `${b.student_name} (${b.phone}) — level ${b.estimated_level} — ${new Date(b.starts_at).toLocaleString()}`;
+      li.textContent = `${b.student_name} (${b.phone}) — level ${b.estimated_level} — ${when(b.starts_at)}`;
       bookingList.appendChild(li);
     });
 
@@ -178,6 +189,7 @@
       toggle.className = 'btn btn-outline';
       toggle.textContent = q.active ? 'Deactivate' : 'Activate';
       toggle.addEventListener('click', async () => {
+        if (!confirm(`${q.active ? 'Deactivate' : 'Activate'} this question?`)) return;
         await api(`/api/admin/questions/${q.id}`, { method: 'PATCH', body: JSON.stringify({ active: !q.active }) });
         loadAll();
       });
@@ -190,9 +202,14 @@
     const idTypeLabels: Record<string, string> = { national_id: 'National ID', iqama: 'Iqama', passport: 'Passport' };
     applications.forEach((a: any) => {
       const li = document.createElement('li');
-      const summary = document.createElement('span');
+      const summary = document.createElement('div');
+      summary.className = 'admin-row';
       const idTypeLabel = idTypeLabels[a.id_type] ?? a.id_type;
-      summary.textContent = `${a.student_name} (${a.phone}) — ${a.email} — ${a.course} — level ${a.estimated_level ?? '—'} — ${idTypeLabel} #${a.id_number} — ${a.status}`;
+      const name = document.createElement('strong');
+      name.textContent = `${a.student_name} · ${a.status}`;
+      const details = document.createElement('span');
+      details.textContent = `${a.course} · level ${a.estimated_level ?? '—'} · ${a.phone} · ${a.email} · ${idTypeLabel} ${maskId(String(a.id_number ?? ''))}`;
+      summary.append(name, details);
       li.appendChild(summary);
 
       if (a.status === 'pending') {
@@ -201,6 +218,7 @@
         approve.className = 'btn btn-primary';
         approve.textContent = 'Approve';
         approve.addEventListener('click', async () => {
+          if (!confirm(`Approve ${a.student_name}'s application? This cannot be undone here.`)) return;
           await api(`/api/admin/applications/${a.application_id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) });
           loadAll();
         });
@@ -209,6 +227,7 @@
         reject.className = 'btn btn-outline';
         reject.textContent = 'Reject';
         reject.addEventListener('click', async () => {
+          if (!confirm(`Reject ${a.student_name}'s application? This cannot be undone here.`)) return;
           await api(`/api/admin/applications/${a.application_id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) });
           loadAll();
         });
@@ -226,7 +245,7 @@
     const capacity = Number((document.getElementById('slot-capacity') as HTMLInputElement).value);
     await api('/api/admin/slots', {
       method: 'POST',
-      body: JSON.stringify({ startsAt: new Date(startsAt).toISOString(), capacity }),
+      body: JSON.stringify({ startsAt: new Date(`${startsAt}:00+03:00`).toISOString(), capacity }),
     });
     await loadAll();
   });
@@ -317,18 +336,18 @@
   .slot-form {
     display: grid;
     gap: 1rem;
-    grid-template-columns: 1fr 1fr auto;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
     align-items: end;
   }
 
   .question-form {
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: end;
     margin-bottom: 1rem;
   }
-  .question-form select {
+  .card select {
     width: 100%;
     min-height: 3.25rem;
     padding: 0.75rem 0.9rem;
@@ -341,6 +360,30 @@
   .question-form button {
     grid-column: 1 / -1;
   }
+  @media (max-width: 40rem) {
+    .slot-form,
+    .question-form {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .card,
+  .card label {
+    min-width: 0;
+  }
+  .admin-error {
+    margin: 0;
+    color: var(--color-primary-text);
+    font-weight: 600;
+  }
+  .admin-list :global(.admin-row) {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+    flex: 1 1 16rem;
+  }
+  .admin-list :global(.admin-row span) {
+    color: var(--color-ink-subtle);
+  }
 
   .admin-list {
     display: grid;
@@ -349,7 +392,8 @@
     padding: 0;
     list-style: none;
   }
-  .admin-list li {
+  /* Rows are built in the script, so they need :global() to get these styles. */
+  .admin-list :global(li) {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -361,5 +405,6 @@
     background: var(--color-surface-soft);
     color: var(--color-ink);
     font-size: 0.9rem;
+    overflow-wrap: anywhere;
   }
 </style>

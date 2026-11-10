@@ -24,13 +24,13 @@ export function organizationSchema(
     telephone: '+966591799917',
     contactPoint: [
       { '@type': 'ContactPoint', telephone: '+966591799917', contactType: 'admissions' },
-      { '@type': 'ContactPoint', telephone: '+966546656000', contactType: 'WhatsApp' },
-      { '@type': 'ContactPoint', telephone: '+966126305553', contactType: 'customer service' },
+      { '@type': 'ContactPoint', telephone: '+966591799917', contactType: 'WhatsApp' },
+      { '@type': 'ContactPoint', telephone: '+966126306030', contactType: 'customer service' },
       { '@type': 'ContactPoint', telephone: '+966126306030', contactType: 'customer service' },
     ],
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
+      streetAddress: 'Inside Arwa International School, Al Fayha District',
       addressLocality: 'Jeddah',
       addressRegion: 'Makkah Province',
       addressCountry: 'SA',
@@ -74,7 +74,7 @@ export function localBusinessSchema(
     telephone: '+966591799917',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
+      streetAddress: 'Inside Arwa International School, Al Fayha District',
       addressLocality: 'Jeddah',
       addressRegion: 'Makkah Province',
       addressCountry: 'SA',
@@ -237,7 +237,7 @@ export function eventSchema(event: {
         name: event.location,
         address: {
           '@type': 'PostalAddress',
-          streetAddress: 'Abdullah Al-Suleiman Street, Al Fayahaa District',
+          streetAddress: 'Inside Arwa International School, Al Fayha District',
           addressLocality: 'Jeddah',
           addressCountry: 'SA',
         },
